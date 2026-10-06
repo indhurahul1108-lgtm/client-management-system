@@ -27,6 +27,9 @@ import Attendance from './pages/staff/Attendance';
 import StaffLeave from './pages/staff/StaffLeave';
 import StaffSalary from './pages/staff/StaffSalary';
 import StaffProfile from './pages/staff/StaffProfile';
+import StaffClients from './pages/staff/StaffClients';
+import StaffOverdue from './pages/staff/StaffOverdue';
+
 
 // Client pages
 import ClientDashboard from './pages/client/ClientDashboard';
@@ -108,6 +111,12 @@ export default function App() {
           } />
           <Route path="/staff/profile" element={
             <ProtectedRoute roles={['staff']}><StaffProfile /></ProtectedRoute>
+          } />
+          <Route path="/staff/clients" element={
+            <ProtectedRoute roles={['staff']}><StaffClients /></ProtectedRoute>
+          } />
+          <Route path="/staff/overdue" element={
+            <ProtectedRoute roles={['staff']}><StaffOverdue /></ProtectedRoute>
           } />
 
           {/* ── CLIENT ─────────────────────────────────── */}
