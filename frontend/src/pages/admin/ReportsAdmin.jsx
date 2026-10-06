@@ -1,7 +1,7 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import DashboardLayout from '../../components/DashboardLayout';
 import { DUMMY_ATTENDANCE, DUMMY_LEAVES, DUMMY_SALARIES, DUMMY_OVERDUE, DUMMY_USERS } from '../../data/dummyData.jsx';
-import { BarChart2, CalendarCheck, FileText, DollarSign, AlertTriangle } from 'lucide-react';
+import { BarChart2, CalendarCheck, FileText, DollarSign, AlertTriangle, Printer, Download } from 'lucide-react';
 
 const TABS = [
   { id: 'attendance', label: 'Attendance', icon: CalendarCheck },
@@ -24,13 +24,71 @@ function Badge({ status }) {
   return <span className={`text-xs px-2.5 py-1 rounded-full font-semibold capitalize ${map[status] || 'bg-slate-100 text-slate-600'}`}>{status}</span>;
 }
 
+const TAB_LABELS = { attendance: 'Attendance Report', leave: 'Leave Report', salary: 'Salary Report', overdue: 'Overdue Report' };
+
 export default function ReportsAdmin() {
   const [tab, setTab] = useState('attendance');
 
+  const handlePrint = () => {
+    const title  = TAB_LABELS[tab];
+    const date   = new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'long', year: 'numeric' });
+    const content = document.getElementById('report-content');
+    if (!content) return;
+
+    const printWindow = window.open('', '_blank');
+    printWindow.document.write(`
+      <html>
+        <head>
+          <title>${title}</title>
+          <style>
+            * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; font-size: 12px; }
+            body { padding: 24px; color: #1e293b; }
+            .header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #1d4ed8; padding-bottom: 12px; margin-bottom: 20px; }
+            .company { font-size: 18px; font-weight: bold; color: #1d4ed8; }
+            .report-title { font-size: 14px; font-weight: bold; margin-top: 4px; }
+            .date { font-size: 11px; color: #64748b; margin-top: 4px; }
+            table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+            th { background: #1d4ed8; color: white; padding: 8px 10px; text-align: left; font-size: 11px; text-transform: uppercase; }
+            td { padding: 8px 10px; border-bottom: 1px solid #e2e8f0; }
+            tr:nth-child(even) td { background: #f8fafc; }
+            .badge { display: inline-block; padding: 2px 8px; border-radius: 20px; font-size: 10px; font-weight: bold; }
+            .green { background: #dcfce7; color: #166534; }
+            .red   { background: #fee2e2; color: #991b1b; }
+            .yellow{ background: #fef9c3; color: #854d0e; }
+            .blue  { background: #dbeafe; color: #1e40af; }
+            .footer { margin-top: 30px; text-align: center; font-size: 10px; color: #94a3b8; border-top: 1px solid #e2e8f0; padding-top: 12px; }
+            .stats { display: flex; gap: 16px; margin-bottom: 16px; }
+            .stat-box { flex: 1; background: #f1f5f9; padding: 10px 14px; border-radius: 8px; text-align: center; }
+            .stat-val { font-size: 20px; font-weight: bold; color: #1d4ed8; }
+            .stat-lbl { font-size: 10px; color: #64748b; margin-top: 2px; }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <div>
+              <div class="company">Client Management System</div>
+              <div class="report-title">${title}</div>
+              <div class="date">Generated: ${date}</div>
+            </div>
+            <div style="text-align:right; color:#64748b; font-size:11px;">
+              <div>Printed by: Admin</div>
+              <div>${new Date().toLocaleTimeString('en-IN')}</div>
+            </div>
+          </div>
+          ${content.innerHTML}
+          <div class="footer">This is a system-generated report. Client Management System © ${new Date().getFullYear()}</div>
+        </body>
+      </html>
+    `);
+    printWindow.document.close();
+    printWindow.focus();
+    setTimeout(() => { printWindow.print(); printWindow.close(); }, 500);
+  };
+
   return (
     <DashboardLayout title="Reports">
-      {/* Tab navigation */}
-      <div className="flex gap-2 mb-6 flex-wrap">
+      {/* Tab navigation + Print Button */}
+      <div className="flex flex-wrap items-center gap-2 mb-6">
         {TABS.map(({ id, label, icon: Icon }) => (
           <button key={id} onClick={() => setTab(id)}
             className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition
@@ -38,8 +96,13 @@ export default function ReportsAdmin() {
             <Icon size={15} /> {label}
           </button>
         ))}
+        <button onClick={handlePrint}
+          className="ml-auto flex items-center gap-2 bg-green-600 text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-green-700 transition">
+          <Printer size={15} /> Print / PDF
+        </button>
       </div>
 
+      <div id="report-content">
       {/* Attendance Report */}
       {tab === 'attendance' && (
         <div className="space-y-6">
@@ -203,6 +266,7 @@ export default function ReportsAdmin() {
           </div>
         </div>
       )}
+      </div>{/* end report-content */}
     </DashboardLayout>
   );
 }

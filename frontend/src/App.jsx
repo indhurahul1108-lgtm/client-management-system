@@ -35,6 +35,9 @@ import StaffOverdue from './pages/staff/StaffOverdue';
 
 // Client pages
 import ClientDashboard from './pages/client/ClientDashboard';
+import ClientWork from './pages/client/ClientWork';
+import ClientProfile from './pages/client/ClientProfile';
+
 
 export default function App() {
   return (
@@ -131,6 +134,13 @@ export default function App() {
           <Route path="/client" element={
             <ProtectedRoute roles={['client']}><ClientDashboard /></ProtectedRoute>
           } />
+          <Route path="/client/work" element={
+            <ProtectedRoute roles={['client']}><ClientWork /></ProtectedRoute>
+          } />
+          <Route path="/client/profile" element={
+            <ProtectedRoute roles={['client']}><ClientProfile /></ProtectedRoute>
+          } />
+
 
           {/* Catch-all */}
           <Route path="*" element={<Navigate to="/login" replace />} />
