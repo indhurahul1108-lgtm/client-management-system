@@ -17,6 +17,8 @@ import LeaveAdmin from './pages/admin/LeaveAdmin';
 import SalaryAdmin from './pages/admin/SalaryAdmin';
 import OverdueAdmin from './pages/admin/OverdueAdmin';
 import ReportsAdmin from './pages/admin/ReportsAdmin';
+import AssignTasks from './pages/admin/AssignTasks';
+import SystemSettings from './pages/admin/SystemSettings';
 
 // Manager pages
 import ManagerDashboard from './pages/manager/ManagerDashboard';
@@ -71,6 +73,12 @@ export default function App() {
           } />
           <Route path="/admin/reports" element={
             <ProtectedRoute roles={['admin']}><ReportsAdmin /></ProtectedRoute>
+          } />
+          <Route path="/admin/assign-tasks" element={
+            <ProtectedRoute roles={['admin']}><AssignTasks /></ProtectedRoute>
+          } />
+          <Route path="/admin/settings" element={
+            <ProtectedRoute roles={['admin']}><SystemSettings /></ProtectedRoute>
           } />
 
           {/* ── MANAGER ────────────────────────────────── */}

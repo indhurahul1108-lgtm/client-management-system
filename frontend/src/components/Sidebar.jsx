@@ -4,20 +4,22 @@ import { useAuth } from '../context/AuthContext';
 import {
   LayoutDashboard, Users, UserCheck, Building2, CalendarCheck,
   FileText, DollarSign, AlertTriangle, BarChart2, LogOut,
-  ChevronLeft, ChevronRight, ClipboardList, User, Clock, Menu, X
+  ChevronLeft, ChevronRight, ClipboardList, User, Clock, Menu, X, Settings
 } from 'lucide-react';
 
 const MENUS = {
   admin: [
-    { label: 'Dashboard',   icon: LayoutDashboard, path: '/admin' },
-    { label: 'Managers',    icon: UserCheck,       path: '/admin/managers' },
-    { label: 'Staff',       icon: Users,           path: '/admin/staff' },
-    { label: 'Clients',     icon: Building2,       path: '/admin/clients' },
-    { label: 'Attendance',  icon: CalendarCheck,   path: '/admin/attendance' },
-    { label: 'Leave',       icon: FileText,        path: '/admin/leave' },
-    { label: 'Salary',      icon: DollarSign,      path: '/admin/salary' },
-    { label: 'Overdue',     icon: AlertTriangle,   path: '/admin/overdue' },
-    { label: 'Reports',     icon: BarChart2,       path: '/admin/reports' },
+    { label: 'Dashboard',    icon: LayoutDashboard, path: '/admin' },
+    { label: 'Managers',     icon: UserCheck,       path: '/admin/managers' },
+    { label: 'Staff',        icon: Users,           path: '/admin/staff' },
+    { label: 'Clients',      icon: Building2,       path: '/admin/clients' },
+    { label: 'Attendance',   icon: CalendarCheck,   path: '/admin/attendance' },
+    { label: 'Leave',        icon: FileText,        path: '/admin/leave' },
+    { label: 'Salary',       icon: DollarSign,      path: '/admin/salary' },
+    { label: 'Assign Tasks', icon: ClipboardList,   path: '/admin/assign-tasks' },
+    { label: 'Overdue',      icon: AlertTriangle,   path: '/admin/overdue' },
+    { label: 'Reports',      icon: BarChart2,       path: '/admin/reports' },
+    { label: 'Settings',     icon: Settings,        path: '/admin/settings' },
   ],
   manager: [
     { label: 'Dashboard',  icon: LayoutDashboard, path: '/manager' },
