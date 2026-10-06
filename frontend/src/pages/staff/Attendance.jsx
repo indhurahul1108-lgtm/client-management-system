@@ -1,8 +1,8 @@
-﻿import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import DashboardLayout from '../../components/DashboardLayout';
 import { useAuth } from '../../context/AuthContext';
 import { DUMMY_ATTENDANCE } from '../../data/dummyData.jsx';
-import { Camera, MapPin, Clock, CheckCircle, LogIn, LogOut, CalendarCheck } from 'lucide-react';
+import { Camera, MapPin, Clock, CheckCircle, LogIn, LogOut, CalendarCheck, X } from 'lucide-react';
 
 function Badge({ status }) {
   const map = { present: 'bg-green-100 text-green-700', absent: 'bg-red-100 text-red-700', late: 'bg-yellow-100 text-yellow-700' };
@@ -11,186 +11,261 @@ function Badge({ status }) {
 
 export default function StaffAttendance() {
   const { user } = useAuth();
-  const videoRef = useRef(null);
+  const videoRef  = useRef(null);
   const canvasRef = useRef(null);
 
-  const [cameraOpen, setCameraOpen] = useState(false);
-  const [capturedPhoto, setCapturedPhoto] = useState(null);
-  const [location, setLocation] = useState(null);
-  const [punchType, setPunchType] = useState(null); // 'in' | 'out'
-  const [punched, setPunched] = useState({ in: null, out: null });
-  const [loading, setLoading] = useState(false);
-  const [step, setStep] = useState('idle'); // idle | camera | location | done
+  const [punchType,     setPunchType]     = useState(null);   // 'in' | 'out'
+  const [step,          setStep]          = useState('idle'); // idle | camera | composing | confirm
+  const [composedPhoto, setComposedPhoto] = useState(null);  // final photo with overlay
+  const [location,      setLocation]      = useState(null);
+  const [locationText,  setLocationText]  = useState('');
+  const [loadingLoc,    setLoadingLoc]    = useState(false);
+  const [punched,       setPunched]       = useState({ in: null, out: null });
 
   const myHistory = DUMMY_ATTENDANCE.filter(a => a.userId === user?.id);
 
-  // Start camera
+  /* ── helpers ─────────────────────────────────── */
+
+  const stopCamera = () => {
+    if (videoRef.current?.srcObject)
+      videoRef.current.srcObject.getTracks().forEach(t => t.stop());
+  };
+
+  /** Draw date/time/location watermark ON the photo and return dataURL */
+  const composePhoto = (videoEl, lat, lng, locText) => {
+    const canvas = canvasRef.current;
+    const W = videoEl.videoWidth  || 640;
+    const H = videoEl.videoHeight || 480;
+    canvas.width  = W;
+    canvas.height = H;
+    const ctx = canvas.getContext('2d');
+
+    // Mirror (selfie) + draw frame
+    ctx.save();
+    ctx.scale(-1, 1);
+    ctx.drawImage(videoEl, -W, 0, W, H);
+    ctx.restore();
+
+    // --- Watermark bar ---
+    const barH = 100;
+    ctx.fillStyle = 'rgba(0,0,0,0.62)';
+    ctx.fillRect(0, H - barH, W, barH);
+
+    const now     = new Date();
+    const dateStr = now.toLocaleDateString('en-IN',  { day: '2-digit', month: 'short', year: 'numeric' });
+    const timeStr = now.toLocaleTimeString('en-IN',  { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
+    const gps     = lat ? `${lat}, ${lng}` : 'Location unavailable';
+    const place   = locText || gps;
+
+    ctx.fillStyle = '#ffffff';
+    ctx.font      = 'bold 15px Arial, sans-serif';
+    ctx.fillText(`📅  ${dateStr}`, 12, H - barH + 24);
+    ctx.fillText(`🕐  ${timeStr}`, 12, H - barH + 48);
+
+    ctx.font = '13px Arial, sans-serif';
+    ctx.fillStyle = '#94d8fc';
+    // Truncate location text if too long
+    const maxW   = W - 20;
+    let   locLine = `📍  ${place}`;
+    while (ctx.measureText(locLine).width > maxW && locLine.length > 20)
+      locLine = locLine.slice(0, -4) + '…';
+    ctx.fillText(locLine, 12, H - barH + 72);
+
+    // Staff name top-right
+    ctx.font      = 'bold 13px Arial, sans-serif';
+    ctx.fillStyle = '#fbbf24';
+    ctx.textAlign = 'right';
+    ctx.fillText(user?.name || '', W - 12, H - barH + 24);
+    ctx.textAlign = 'left';
+
+    return canvas.toDataURL('image/jpeg', 0.92);
+  };
+
+  /* ── actions ─────────────────────────────────── */
+
   const openCamera = async (type) => {
     setPunchType(type);
-    setCapturedPhoto(null);
+    setComposedPhoto(null);
     setLocation(null);
+    setLocationText('');
     setStep('camera');
-    setCameraOpen(true);
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } });
-      if (videoRef.current) videoRef.current.srcObject = stream;
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: 'user', width: { ideal: 1280 }, height: { ideal: 720 } },
+      });
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+        videoRef.current.style.transform = 'scaleX(-1)'; // mirror preview
+      }
     } catch {
-      alert('Camera access denied. Please allow camera access.');
+      alert('Camera access denied. Please allow camera permission.');
       setStep('idle');
-      setCameraOpen(false);
     }
   };
 
-  // Stop camera
-  const stopCamera = () => {
-    if (videoRef.current?.srcObject) {
-      videoRef.current.srcObject.getTracks().forEach(t => t.stop());
-    }
-    setCameraOpen(false);
-  };
-
-  // Capture photo
-  const capturePhoto = () => {
+  const captureAndCompose = () => {
+    setStep('composing');
+    setLoadingLoc(true);
     const video = videoRef.current;
-    const canvas = canvasRef.current;
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-    canvas.getContext('2d').drawImage(video, 0, 0);
-    const dataUrl = canvas.toDataURL('image/jpeg');
-    setCapturedPhoto(dataUrl);
     stopCamera();
-    setStep('location');
-    getLocation();
-  };
 
-  // Get GPS location
-  const getLocation = () => {
-    setLoading(true);
     navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        setLocation({ lat: pos.coords.latitude.toFixed(4), lng: pos.coords.longitude.toFixed(4) });
-        setLoading(false);
+      async (pos) => {
+        const lat = pos.coords.latitude.toFixed(5);
+        const lng = pos.coords.longitude.toFixed(5);
+        setLocation({ lat, lng });
+
+        // Try reverse geocode (free Nominatim API)
+        let place = `${lat}, ${lng}`;
+        try {
+          const res  = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`);
+          const data = await res.json();
+          place = data.display_name?.split(',').slice(0, 3).join(', ') || place;
+        } catch { /* use coords */ }
+
+        setLocationText(place);
+        setComposedPhoto(composePhoto(video, lat, lng, place));
+        setLoadingLoc(false);
         setStep('confirm');
       },
       () => {
-        setLocation({ lat: '13.0827', lng: '80.2707' }); // Chennai default
-        setLoading(false);
+        const lat = '13.0827', lng = '80.2707';
+        setLocation({ lat, lng });
+        setLocationText('Chennai, Tamil Nadu (default)');
+        setComposedPhoto(composePhoto(video, lat, lng, 'Chennai, Tamil Nadu'));
+        setLoadingLoc(false);
         setStep('confirm');
-      }
+      },
+      { timeout: 10000, enableHighAccuracy: true }
     );
   };
 
-  // Confirm punch
   const confirmPunch = () => {
-    const now = new Date();
+    const now  = new Date();
     const time = now.toTimeString().slice(0, 5);
     if (punchType === 'in') {
-      setPunched(p => ({ ...p, in: { time, photo: capturedPhoto, location } }));
+      setPunched(p => ({ ...p, in: { time, photo: composedPhoto, location } }));
     } else {
-      setPunched(p => ({ ...p, out: { time, photo: capturedPhoto, location } }));
+      setPunched(p => ({ ...p, out: { time, photo: composedPhoto, location } }));
     }
-    setCapturedPhoto(null);
+    setComposedPhoto(null);
     setLocation(null);
     setPunchType(null);
     setStep('idle');
   };
 
+  const cancel = () => {
+    stopCamera();
+    setStep('idle');
+    setComposedPhoto(null);
+  };
+
+  /* ── render ──────────────────────────────────── */
   return (
     <DashboardLayout title="Attendance">
-      {/* Punch Card */}
-      <div className="bg-gradient-to-br from-blue-700 to-blue-900 rounded-3xl p-8 text-white mb-8">
-        <div className="flex items-center justify-between mb-6">
+
+      {/* ── Punch Card ── */}
+      <div className="bg-gradient-to-br from-blue-700 to-blue-900 rounded-3xl p-6 text-white mb-6">
+        <div className="flex items-center justify-between mb-4">
           <div>
-            <h2 className="text-xl font-bold">Today's Attendance</h2>
-            <p className="text-blue-200 text-sm mt-1">{new Date().toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long' })}</p>
+            <h2 className="text-lg font-bold">Today's Attendance</h2>
+            <p className="text-blue-200 text-xs mt-0.5">
+              {new Date().toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
+            </p>
           </div>
-          <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center">
-            <Clock size={28} />
+          <div className="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center">
+            <Clock size={24} />
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-4 mb-6">
+        <div className="grid grid-cols-2 gap-3 mb-5">
           <div className="bg-white/10 rounded-2xl p-4">
             <p className="text-blue-200 text-xs font-medium mb-1">Punch In</p>
             <p className="text-2xl font-bold">{punched.in?.time || '—'}</p>
-            {punched.in && <p className="text-blue-200 text-xs mt-1">✓ Recorded</p>}
+            {punched.in && <p className="text-green-300 text-xs mt-1">✓ Recorded</p>}
           </div>
           <div className="bg-white/10 rounded-2xl p-4">
             <p className="text-blue-200 text-xs font-medium mb-1">Punch Out</p>
             <p className="text-2xl font-bold">{punched.out?.time || '—'}</p>
-            {punched.out && <p className="text-blue-200 text-xs mt-1">✓ Recorded</p>}
+            {punched.out && <p className="text-green-300 text-xs mt-1">✓ Recorded</p>}
           </div>
         </div>
 
         <div className="flex gap-3">
-          <button
-            onClick={() => openCamera('in')}
-            disabled={!!punched.in}
-            className="flex-1 flex items-center justify-center gap-2 bg-green-500 hover:bg-green-400 disabled:opacity-50 disabled:cursor-not-allowed text-white py-3.5 rounded-2xl font-bold transition"
-          >
-            <LogIn size={18} /> Punch In
+          <button onClick={() => openCamera('in')} disabled={!!punched.in}
+            className="flex-1 flex items-center justify-center gap-2 bg-green-500 hover:bg-green-400 disabled:opacity-40 disabled:cursor-not-allowed text-white py-3.5 rounded-2xl font-bold transition text-sm">
+            <LogIn size={17} /> Punch In
           </button>
-          <button
-            onClick={() => openCamera('out')}
-            disabled={!punched.in || !!punched.out}
-            className="flex-1 flex items-center justify-center gap-2 bg-red-500 hover:bg-red-400 disabled:opacity-50 disabled:cursor-not-allowed text-white py-3.5 rounded-2xl font-bold transition"
-          >
-            <LogOut size={18} /> Punch Out
+          <button onClick={() => openCamera('out')} disabled={!punched.in || !!punched.out}
+            className="flex-1 flex items-center justify-center gap-2 bg-red-500 hover:bg-red-400 disabled:opacity-40 disabled:cursor-not-allowed text-white py-3.5 rounded-2xl font-bold transition text-sm">
+            <LogOut size={17} /> Punch Out
           </button>
         </div>
       </div>
 
-      {/* Camera / Capture Modal */}
+      {/* ── Hidden canvas for composing photo ── */}
+      <canvas ref={canvasRef} className="hidden" />
+
+      {/* ── Camera Modal ── */}
       {step === 'camera' && (
-        <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4">
           <div className="bg-white rounded-3xl overflow-hidden w-full max-w-sm">
-            <div className="bg-slate-900 aspect-square relative">
-              <video ref={videoRef} autoPlay playsInline className="w-full h-full object-cover" />
-              <canvas ref={canvasRef} className="hidden" />
-            </div>
-            <div className="p-6 space-y-3">
-              <p className="text-center text-slate-600 text-sm">Position your face clearly in the camera</p>
-              <button onClick={capturePhoto} className="w-full bg-blue-700 text-white py-3.5 rounded-2xl font-bold flex items-center justify-center gap-2 hover:bg-blue-800 transition">
-                <Camera size={20} /> Capture Photo
+            <div className="relative bg-black aspect-video">
+              <video ref={videoRef} autoPlay playsInline muted className="w-full h-full object-cover" />
+              <button onClick={cancel} className="absolute top-3 right-3 w-8 h-8 bg-black/60 rounded-full flex items-center justify-center text-white">
+                <X size={16} />
               </button>
-              <button onClick={() => { stopCamera(); setStep('idle'); }} className="w-full text-slate-500 py-2 text-sm">Cancel</button>
+            </div>
+            <div className="p-5 space-y-3">
+              <p className="text-center text-slate-500 text-xs">Look at camera clearly. Location + Date + Time will be added on photo.</p>
+              <button onClick={captureAndCompose}
+                className="w-full bg-blue-700 text-white py-3.5 rounded-2xl font-bold flex items-center justify-center gap-2 hover:bg-blue-800 transition">
+                <Camera size={18} /> Capture Photo
+              </button>
+              <button onClick={cancel} className="w-full text-slate-400 py-2 text-sm">Cancel</button>
             </div>
           </div>
         </div>
       )}
 
-      {/* Location + Confirm */}
-      {step === 'confirm' && (
-        <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl p-6 w-full max-w-sm space-y-4">
-            <h3 className="font-bold text-slate-800 text-lg text-center">Confirm {punchType === 'in' ? 'Punch In' : 'Punch Out'}</h3>
-            {capturedPhoto && (
-              <img src={capturedPhoto} alt="captured" className="w-24 h-24 rounded-2xl object-cover mx-auto border-4 border-blue-100" />
-            )}
-            <div className="bg-slate-50 rounded-2xl p-4 flex items-start gap-3">
-              <MapPin size={16} className="text-blue-600 mt-0.5 shrink-0" />
-              <div>
-                <p className="text-sm font-medium text-slate-700">Location Detected</p>
-                {loading ? (
-                  <p className="text-xs text-slate-400">Getting location...</p>
-                ) : (
-                  <p className="text-xs text-slate-500">Lat: {location?.lat}, Lng: {location?.lng}</p>
-                )}
+      {/* ── Composing (loading) ── */}
+      {step === 'composing' && (
+        <div className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center">
+          <div className="bg-white rounded-3xl p-8 text-center w-72">
+            <div className="w-12 h-12 border-4 border-blue-700 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+            <p className="font-bold text-slate-800">Processing Photo...</p>
+            <p className="text-slate-400 text-xs mt-1">Adding location & timestamp</p>
+          </div>
+        </div>
+      )}
+
+      {/* ── Confirm Modal ── */}
+      {step === 'confirm' && composedPhoto && (
+        <div className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl w-full max-w-sm overflow-hidden">
+            <div className="bg-slate-900 p-1">
+              <img src={composedPhoto} alt="captured" className="w-full rounded-2xl" />
+            </div>
+            <div className="p-5 space-y-3">
+              <h3 className="font-bold text-slate-800 text-center">
+                Confirm {punchType === 'in' ? '🟢 Punch In' : '🔴 Punch Out'}
+              </h3>
+              <div className="bg-slate-50 rounded-xl p-3 text-xs text-slate-500 space-y-1">
+                <p>📅 {new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}</p>
+                <p>🕐 {new Date().toLocaleTimeString('en-IN')}</p>
+                <p className="text-blue-600">📍 {locationText}</p>
               </div>
+              <button onClick={confirmPunch}
+                className="w-full bg-blue-700 text-white py-3.5 rounded-2xl font-bold hover:bg-blue-800 transition flex items-center justify-center gap-2">
+                <CheckCircle size={18} /> Confirm
+              </button>
+              <button onClick={cancel} className="w-full text-slate-400 py-2 text-sm">Cancel</button>
             </div>
-            <div className="bg-slate-50 rounded-2xl p-4 flex items-center gap-3">
-              <Clock size={16} className="text-blue-600" />
-              <p className="text-sm font-medium text-slate-700">{new Date().toLocaleTimeString('en-IN')}</p>
-            </div>
-            <button onClick={confirmPunch} disabled={loading} className="w-full bg-blue-700 text-white py-3.5 rounded-2xl font-bold hover:bg-blue-800 disabled:opacity-60 transition flex items-center justify-center gap-2">
-              <CheckCircle size={18} /> Confirm
-            </button>
-            <button onClick={() => setStep('idle')} className="w-full text-slate-400 py-2 text-sm">Cancel</button>
           </div>
         </div>
       )}
 
-      {/* History */}
+      {/* ── Attendance History (no photos — admin only sees photos) ── */}
       <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
         <div className="px-6 py-4 border-b border-slate-100">
           <h2 className="font-bold text-slate-800">My Attendance History</h2>
