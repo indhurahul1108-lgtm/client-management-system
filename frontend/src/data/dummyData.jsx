@@ -335,16 +335,16 @@ export const DUMMY_USERS = [
 const today = new Date().toISOString().split('T')[0];
 
 export const DUMMY_ATTENDANCE = [
-  { id: 'a001', userId: 'u004', staffName: 'Anitha Devi', date: today, punchIn: '09:05', punchOut: '18:10', status: 'present', location: 'Chennai, Tamil Nadu', photo: 'https://ui-avatars.com/api/?name=Anitha+Devi&background=dc2626&color=fff' },
-  { id: 'a002', userId: 'u005', staffName: 'Murugan P',   date: today, punchIn: '09:20', punchOut: '18:05', status: 'late',    location: 'Chennai, Tamil Nadu', photo: 'https://ui-avatars.com/api/?name=Murugan+P&background=d97706&color=fff' },
-  { id: 'a003', userId: 'u006', staffName: 'Deepa S',     date: today, punchIn: '09:00', punchOut: '18:00', status: 'present', location: 'Chennai, Tamil Nadu', photo: 'https://ui-avatars.com/api/?name=Deepa+S&background=0891b2&color=fff' },
-  { id: 'a004', userId: 'u007', staffName: 'Ravi Kumar',  date: today, punchIn: null,    punchOut: null,    status: 'absent',  location: null, photo: null },
-  { id: 'a005', userId: 'u008', staffName: 'Lavanya M',   date: today, punchIn: '08:55', punchOut: '17:58', status: 'present', location: 'Chennai, Tamil Nadu', photo: 'https://ui-avatars.com/api/?name=Lavanya+M&background=c026d3&color=fff' },
-  { id: 'a006', userId: 'u009', staffName: 'Senthil K',   date: today, punchIn: null,    punchOut: null,    status: 'absent',  location: null, photo: null },
-  { id: 'a007', userId: 'u010', staffName: 'Meena R',     date: today, punchIn: '09:10', punchOut: '18:15', status: 'present', location: 'Chennai, Tamil Nadu', photo: 'https://ui-avatars.com/api/?name=Meena+R&background=0284c7&color=fff' },
-  { id: 'a008', userId: 'u011', staffName: 'Vijay S',     date: today, punchIn: '09:30', punchOut: null,    status: 'late',    location: 'Chennai, Tamil Nadu', photo: 'https://ui-avatars.com/api/?name=Vijay+S&background=9333ea&color=fff' },
-  { id: 'a009', userId: 'u012', staffName: 'Suganya T',   date: today, punchIn: '09:02', punchOut: '18:00', status: 'present', location: 'Chennai, Tamil Nadu', photo: 'https://ui-avatars.com/api/?name=Suganya+T&background=f59e0b&color=fff' },
-  { id: 'a010', userId: 'u013', staffName: 'Bala Murugan',date: today, punchIn: '09:00', punchOut: '18:00', status: 'present', location: 'Chennai, Tamil Nadu', photo: 'https://ui-avatars.com/api/?name=Bala+Murugan&background=10b981&color=fff' },
+  { id:'a001', userId:'u004', staffName:'Anitha Devi',  date:today, punchIn:'10:05', punchOut:'19:10', status:'present', lateMinutes:0,  location:'Chennai, Tamil Nadu', photo:'https://ui-avatars.com/api/?name=Anitha+Devi&background=dc2626&color=fff' },
+  { id:'a002', userId:'u005', staffName:'Murugan P',    date:today, punchIn:'10:25', punchOut:'19:15', status:'late',    lateMinutes:15, location:'Chennai, Tamil Nadu', photo:'https://ui-avatars.com/api/?name=Murugan+P&background=d97706&color=fff' },
+  { id:'a003', userId:'u006', staffName:'Deepa S',      date:today, punchIn:'10:00', punchOut:'19:00', status:'present', lateMinutes:0,  location:'Chennai, Tamil Nadu', photo:'https://ui-avatars.com/api/?name=Deepa+S&background=0891b2&color=fff' },
+  { id:'a004', userId:'u007', staffName:'Ravi Kumar',   date:today, punchIn:null,    punchOut:null,    status:'absent',  lateMinutes:null, location:null, photo:null },
+  { id:'a005', userId:'u008', staffName:'Lavanya M',    date:today, punchIn:'09:55', punchOut:'18:58', status:'present', lateMinutes:0,  location:'Chennai, Tamil Nadu', photo:'https://ui-avatars.com/api/?name=Lavanya+M&background=c026d3&color=fff' },
+  { id:'a006', userId:'u009', staffName:'Senthil K',    date:today, punchIn:null,    punchOut:null,    status:'absent',  lateMinutes:null, location:null, photo:null },
+  { id:'a007', userId:'u010', staffName:'Meena R',      date:today, punchIn:'10:08', punchOut:'19:15', status:'present', lateMinutes:0,  location:'Chennai, Tamil Nadu', photo:'https://ui-avatars.com/api/?name=Meena+R&background=0284c7&color=fff' },
+  { id:'a008', userId:'u011', staffName:'Vijay S',      date:today, punchIn:'10:35', punchOut:null,    status:'late',    lateMinutes:25, location:'Chennai, Tamil Nadu', photo:'https://ui-avatars.com/api/?name=Vijay+S&background=9333ea&color=fff' },
+  { id:'a009', userId:'u012', staffName:'Suganya T',    date:today, punchIn:'10:02', punchOut:'19:00', status:'present', lateMinutes:0,  location:'Chennai, Tamil Nadu', photo:'https://ui-avatars.com/api/?name=Suganya+T&background=f59e0b&color=fff' },
+  { id:'a010', userId:'u013', staffName:'Bala Murugan', date:today, punchIn:'11:00', punchOut:'19:00', status:'late',    lateMinutes:50, location:'Chennai, Tamil Nadu', photo:'https://ui-avatars.com/api/?name=Bala+Murugan&background=10b981&color=fff' },
 ];
 
 // ── LEAVE DATA ──────────────────────────────────────────────

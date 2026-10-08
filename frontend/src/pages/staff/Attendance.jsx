@@ -2,7 +2,8 @@ import React, { useState, useRef } from 'react';
 import DashboardLayout from '../../components/DashboardLayout';
 import { useAuth } from '../../context/AuthContext';
 import { DUMMY_ATTENDANCE } from '../../data/dummyData.jsx';
-import { Camera, MapPin, Clock, CheckCircle, LogIn, LogOut, CalendarCheck, X } from 'lucide-react';
+import { calcLateMinutes, formatLate, SHIFT_CONFIG } from '../../utils/attendanceUtils.js';
+import { Camera, MapPin, Clock, CheckCircle, LogIn, LogOut, CalendarCheck, X, AlertTriangle } from 'lucide-react';
 
 function Badge({ status }) {
   const map = { present: 'bg-green-100 text-green-700', absent: 'bg-red-100 text-red-700', late: 'bg-yellow-100 text-yellow-700' };
@@ -141,10 +142,13 @@ export default function StaffAttendance() {
   };
 
   const confirmPunch = () => {
-    const now  = new Date();
-    const time = now.toTimeString().slice(0, 5);
+    const now     = new Date();
+    const time    = now.toTimeString().slice(0, 5);
+    const lateMin = punchType === 'in'
+      ? calcLateMinutes(time, SHIFT_CONFIG.shiftStart, SHIFT_CONFIG.graceMins)
+      : null;
     if (punchType === 'in') {
-      setPunched(p => ({ ...p, in: { time, photo: composedPhoto, location } }));
+      setPunched(p => ({ ...p, in: { time, photo: composedPhoto, location, lateMinutes: lateMin } }));
     } else {
       setPunched(p => ({ ...p, out: { time, photo: composedPhoto, location } }));
     }
@@ -178,17 +182,26 @@ export default function StaffAttendance() {
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-3 mb-5">
+        <div className="grid grid-cols-2 gap-3 mb-4">
           <div className="bg-white/10 rounded-2xl p-4">
             <p className="text-blue-200 text-xs font-medium mb-1">Punch In</p>
             <p className="text-2xl font-bold">{punched.in?.time || '—'}</p>
-            {punched.in && <p className="text-green-300 text-xs mt-1">✓ Recorded</p>}
+            {punched.in && punched.in.lateMinutes > 0
+              ? <p className="text-red-300 text-xs mt-1 flex items-center gap-1"><AlertTriangle size={10} /> {formatLate(punched.in.lateMinutes)}</p>
+              : punched.in && <p className="text-green-300 text-xs mt-1">✓ On Time</p>}
           </div>
           <div className="bg-white/10 rounded-2xl p-4">
             <p className="text-blue-200 text-xs font-medium mb-1">Punch Out</p>
             <p className="text-2xl font-bold">{punched.out?.time || '—'}</p>
             {punched.out && <p className="text-green-300 text-xs mt-1">✓ Recorded</p>}
           </div>
+        </div>
+
+        {/* Shift info */}
+        <div className="bg-white/10 rounded-xl px-4 py-2 flex items-center justify-between text-xs text-blue-200 mb-1">
+          <span>⏰ Shift: <strong className="text-white">{SHIFT_CONFIG.shiftStart}</strong></span>
+          <span>⚡ Grace: <strong className="text-white">{SHIFT_CONFIG.graceMins} mins</strong></span>
+          <span>🔴 Late after: <strong className="text-white">{(() => { const [h,m]=SHIFT_CONFIG.shiftStart.split(':').map(Number); const t=h*60+m+SHIFT_CONFIG.graceMins; return `${String(Math.floor(t/60)).padStart(2,'0')}:${String(t%60).padStart(2,'0')}`; })()} </strong></span>
         </div>
 
         <div className="flex gap-3">

@@ -1,95 +1,137 @@
-﻿import React from 'react';
+import React, { useState } from 'react';
 import DashboardLayout from '../../components/DashboardLayout';
 import { DUMMY_USERS, DUMMY_ATTENDANCE, DUMMY_LEAVES, DUMMY_SALARIES, DUMMY_OVERDUE } from '../../data/dummyData.jsx';
-import { Users, UserCheck, Building2, CalendarCheck, FileText, DollarSign, AlertTriangle, TrendingUp } from 'lucide-react';
+import { CLIENT_WORKS, calcOverdueDays } from '../../data/clientData.js';
+import {
+  Users, UserCheck, Building2, CalendarCheck, Clock, AlertTriangle,
+  Briefcase, CheckCircle, TrendingUp, Bell, Activity, LogOut, ChevronRight
+} from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
 
-const staff = DUMMY_USERS.filter(u => u.role === 'staff');
-const managers = DUMMY_USERS.filter(u => u.role === 'manager');
-const clients = DUMMY_USERS.filter(u => u.role === 'client');
 const today = new Date().toISOString().split('T')[0];
 
-const presentToday  = DUMMY_ATTENDANCE.filter(a => a.status === 'present').length;
-const absentToday   = DUMMY_ATTENDANCE.filter(a => a.status === 'absent').length;
-const lateToday     = DUMMY_ATTENDANCE.filter(a => a.status === 'late').length;
-const pendingLeaves = DUMMY_LEAVES.filter(l => l.status === 'pending').length;
-const pendingSal    = DUMMY_SALARIES.filter(s => s.status === 'pending').length;
-const overdueItems  = DUMMY_OVERDUE.filter(o => o.status === 'overdue').length;
+const staff    = DUMMY_USERS.filter(u => u.role === 'staff');
+const managers = DUMMY_USERS.filter(u => u.role === 'manager');
+const clients  = DUMMY_USERS.filter(u => u.role === 'client');
 
-function StatCard({ label, value, icon: Icon, color, bg }) {
-  return (
-    <div className={`${bg} rounded-2xl p-5 flex items-center gap-4 shadow-sm border border-white`}>
-      <div className={`w-12 h-12 rounded-xl ${color} flex items-center justify-center`}>
-        <Icon size={22} className="text-white" />
-      </div>
+const presentToday = DUMMY_ATTENDANCE.filter(a => a.date === today && a.status === 'present').length;
+const absentToday  = DUMMY_ATTENDANCE.filter(a => a.date === today && a.status === 'absent').length;
+const lateToday    = DUMMY_ATTENDANCE.filter(a => a.date === today && a.status === 'late').length;
+const onLeave      = DUMMY_LEAVES.filter(l => l.status === 'approved' && l.fromDate <= today && l.toDate >= today).length;
+const pendingLeave = DUMMY_LEAVES.filter(l => l.status === 'pending').length;
+
+const allWorks    = CLIENT_WORKS;
+const activeWork  = allWorks.filter(w => w.status === 'in_progress').length;
+const completedW  = allWorks.filter(w => w.status === 'completed').length;
+const pendingW    = allWorks.filter(w => w.status === 'pending').length;
+const overdueW    = allWorks.filter(w => w.status === 'overdue' || (calcOverdueDays(w.dueDate) > 0 && w.status !== 'completed')).length;
+
+const RECENT_ACTIVITY = [
+  { id:1, user:'Anitha Devi',  action:'Punched In',             time:'10:05 AM', icon:'🟢', module:'Attendance' },
+  { id:2, user:'Murugan P',    action:'Applied for Sick Leave',  time:'09:30 AM', icon:'📋', module:'Leave' },
+  { id:3, user:'Admin',        action:'Added New Client: XYZ Co',time:'09:00 AM', icon:'🏢', module:'Clients' },
+  { id:4, user:'Deepa S',      action:'Completed Work WRK-003',  time:'Yesterday', icon:'✅', module:'Work' },
+  { id:5, user:'Vijay S',      action:'Marked Late',             time:'10:35 AM', icon:'🔴', module:'Attendance' },
+];
+
+const NOTIFICATIONS = [
+  { id:1, msg:'Murugan P applied for Sick Leave — pending approval', type:'leave',   icon:'📋', unread:true },
+  { id:2, msg:'GST Filing for Sri Tech is 3 days overdue',          type:'overdue',  icon:'⚠️', unread:true },
+  { id:3, msg:'New client Delta Logistics registered',              type:'client',   icon:'🏢', unread:false },
+  { id:4, msg:'Vijay S was marked late today (10:35 AM)',           type:'attend',   icon:'🕐', unread:true },
+];
+
+function StatCard({ label, value, color, icon, to }) {
+  const card = (
+    <div className={`bg-${color}-50 border border-${color}-100 rounded-2xl p-5 flex items-center gap-3 hover:shadow-md transition`}>
+      <div className={`w-11 h-11 bg-${color}-600 rounded-xl flex items-center justify-center shrink-0`}>{icon}</div>
       <div>
-        <p className="text-2xl font-bold text-slate-800">{value}</p>
-        <p className="text-sm text-slate-500 font-medium">{label}</p>
+        <p className={`text-2xl font-bold text-${color}-800`}>{value}</p>
+        <p className="text-xs text-slate-500 font-medium">{label}</p>
       </div>
     </div>
   );
-}
-
-function Badge({ status }) {
-  const map = {
-    present:  'bg-green-100 text-green-700',
-    absent:   'bg-red-100 text-red-700',
-    late:     'bg-yellow-100 text-yellow-700',
-    pending:  'bg-yellow-100 text-yellow-700',
-    approved: 'bg-green-100 text-green-700',
-    rejected: 'bg-red-100 text-red-700',
-    paid:     'bg-green-100 text-green-700',
-    overdue:  'bg-red-100 text-red-700',
-    completed:'bg-blue-100 text-blue-700',
-  };
-  return (
-    <span className={`text-xs px-2.5 py-1 rounded-full font-semibold capitalize ${map[status] || 'bg-slate-100 text-slate-600'}`}>
-      {status}
-    </span>
-  );
+  return to ? <Link to={to}>{card}</Link> : card;
 }
 
 export default function AdminDashboard() {
+  const { user } = useAuth();
+
   return (
     <DashboardLayout title="Admin Dashboard">
-      {/* Stats */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <StatCard label="Total Managers" value={managers.length} icon={UserCheck}   color="bg-purple-600" bg="bg-purple-50" />
-        <StatCard label="Total Staff"    value={staff.length}    icon={Users}        color="bg-blue-600"   bg="bg-blue-50" />
-        <StatCard label="Total Clients"  value={clients.length}  icon={Building2}    color="bg-orange-500" bg="bg-orange-50" />
-        <StatCard label="Present Today"  value={presentToday}    icon={CalendarCheck} color="bg-green-600"  bg="bg-green-50" />
+
+      {/* Welcome */}
+      <div className="bg-gradient-to-r from-blue-700 to-blue-900 rounded-3xl p-6 text-white mb-6 flex items-center gap-4">
+        <div className="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center text-2xl font-bold">
+          {user?.name?.charAt(0) || 'A'}
+        </div>
+        <div className="flex-1">
+          <p className="text-blue-200 text-sm">Welcome back,</p>
+          <h1 className="text-xl font-bold">{user?.name || 'Admin'}</h1>
+          <p className="text-blue-300 text-xs mt-0.5">{new Date().toLocaleDateString('en-IN', { weekday:'long', day:'numeric', month:'long', year:'numeric' })}</p>
+        </div>
+        <div className="text-right text-sm text-blue-200">
+          <p className="font-bold text-white text-lg">{new Date().toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit' })}</p>
+          <p>System Active</p>
+        </div>
       </div>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <StatCard label="Absent Today"   value={absentToday}    icon={Users}        color="bg-red-500"    bg="bg-red-50" />
-        <StatCard label="Late Today"     value={lateToday}      icon={CalendarCheck} color="bg-yellow-500" bg="bg-yellow-50" />
-        <StatCard label="Leave Requests" value={pendingLeaves}  icon={FileText}     color="bg-indigo-500" bg="bg-indigo-50" />
-        <StatCard label="Overdue Items"  value={overdueItems}   icon={AlertTriangle} color="bg-red-600"    bg="bg-red-50" />
+      {/* ── Section 1: People ── */}
+      <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">👥 Organization</p>
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <StatCard label="Total Managers" value={managers.length}  color="purple" icon={<UserCheck  size={20} className="text-white"/>} to="/admin/managers" />
+        <StatCard label="Total Staff"    value={staff.length}     color="blue"   icon={<Users      size={20} className="text-white"/>} to="/admin/staff" />
+        <StatCard label="Total Clients"  value={clients.length}   color="orange" icon={<Building2  size={20} className="text-white"/>} to="/admin/clients" />
+        <StatCard label="Total Users"    value={DUMMY_USERS.length} color="slate" icon={<Users     size={20} className="text-white"/>} to="/admin/users" />
       </div>
 
-      <div className="grid lg:grid-cols-2 gap-6">
-        {/* Today's Attendance */}
+      {/* ── Section 2: Attendance ── */}
+      <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">📅 Today's Attendance</p>
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <StatCard label="Present Today"  value={presentToday}   color="green"  icon={<CalendarCheck size={20} className="text-white"/>} to="/admin/attendance" />
+        <StatCard label="Absent Today"   value={absentToday}    color="red"    icon={<Users         size={20} className="text-white"/>} to="/admin/attendance" />
+        <StatCard label="Late Today"     value={lateToday}      color="yellow" icon={<Clock         size={20} className="text-white"/>} to="/admin/attendance" />
+        <StatCard label="On Leave"       value={onLeave}        color="slate"  icon={<LogOut        size={20} className="text-white"/>} to="/admin/leave" />
+      </div>
+
+      {/* ── Section 3: Work ── */}
+      <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">📋 Work Status</p>
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <StatCard label="Active Work"    value={activeWork}   color="blue"   icon={<TrendingUp  size={20} className="text-white"/>} to="/admin/assign-tasks" />
+        <StatCard label="Completed"      value={completedW}   color="green"  icon={<CheckCircle size={20} className="text-white"/>} to="/admin/assign-tasks" />
+        <StatCard label="Pending Work"   value={pendingW}     color="yellow" icon={<Clock       size={20} className="text-white"/>} to="/admin/assign-tasks" />
+        <StatCard label="Overdue"        value={overdueW}     color="red"    icon={<AlertTriangle size={20} className="text-white"/>} to="/admin/overdue" />
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+
+        {/* Today's Attendance Table */}
         <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-          <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
-            <h2 className="font-bold text-slate-800">Today's Attendance</h2>
-            <span className="text-xs text-slate-400">{today}</span>
+          <div className="px-5 py-4 border-b border-slate-50 flex items-center justify-between">
+            <h3 className="font-bold text-slate-800 flex items-center gap-2"><CalendarCheck size={16} className="text-blue-600"/>Today's Attendance</h3>
+            <Link to="/admin/attendance" className="text-xs text-blue-600 font-semibold">View All →</Link>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead className="bg-slate-50">
                 <tr>
-                  <th className="text-left px-6 py-3 text-xs font-semibold text-slate-500 uppercase">Staff</th>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase">In</th>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase">Out</th>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase">Status</th>
+                  <th className="text-left px-4 py-2 text-xs text-slate-400 font-semibold">Name</th>
+                  <th className="text-left px-4 py-2 text-xs text-slate-400 font-semibold">Punch In</th>
+                  <th className="text-left px-4 py-2 text-xs text-slate-400 font-semibold">Status</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-50">
-                {DUMMY_ATTENDANCE.map(a => (
-                  <tr key={a.id} className="hover:bg-slate-50 transition">
-                    <td className="px-6 py-3 font-medium text-slate-700">{a.staffName}</td>
-                    <td className="px-4 py-3 text-slate-500">{a.punchIn || '—'}</td>
-                    <td className="px-4 py-3 text-slate-500">{a.punchOut || '—'}</td>
-                    <td className="px-4 py-3"><Badge status={a.status} /></td>
+                {DUMMY_ATTENDANCE.slice(0,6).map(a => (
+                  <tr key={a.id} className="hover:bg-slate-50">
+                    <td className="px-4 py-2.5 font-medium text-slate-700 text-xs">{a.staffName}</td>
+                    <td className="px-4 py-2.5 text-xs text-slate-500 font-mono">{a.punchIn || '—'}</td>
+                    <td className="px-4 py-2.5">
+                      <span className={`text-xs px-2 py-0.5 rounded-full font-semibold capitalize
+                        ${a.status==='present'?'bg-green-100 text-green-700':a.status==='late'?'bg-yellow-100 text-yellow-700':'bg-red-100 text-red-700'}`}>
+                        {a.status}
+                      </span>
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -97,76 +139,90 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        {/* Recent Leave Requests */}
+        {/* Pending Leave Requests */}
         <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-          <div className="px-6 py-4 border-b border-slate-100">
-            <h2 className="font-bold text-slate-800">Leave Requests</h2>
-          </div>
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead className="bg-slate-50">
-                <tr>
-                  <th className="text-left px-6 py-3 text-xs font-semibold text-slate-500 uppercase">Staff</th>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase">Type</th>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase">Status</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-50">
-                {DUMMY_LEAVES.map(l => (
-                  <tr key={l.id} className="hover:bg-slate-50 transition">
-                    <td className="px-6 py-3 font-medium text-slate-700">{l.staffName}</td>
-                    <td className="px-4 py-3 text-slate-500 text-xs">{l.leaveType}</td>
-                    <td className="px-4 py-3"><Badge status={l.status} /></td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        {/* Salary Summary */}
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
-          <h2 className="font-bold text-slate-800 mb-4">Salary Summary — October 2024</h2>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="bg-green-50 rounded-xl p-4 text-center">
-              <p className="text-2xl font-bold text-green-700">{DUMMY_SALARIES.filter(s => s.status === 'paid').length}</p>
-              <p className="text-sm text-green-600 font-medium mt-1">Paid</p>
-            </div>
-            <div className="bg-yellow-50 rounded-xl p-4 text-center">
-              <p className="text-2xl font-bold text-yellow-700">{DUMMY_SALARIES.filter(s => s.status === 'pending').length}</p>
-              <p className="text-sm text-yellow-600 font-medium mt-1">Pending</p>
-            </div>
-          </div>
-          <div className="mt-4 pt-4 border-t border-slate-100">
-            <div className="flex justify-between text-sm">
-              <span className="text-slate-500">Total Payable (October)</span>
-              <span className="font-bold text-slate-800">
-                ₹{DUMMY_SALARIES.filter(s => s.month === 'October 2024').reduce((s, a) => s + a.net, 0).toLocaleString('en-IN')}
-              </span>
-            </div>
-          </div>
-        </div>
-
-        {/* Overdue */}
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-          <div className="px-6 py-4 border-b border-slate-100">
-            <h2 className="font-bold text-slate-800">Overdue Items</h2>
+          <div className="px-5 py-4 border-b border-slate-50 flex items-center justify-between">
+            <h3 className="font-bold text-slate-800 flex items-center gap-2">
+              <Briefcase size={16} className="text-purple-600"/>Pending Leave
+              {pendingLeave > 0 && <span className="bg-red-500 text-white text-xs font-bold px-1.5 py-0.5 rounded-full">{pendingLeave}</span>}
+            </h3>
+            <Link to="/admin/leave" className="text-xs text-purple-600 font-semibold">Manage →</Link>
           </div>
           <div className="divide-y divide-slate-50">
-            {DUMMY_OVERDUE.filter(o => o.status === 'overdue').map(o => (
-              <div key={o.id} className="px-6 py-4 flex items-center justify-between">
+            {DUMMY_LEAVES.filter(l=>l.status==='pending').map(l => (
+              <div key={l.id} className="px-5 py-3 flex items-center justify-between hover:bg-slate-50">
                 <div>
-                  <p className="font-medium text-slate-700 text-sm">{o.clientName}</p>
-                  <p className="text-xs text-slate-400 mt-0.5">{o.task}</p>
+                  <p className="font-medium text-slate-700 text-sm">{l.staffName}</p>
+                  <p className="text-xs text-slate-400">{l.leaveType} · {l.fromDate} → {l.toDate}</p>
                 </div>
-                <span className="text-xs font-bold text-red-600 bg-red-50 px-2.5 py-1 rounded-full">
-                  +{o.overdueDays}d
-                </span>
+                <span className="text-xs bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded-full font-semibold">Pending</span>
+              </div>
+            ))}
+            {pendingLeave === 0 && <p className="text-center py-6 text-slate-400 text-sm">No pending requests</p>}
+          </div>
+        </div>
+
+        {/* Overdue Work */}
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+          <div className="px-5 py-4 border-b border-slate-50 flex items-center justify-between">
+            <h3 className="font-bold text-slate-800 flex items-center gap-2"><AlertTriangle size={16} className="text-red-500"/>Overdue Work</h3>
+            <Link to="/admin/overdue" className="text-xs text-red-500 font-semibold">View All →</Link>
+          </div>
+          <div className="divide-y divide-slate-50">
+            {CLIENT_WORKS.filter(w => w.status === 'overdue' || (calcOverdueDays(w.dueDate) > 0 && w.status !== 'completed')).slice(0,4).map(w => (
+              <div key={w.id} className="px-5 py-3 flex items-start justify-between hover:bg-red-50/30">
+                <div>
+                  <p className="font-medium text-slate-700 text-sm">{w.title}</p>
+                  <p className="text-xs text-slate-400">{w.staffName} · Due: {w.dueDate}</p>
+                </div>
+                <span className="text-xs bg-red-100 text-red-700 px-2 py-0.5 rounded-full font-bold whitespace-nowrap">+{calcOverdueDays(w.dueDate)}d</span>
+              </div>
+            ))}
+            {overdueW === 0 && <p className="text-center py-6 text-green-600 text-sm font-medium">✅ No overdue work!</p>}
+          </div>
+        </div>
+
+        {/* Recent Activity */}
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+          <div className="px-5 py-4 border-b border-slate-50 flex items-center justify-between">
+            <h3 className="font-bold text-slate-800 flex items-center gap-2"><Activity size={16} className="text-blue-600"/>Recent Activity</h3>
+            <Link to="/admin/audit-log" className="text-xs text-blue-600 font-semibold">Audit Log →</Link>
+          </div>
+          <div className="divide-y divide-slate-50">
+            {RECENT_ACTIVITY.map(a => (
+              <div key={a.id} className="px-5 py-3 flex items-center gap-3 hover:bg-slate-50">
+                <span className="text-lg shrink-0">{a.icon}</span>
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-slate-700"><span className="text-slate-500">{a.user}</span> · {a.action}</p>
+                  <p className="text-xs text-slate-400">{a.module} · {a.time}</p>
+                </div>
               </div>
             ))}
           </div>
         </div>
+
       </div>
+
+      {/* Notifications */}
+      <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+        <div className="px-5 py-4 border-b border-slate-50 flex items-center justify-between">
+          <h3 className="font-bold text-slate-800 flex items-center gap-2">
+            <Bell size={16} className="text-blue-600"/>Notifications
+            <span className="bg-red-500 text-white text-xs font-bold px-1.5 py-0.5 rounded-full">{NOTIFICATIONS.filter(n=>n.unread).length}</span>
+          </h3>
+          <Link to="/admin/notifications" className="text-xs text-blue-600 font-semibold">View All →</Link>
+        </div>
+        <div className="divide-y divide-slate-50">
+          {NOTIFICATIONS.map(n => (
+            <div key={n.id} className={`px-5 py-3 flex items-center gap-3 hover:bg-slate-50 ${n.unread ? 'bg-blue-50/30 border-l-4 border-blue-400' : ''}`}>
+              <span className="text-lg shrink-0">{n.icon}</span>
+              <p className={`text-sm flex-1 ${n.unread ? 'font-semibold text-slate-800' : 'text-slate-600'}`}>{n.msg}</p>
+              {n.unread && <div className="w-2 h-2 bg-blue-500 rounded-full shrink-0" />}
+            </div>
+          ))}
+        </div>
+      </div>
+
     </DashboardLayout>
   );
 }
