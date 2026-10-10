@@ -101,7 +101,7 @@ export default function AdminDashboard() {
         <StatCard label="Active Work"    value={activeWork}   color="blue"   icon={<TrendingUp  size={20} className="text-white"/>} to="/admin/assign-tasks" />
         <StatCard label="Completed"      value={completedW}   color="green"  icon={<CheckCircle size={20} className="text-white"/>} to="/admin/assign-tasks" />
         <StatCard label="Pending Work"   value={pendingW}     color="yellow" icon={<Clock       size={20} className="text-white"/>} to="/admin/assign-tasks" />
-        <StatCard label="Overdue"        value={overdueW}     color="red"    icon={<AlertTriangle size={20} className="text-white"/>} to="/admin/overdue" />
+        <StatCard label="Daily Bank Visits" value="6 Scheduled" color="indigo" icon={<Building2 size={20} className="text-white"/>} to="/admin/visits" />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
@@ -162,23 +162,30 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        {/* Overdue Work */}
+        {/* Daily Bank Visits Preview */}
         <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
           <div className="px-5 py-4 border-b border-slate-50 flex items-center justify-between">
-            <h3 className="font-bold text-slate-800 flex items-center gap-2"><AlertTriangle size={16} className="text-red-500"/>Overdue Work</h3>
-            <Link to="/admin/overdue" className="text-xs text-red-500 font-semibold">View All →</Link>
+            <h3 className="font-bold text-slate-800 flex items-center gap-2"><Building2 size={16} className="text-indigo-600"/>Daily Bank & Branch Visits</h3>
+            <Link to="/admin/visits" className="text-xs text-indigo-600 font-semibold">View Schedule →</Link>
           </div>
           <div className="divide-y divide-slate-50">
-            {CLIENT_WORKS.filter(w => w.status === 'overdue' || (calcOverdueDays(w.dueDate) > 0 && w.status !== 'completed')).slice(0,4).map(w => (
-              <div key={w.id} className="px-5 py-3 flex items-start justify-between hover:bg-red-50/30">
+            {[
+              { day: 'Mon', bank: 'State Bank of India — Commercial Hub', branch: 'Anna Salai', purpose: 'Bulk Document Audit', staff: 'Anitha, Murugan' },
+              { day: 'Tue', bank: 'HDFC Bank — Corporate Branch', branch: 'Nungambakkam', purpose: 'Bulk KYC Review', staff: 'Deepa, Ravi' },
+              { day: 'Wed', bank: 'ICICI Bank — SME Hub', branch: 'Guindy Industrial', purpose: 'Q2 GST Clearance', staff: 'Lavanya, Vijay' },
+              { day: 'Thu', bank: 'Axis Bank — Tech Park', branch: 'OMR Chennai', purpose: 'Export Accounts Check', staff: 'Bala, Kavitha' },
+            ].map((v, i) => (
+              <div key={i} className="px-5 py-3 flex items-center justify-between hover:bg-slate-50">
                 <div>
-                  <p className="font-medium text-slate-700 text-sm">{w.title}</p>
-                  <p className="text-xs text-slate-400">{w.staffName} · Due: {w.dueDate}</p>
+                  <p className="font-medium text-slate-700 text-sm flex items-center gap-2">
+                    <span className="text-[10px] font-bold bg-purple-50 text-purple-700 px-1.5 py-0.5 rounded">{v.day}</span>
+                    {v.bank}
+                  </p>
+                  <p className="text-xs text-slate-400">{v.branch} · {v.purpose}</p>
                 </div>
-                <span className="text-xs bg-red-100 text-red-700 px-2 py-0.5 rounded-full font-bold whitespace-nowrap">+{calcOverdueDays(w.dueDate)}d</span>
+                <span className="text-xs text-indigo-600 font-semibold bg-indigo-50 px-2 py-0.5 rounded-full">{v.staff}</span>
               </div>
             ))}
-            {overdueW === 0 && <p className="text-center py-6 text-green-600 text-sm font-medium">✅ No overdue work!</p>}
           </div>
         </div>
 

@@ -3,7 +3,7 @@ import DashboardLayout from '../../components/DashboardLayout';
 import { useAuth } from '../../context/AuthContext';
 import { DUMMY_USERS, DUMMY_LEAVES } from '../../data/dummyData.jsx';
 import { Plus, X, CheckCircle, XCircle } from 'lucide-react';
-import { toast } from 'react-hot-toast';
+// toast handled via local state
 
 const LEAVE_TYPES = ['Sick Leave','Casual Leave','Annual Leave','Emergency Leave'];
 
@@ -28,11 +28,23 @@ export default function ManagerLeave() {
   const [toastMsg, setToastMsg] = useState('');
   const [form, setForm] = useState({ type:'Sick Leave', from:'', to:'', reason:'' });
 
+  const [rejectModal, setRejectModal] = useState(null);
+  const [rejectReason, setRejectReason] = useState('');
+
   const showToast = (msg) => { setToastMsg(msg); setTimeout(()=>setToastMsg(''),3000); };
 
-  const handleLeave = (id, action) => {
-    setStaffLeaves(prev => prev.map(l => l.id===id ? {...l, status: action==='approve'?'approved':'rejected'} : l));
-    showToast(action==='approve' ? '✅ Leave approved!' : '❌ Leave rejected!');
+  const handleApprove = (id) => {
+    setStaffLeaves(prev => prev.map(l => l.id===id ? {...l, status:'approved'} : l));
+    showToast('✅ Leave approved!');
+  };
+
+  const openReject = (leave) => { setRejectReason(''); setRejectModal(leave); };
+
+  const confirmReject = () => {
+    if (!rejectReason.trim()) { showToast('⚠️ Enter rejection reason'); return; }
+    setStaffLeaves(prev => prev.map(l => l.id===rejectModal.id ? {...l, status:'rejected', rejectReason} : l));
+    setRejectModal(null);
+    showToast('❌ Leave rejected. Reason sent to staff.');
   };
 
   const submitLeave = () => {
@@ -74,14 +86,15 @@ export default function ManagerLeave() {
                   <p className="font-semibold text-slate-800">{l.staffName}</p>
                   <p className="text-xs text-slate-500 mt-0.5">{l.leaveType} · {l.fromDate} → {l.toDate}</p>
                   <p className="text-xs text-slate-400 italic mt-0.5">"{l.reason}"</p>
+                  {l.rejectReason && <p className="text-xs text-red-500 mt-0.5">❌ Reason: {l.rejectReason}</p>}
                 </div>
                 <span className={`text-xs px-2.5 py-1 rounded-full font-semibold capitalize ${badgeColor(l.status)}`}>{l.status}</span>
                 {l.status==='pending' && (
                   <div className="flex gap-2">
-                    <button onClick={()=>handleLeave(l.id,'approve')} className="flex items-center gap-1 bg-green-100 text-green-700 px-3 py-1.5 rounded-xl text-xs font-bold hover:bg-green-200">
+                    <button onClick={()=>handleApprove(l.id)} className="flex items-center gap-1 bg-green-100 text-green-700 px-3 py-1.5 rounded-xl text-xs font-bold hover:bg-green-200">
                       <CheckCircle size={13}/> Approve
                     </button>
-                    <button onClick={()=>handleLeave(l.id,'reject')} className="flex items-center gap-1 bg-red-100 text-red-700 px-3 py-1.5 rounded-xl text-xs font-bold hover:bg-red-200">
+                    <button onClick={()=>openReject(l)} className="flex items-center gap-1 bg-red-100 text-red-700 px-3 py-1.5 rounded-xl text-xs font-bold hover:bg-red-200">
                       <XCircle size={13}/> Reject
                     </button>
                   </div>
@@ -91,6 +104,27 @@ export default function ManagerLeave() {
             {displayed.length===0 && <p className="text-center py-8 text-slate-400 text-sm">No records found</p>}
           </div>
         </>
+      )}
+
+      {/* Reject Reason Modal */}
+      {rejectModal && (
+        <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl w-full max-w-sm p-6 shadow-2xl">
+            <h3 className="font-bold text-slate-800 mb-1">Reject Leave Request</h3>
+            <p className="text-xs text-slate-400 mb-4">{rejectModal.staffName} — {rejectModal.leaveType} ({rejectModal.fromDate} → {rejectModal.toDate})</p>
+            <div className="bg-red-50 border border-red-100 rounded-xl p-3 mb-4 text-xs text-red-600">
+              ⚠️ This reason will be sent to the staff member.
+            </div>
+            <label className="text-xs font-semibold text-slate-500 uppercase block mb-2">Rejection Reason *</label>
+            <textarea value={rejectReason} onChange={e=>setRejectReason(e.target.value)} rows={3}
+              placeholder="e.g. Critical deadline / Insufficient balance / Please reschedule..."
+              className="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-sm resize-none focus:outline-none focus:ring-2 focus:ring-red-400"/>
+            <div className="flex gap-3 mt-4">
+              <button onClick={()=>setRejectModal(null)} className="flex-1 py-2.5 border border-slate-200 rounded-xl text-slate-600 text-sm">Cancel</button>
+              <button onClick={confirmReject} className="flex-1 py-2.5 bg-red-600 text-white rounded-xl text-sm font-bold hover:bg-red-700">Send Rejection</button>
+            </div>
+          </div>
+        </div>
       )}
 
       {tab==='my' && (

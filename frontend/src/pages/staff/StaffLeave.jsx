@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import DashboardLayout from '../../components/DashboardLayout';
 import { useAuth } from '../../context/AuthContext';
 import { DUMMY_LEAVES } from '../../data/dummyData.jsx';
@@ -96,7 +96,12 @@ export default function StaffLeave() {
                     <td className="px-6 py-3 font-medium text-slate-700">{l.leaveType}</td>
                     <td className="px-4 py-3 text-slate-500">{l.fromDate}</td>
                     <td className="px-4 py-3 text-slate-500">{l.toDate}</td>
-                    <td className="px-4 py-3 text-slate-400 text-xs max-w-xs truncate">{l.reason}</td>
+                    <td className="px-4 py-3 text-slate-400 text-xs max-w-xs">
+                      <p className="truncate">{l.reason}</p>
+                      {l.rejectReason && (
+                        <p className="text-red-500 font-semibold mt-1">❌ Rejected: {l.rejectReason}</p>
+                      )}
+                    </td>
                     <td className="px-4 py-3 text-slate-400 text-xs">{l.appliedOn}</td>
                     <td className="px-4 py-3"><Badge status={l.status} /></td>
                   </tr>
