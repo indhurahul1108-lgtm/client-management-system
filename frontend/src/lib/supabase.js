@@ -1,14 +1,13 @@
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl  = import.meta.env.VITE_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+// Fallback to project credentials so it never throws on missing env
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://lkfugilmpgueogleajox.supabase.co';
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'sb_publishable_EwDnKiaeVP0jDGzcOyDpqw_qs8V5jKo';
 
-if (!supabaseUrl || !supabaseAnonKey) {
-  console.error('❌ Supabase credentials missing! Check your .env file.');
-}
-
-export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-  auth: { persistSession: true, autoRefreshToken: true },
-});
+export const supabase = (supabaseUrl && supabaseAnonKey && !supabaseUrl.includes('YOUR_PROJECT'))
+  ? createClient(supabaseUrl, supabaseAnonKey, {
+      auth: { persistSession: true, autoRefreshToken: true },
+    })
+  : null;
 
 export default supabase;

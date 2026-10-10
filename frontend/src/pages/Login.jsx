@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Phone, Lock, Eye, EyeOff, ArrowRight } from 'lucide-react';
@@ -18,11 +18,12 @@ export default function Login() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  // Already logged in
-  if (user) {
-    navigate(ROLE_REDIRECT[user.role]);
-    return null;
-  }
+  // Safely redirect if user is already logged in
+  useEffect(() => {
+    if (user && user.role && ROLE_REDIRECT[user.role]) {
+      navigate(ROLE_REDIRECT[user.role], { replace: true });
+    }
+  }, [user, navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -32,13 +33,17 @@ export default function Login() {
       return;
     }
     setLoading(true);
-    await new Promise(r => setTimeout(r, 600)); // simulate network
-    const result = login(form.mobile, form.password);
-    setLoading(false);
-    if (result.success) {
-      navigate(ROLE_REDIRECT[result.role]);
-    } else {
-      setError(result.message);
+    try {
+      const result = await login(form.mobile, form.password);
+      if (result && result.success) {
+        navigate(ROLE_REDIRECT[result.role] || '/admin', { replace: true });
+      } else {
+        setError(result?.message || 'Invalid mobile number or password');
+      }
+    } catch (err) {
+      setError('Login error. Please try again.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -149,6 +154,7 @@ export default function Login() {
                 {DEMOS.map(d => (
                   <button
                     key={d.label}
+                    type="button"
                     onClick={() => setForm({ mobile: d.mobile, password: d.password })}
                     className={`text-xs border rounded-lg px-3 py-2 font-medium transition hover:scale-105 ${d.color}`}
                   >
@@ -162,7 +168,7 @@ export default function Login() {
         </div>
 
         <p className="text-center text-white/50 text-xs mt-6">
-          © 2024 Client Management System. All rights reserved.
+          © Client Management System. All rights reserved.
         </p>
       </div>
     </div>
