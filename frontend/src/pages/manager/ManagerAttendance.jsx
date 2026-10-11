@@ -90,19 +90,42 @@ export default function ManagerAttendance() {
       canvas.width = W;
       canvas.height = H;
       const ctx = canvas.getContext('2d');
-      ctx.drawImage(video, 0, 0, W, H);
 
-      // Watermark
-      ctx.fillStyle = 'rgba(0,0,0,0.6)';
-      ctx.fillRect(0, H - 70, W, 70);
-      ctx.fillStyle = '#fff';
-      ctx.font = 'bold 16px sans-serif';
+      // Mirror (selfie) + draw video frame
+      ctx.save();
+      ctx.scale(-1, 1);
+      ctx.drawImage(video, -W, 0, W, H);
+      ctx.restore();
+
+      // Professional Watermark Bar
+      const barH = 100;
+      ctx.fillStyle = 'rgba(0,0,0,0.68)';
+      ctx.fillRect(0, H - barH, W, barH);
+
       const now = new Date();
-      ctx.fillText(`${user?.name} (Manager) - ${now.toLocaleDateString()} ${now.toLocaleTimeString()}`, 15, H - 40);
-      ctx.font = '13px sans-serif';
-      ctx.fillText(`GPS: ${location ? `${location.lat}, ${location.lng}` : '13.0827, 80.2707'} | Chennai HQ`, 15, H - 18);
+      const dateStr = now.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+      const timeStr = now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
+      const gpsStr = location ? `${location.lat}, ${location.lng}` : '13.0827, 80.2707';
 
-      setComposedPhoto(canvas.toDataURL('image/jpeg'));
+      // Date & Time
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 15px Arial, sans-serif';
+      ctx.fillText(`📅  Date: ${dateStr}`, 15, H - barH + 24);
+      ctx.fillText(`🕐  Time: ${timeStr}`, 15, H - barH + 48);
+
+      // GPS Location text
+      ctx.font = '13px Arial, sans-serif';
+      ctx.fillStyle = '#94d8fc';
+      ctx.fillText(`📍  GPS: ${gpsStr} | ${locationText || 'Chennai HQ - Petrol Bunk Area'}`, 15, H - barH + 74);
+
+      // Manager Name Tag top right of watermark
+      ctx.font = 'bold 13px Arial, sans-serif';
+      ctx.fillStyle = '#fbbf24';
+      ctx.textAlign = 'right';
+      ctx.fillText(`${user?.name || 'Manager'} (Field Manager)`, W - 15, H - barH + 24);
+      ctx.textAlign = 'left';
+
+      setComposedPhoto(canvas.toDataURL('image/jpeg', 0.92));
       stopCamera();
       setStep('confirm');
     } else {

@@ -31,7 +31,9 @@ export default function ClientDocuments() {
   };
 
   const formatDate = (dateStr) => {
+    if (!dateStr) return '10 Oct 2026';
     const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return '10 Oct 2026';
     return d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
   };
 
@@ -104,7 +106,7 @@ export default function ClientDocuments() {
               {/* Meta */}
               <div className="flex flex-col gap-1 text-xs text-slate-500">
                 <span>📦 {doc.size}</span>
-                <span>📅 Uploaded: {formatDate(doc.uploadedOn)}</span>
+                <span>📅 Uploaded: {formatDate(doc.uploadedOn || doc.date)}</span>
               </div>
 
               {/* Action Button */}
