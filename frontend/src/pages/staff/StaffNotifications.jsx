@@ -2,14 +2,14 @@ import React, { useState } from 'react';
 import DashboardLayout from '../../components/DashboardLayout';
 
 const NOTIFS = [
-  { id:1, title:'New Work Assigned',       msg:'Income Tax Filing FY 2025-26 has been assigned to you.',         icon:'📌', unread:true,  time:'2026-10-08T09:00:00' },
-  { id:2, title:'Work Due Tomorrow',       msg:'Export Documentation for Sunrise Exports is due tomorrow.',       icon:'📅', unread:true,  time:'2026-10-08T08:00:00' },
-  { id:3, title:'⚠️ Work Overdue',         msg:'GST Filing Q2 2026 is overdue by 3 days. Please update status.', icon:'⚠️', unread:true,  time:'2026-10-08T08:00:00' },
-  { id:4, title:'Leave Approved ✅',       msg:'Your leave request for Oct 20-22 has been approved.',             icon:'✅', unread:false, time:'2026-10-07T14:00:00' },
-  { id:5, title:'Work Status Updated',     msg:'Manager updated work WRK-001 priority to High.',                 icon:'🔄', unread:false, time:'2026-10-07T11:00:00' },
-  { id:6, title:'Manager Message',         msg:'Please provide status update on GST Filing by EOD today.',       icon:'💬', unread:false, time:'2026-10-07T10:00:00' },
-  { id:7, title:'Client Request',          msg:'Sri Tech client submitted a new service request.',               icon:'🏢', unread:false, time:'2026-10-06T09:00:00' },
-  { id:8, title:'Admin Announcement',      msg:'Office holiday on Oct 25 (Diwali). No attendance required.',    icon:'📢', unread:false, time:'2026-10-05T09:00:00' },
+  { id:1, title:'New Bunk Shift Assigned', msg:'Morning Shift at IOCL Anna Salai has been assigned to you.',  icon:'⛽', unread:true,  time:'2026-10-08T09:00:00' },
+  { id:2, title:'Shift Due Tomorrow',      msg:'Evening Shift duty at BPCL Guindy starts at 02:00 PM tomorrow.',icon:'📅', unread:true,  time:'2026-10-08T08:00:00' },
+  { id:3, title:'⚠️ Shift Punch-In Reminder', msg:'Please complete camera punch-in upon reaching fuel pump.',   icon:'⚠️', unread:true,  time:'2026-10-08T08:00:00' },
+  { id:4, title:'Leave Approved ✅',        msg:'Your leave request for Oct 20-22 has been approved.',          icon:'✅', unread:false, time:'2026-10-07T14:00:00' },
+  { id:5, title:'Duty Status Updated',     msg:'Manager confirmed cash collection signoff for Morning shift.', icon:'🔄', unread:false, time:'2026-10-07T11:00:00' },
+  { id:6, title:'Manager Message',         msg:'Please ensure fuel density log sheet is submitted by 02:00 PM.',icon:'💬', unread:false, time:'2026-10-07T10:00:00' },
+  { id:7, title:'Bunk Request',            msg:'IOCL Bunk requested 2 extra operators for rush hours.',         icon:'🏢', unread:false, time:'2026-10-06T09:00:00' },
+  { id:8, title:'Admin Announcement',      msg:'Diwali special bonus and roster timings updated for staff.',   icon:'📢', unread:false, time:'2026-10-05T09:00:00' },
 ];
 
 function groupByDate(notifs) {

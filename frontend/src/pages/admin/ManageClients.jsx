@@ -397,7 +397,7 @@ export default function ManageClients() {
                 <input
                   value={form.name}
                   onChange={e => setForm({ ...form, name: e.target.value })}
-                  placeholder="e.g. Sri Tech Solutions"
+                  placeholder="e.g. Indian Oil Petrol Bunk (IOCL)"
                   className="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm"
                 />
               </div>

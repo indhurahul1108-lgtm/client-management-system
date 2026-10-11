@@ -37,9 +37,9 @@ const RECENT_ACTIVITY = [
 
 const NOTIFICATIONS = [
   { id:1, msg:'Murugan P applied for Sick Leave — pending approval', type:'leave',   icon:'📋', unread:true },
-  { id:2, msg:'GST Filing for Sri Tech is 3 days overdue',          type:'overdue',  icon:'⚠️', unread:true },
-  { id:3, msg:'New client Delta Logistics registered',              type:'client',   icon:'🏢', unread:false },
-  { id:4, msg:'Vijay S was marked late today (10:35 AM)',           type:'attend',   icon:'🕐', unread:true },
+  { id:2, msg:'IOCL Anna Salai requests 2 additional fuel operators for evening shift', type:'overdue',  icon:'⚠️', unread:true },
+  { id:3, msg:'BPCL Guindy submitted monthly manpower verification', type:'client',   icon:'🏢', unread:false },
+  { id:4, msg:'Vijay S reported 15 mins late for Morning Shift at HPCL Bunk', type:'attend',   icon:'🕐', unread:true },
 ];
 
 function StatCard({ label, value, color, icon, to }) {

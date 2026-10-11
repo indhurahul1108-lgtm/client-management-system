@@ -4,17 +4,17 @@ import { X, Send } from 'lucide-react';
 
 const NOTIFS_INIT = [
   { id:1,  title:'Leave Request — Murugan P',     msg:'Sick Leave requested for Oct 10-11. Pending approval.',          type:'leave',   icon:'📋', unread:true,  time:'2026-10-08T09:30:00' },
-  { id:2,  title:'⚠️ Work Overdue — GST Filing', msg:'Sri Tech GST Filing is 3 days overdue.',                         type:'overdue', icon:'⚠️', unread:true,  time:'2026-10-08T08:00:00' },
-  { id:3,  title:'Staff Late — Vijay S',          msg:'Vijay S punched in at 10:35 AM (25 mins late).',                 type:'attend',  icon:'🕐', unread:true,  time:'2026-10-08T10:36:00' },
-  { id:4,  title:'New Client Registered',         msg:'Delta Logistics has been added as a new client.',               type:'client',  icon:'🏢', unread:false, time:'2026-10-08T09:00:00' },
-  { id:5,  title:'Work Completed ✅',             msg:'Annual Audit for Sri Tech completed by Anitha Devi.',            type:'work',    icon:'✅', unread:false, time:'2026-10-07T18:00:00' },
-  { id:6,  title:'⚠️ TDS Filing Overdue',         msg:'Global Traders TDS Return is 5 days overdue.',                  type:'overdue', icon:'⚠️', unread:true,  time:'2026-10-07T08:00:00' },
-  { id:7,  title:'Staff Absent — Ravi Kumar',     msg:'Ravi Kumar has not punched in today.',                          type:'attend',  icon:'🔴', unread:false, time:'2026-10-08T11:00:00' },
-  { id:8,  title:'Salary Pending — 3 Staff',      msg:'October salary not yet processed for 3 staff members.',         type:'salary',  icon:'💰', unread:false, time:'2026-10-07T09:00:00' },
+  { id:2,  title:'⚠️ Bunk Shift Allocation',      msg:'IOCL Anna Salai requires 2 standby fuel operators for evening rush.', type:'overdue', icon:'⚠️', unread:true,  time:'2026-10-08T08:00:00' },
+  { id:3,  title:'Staff Late — Vijay S',          msg:'Vijay S punched in at 06:15 AM (15 mins late for Morning Shift).', type:'attend',  icon:'🕐', unread:true,  time:'2026-10-08T06:16:00' },
+  { id:4,  title:'New Petrol Bunk Registered',    msg:'Nayara Energy Fuel Pump (Poonamallee) added under ELAKIYAA.',   type:'client',  icon:'🏢', unread:false, time:'2026-10-08T09:00:00' },
+  { id:5,  title:'Bunk Duty Completed ✅',         msg:'Morning Shift Duty at IOCL Anna Salai completed by Anitha Devi.', type:'work',   icon:'✅', unread:false, time:'2026-10-07T14:00:00' },
+  { id:6,  title:'⚠️ Monthly Bunk Bill Pending',  msg:'BPCL Guindy manpower invoice verification pending.',             type:'overdue', icon:'⚠️', unread:true,  time:'2026-10-07T08:00:00' },
+  { id:7,  title:'Staff Absent — Ravi Kumar',     msg:'Ravi Kumar has not reported for Night Shift.',                  type:'attend',  icon:'🔴', unread:false, time:'2026-10-08T22:30:00' },
+  { id:8,  title:'Salary Pending — 3 Attendants', msg:'October wages ready for disbursement via GPay / Bank Transfer.',type:'salary',  icon:'💰', unread:false, time:'2026-10-07T09:00:00' },
   { id:9,  title:'Leave Approved',                msg:'Deepa S Annual Leave Oct 20-23 has been approved.',             type:'leave',   icon:'✅', unread:false, time:'2026-10-06T14:00:00' },
-  { id:10, title:'Work Due Tomorrow',             msg:'Export Documentation for Sunrise Exports due tomorrow.',        type:'work',    icon:'📅', unread:true,  time:'2026-10-07T10:00:00' },
+  { id:10, title:'Bunk Inspection Tomorrow',      msg:'Manager site visit scheduled for HPCL OMR fuel station.',       type:'work',    icon:'📅', unread:true,  time:'2026-10-07T10:00:00' },
   { id:11, title:'New Staff Leave Request',       msg:'Lavanya M applied for Casual Leave Oct 25.',                   type:'leave',   icon:'📋', unread:false, time:'2026-10-06T11:00:00' },
-  { id:12, title:'System: Shift Time Updated',    msg:'Admin updated shift to 10:00 AM with 10 min grace.',           type:'system',  icon:'⚙️', unread:false, time:'2026-10-05T09:00:00' },
+  { id:12, title:'System: 3 Bunk Shifts Active',  msg:'24/7 Bunk Operational shifts (Morning, Evening, Night) active.', type:'system', icon:'⚙️', unread:false, time:'2026-10-05T09:00:00' },
 ];
 
 const TYPES = ['all','leave','overdue','attend','work','client','salary','system'];

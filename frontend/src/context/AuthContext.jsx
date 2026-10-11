@@ -9,14 +9,18 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Restore saved session on startup
+  // Restore saved session on startup & sync with latest dummy data
   useEffect(() => {
     try {
       const saved = localStorage.getItem('cms_user');
       if (saved) {
         const parsed = JSON.parse(saved);
         if (parsed && parsed.role) {
-          setUser(parsed);
+          // If the cached user matches any in DUMMY_USERS, update with the latest name, photo, etc.
+          const fresh = DUMMY_USERS.find(u => u.mobile === parsed.mobile || u.id === parsed.id || (parsed.clientId && u.clientId === parsed.clientId));
+          const updatedUser = fresh ? { ...parsed, ...fresh } : parsed;
+          setUser(updatedUser);
+          localStorage.setItem('cms_user', JSON.stringify(updatedUser));
         }
       }
     } catch (e) {

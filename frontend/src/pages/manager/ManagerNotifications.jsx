@@ -5,13 +5,13 @@ import { Bell, X } from 'lucide-react';
 
 const NOTIFS = [
   { id:1, title:'Staff Leave Request', msg:'Anitha Devi applied for Sick Leave Oct 10-11. Action required.', type:'leave',   icon:'📋', unread:true,  time:'2026-10-08T09:30:00' },
-  { id:2, title:'⚠️ Work Overdue',     msg:'GST Filing for Sri Tech is 3 days overdue.',                   type:'overdue', icon:'⚠️', unread:true,  time:'2026-10-08T08:00:00' },
-  { id:3, title:'Staff Absent',        msg:'Ravi Kumar has not punched in today.',                          type:'attend',  icon:'🔴', unread:true,  time:'2026-10-08T11:00:00' },
-  { id:4, title:'Work Completed ✅',   msg:'Annual Audit completed by Anitha Devi.',                       type:'work',    icon:'✅', unread:false, time:'2026-10-07T18:00:00' },
-  { id:5, title:'Leave Approved',      msg:'Your leave request for Oct 20-22 has been approved by Admin.', type:'leave',   icon:'✅', unread:false, time:'2026-10-07T14:00:00' },
-  { id:6, title:'New Work Assigned',   msg:'New work WRK-010 assigned to your team.',                      type:'work',    icon:'📌', unread:false, time:'2026-10-06T09:00:00' },
-  { id:7, title:'Client Request',      msg:'Sri Tech submitted a new service request.',                     type:'client',  icon:'🏢', unread:false, time:'2026-10-06T11:00:00' },
-  { id:8, title:'Admin Announcement',  msg:'Office will be closed on Oct 25 for Diwali.',                  type:'system',  icon:'📢', unread:false, time:'2026-10-05T09:00:00' },
+  { id:2, title:'⚠️ Shift Coverage',  msg:'IOCL Anna Salai evening shift needs 1 relief pump attendant.',   type:'overdue', icon:'⚠️', unread:true,  time:'2026-10-08T08:00:00' },
+  { id:3, title:'Staff Absent',        msg:'Ravi Kumar has not punched in today for Night Shift.',          type:'attend',  icon:'🔴', unread:true,  time:'2026-10-08T22:30:00' },
+  { id:4, title:'Bunk Duty Completed ✅', msg:'Morning shift cash audit completed by Anitha Devi.',        type:'work',    icon:'✅', unread:false, time:'2026-10-07T14:00:00' },
+  { id:5, title:'Leave Approved',      msg:'Your manager leave request has been approved by Admin.',       type:'leave',   icon:'✅', unread:false, time:'2026-10-07T14:00:00' },
+  { id:6, title:'New Roster Assigned', msg:'Bunk allocation roster for upcoming week published.',          type:'work',    icon:'📌', unread:false, time:'2026-10-06T09:00:00' },
+  { id:7, title:'Bunk Request',        msg:'IOCL Anna Salai requested 2 extra operators for weekend.',      type:'client',  icon:'🏢', unread:false, time:'2026-10-06T11:00:00' },
+  { id:8, title:'Admin Announcement',  msg:'Safety guidelines briefing for all bunk crew on Monday.',       type:'system',  icon:'📢', unread:false, time:'2026-10-05T09:00:00' },
 ];
 
 function groupByDate(notifs) {
