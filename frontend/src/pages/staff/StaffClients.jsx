@@ -6,10 +6,15 @@ import { Building2, Phone, MapPin, Mail } from 'lucide-react';
 
 export default function StaffClients() {
   const { user } = useAuth();
-  // Find clients assigned to this staff member
-  const myClients = DUMMY_USERS.filter(
-    u => u.role === 'client' && u.assignedStaffId === user?.staffId
-  );
+  
+  // Find all petrol bunks assigned to this staff member (handles multi-bunks)
+  const myClients = DUMMY_USERS.filter(u => {
+    if (u.role !== 'client') return false;
+    // Check if directly assigned or in staff's assignedClientIds array
+    const staffObj = DUMMY_USERS.find(s => s.id === user?.id || s.staffId === user?.staffId);
+    const assignedIds = staffObj?.assignedClientIds || user?.assignedClientIds || [];
+    return u.assignedStaffId === user?.staffId || assignedIds.includes(u.clientId);
+  });
 
   return (
     <DashboardLayout title="My Clients">

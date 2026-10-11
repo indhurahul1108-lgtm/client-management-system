@@ -206,12 +206,20 @@ export default function StaffAttendance() {
 
         <div className="flex gap-3">
           <button onClick={() => openCamera('in')} disabled={!!punched.in}
-            className="flex-1 flex items-center justify-center gap-2 bg-green-500 hover:bg-green-400 disabled:opacity-40 disabled:cursor-not-allowed text-white py-3.5 rounded-2xl font-bold transition text-sm">
-            <LogIn size={17} /> Punch In
+            className="flex-1 flex flex-col items-center justify-center gap-1 bg-green-500 hover:bg-green-400 disabled:opacity-40 disabled:cursor-not-allowed text-white py-4 rounded-2xl font-bold transition shadow-lg">
+            <div className="flex items-center gap-2 text-base">
+              <LogIn size={20} />
+              <span>Punch In</span>
+            </div>
+            <span className="text-[11px] font-normal text-green-100">வேலை தொடங்கு (செல்ஃபி & GPS)</span>
           </button>
           <button onClick={() => openCamera('out')} disabled={!punched.in || !!punched.out}
-            className="flex-1 flex items-center justify-center gap-2 bg-red-500 hover:bg-red-400 disabled:opacity-40 disabled:cursor-not-allowed text-white py-3.5 rounded-2xl font-bold transition text-sm">
-            <LogOut size={17} /> Punch Out
+            className="flex-1 flex flex-col items-center justify-center gap-1 bg-red-500 hover:bg-red-400 disabled:opacity-40 disabled:cursor-not-allowed text-white py-4 rounded-2xl font-bold transition shadow-lg">
+            <div className="flex items-center gap-2 text-base">
+              <LogOut size={20} />
+              <span>Punch Out</span>
+            </div>
+            <span className="text-[11px] font-normal text-red-100">வேலை முடி (போட்டோ பதிவு)</span>
           </button>
         </div>
       </div>

@@ -60,6 +60,7 @@ export const DUMMY_USERS = [
     managerId: 'm001',
     salary: 25000,
     staffId: 's001',
+    assignedClientIds: ['c001', 'c002', 'c004'],
   },
   {
     id: 'u005',
@@ -74,6 +75,7 @@ export const DUMMY_USERS = [
     managerId: 'm001',
     salary: 22000,
     staffId: 's002',
+    assignedClientIds: ['c001', 'c003', 'c005'],
   },
   {
     id: 'u006',
@@ -88,6 +90,7 @@ export const DUMMY_USERS = [
     managerId: 'm002',
     salary: 28000,
     staffId: 's003',
+    assignedClientIds: ['c002', 'c004', 'c006'],
   },
   {
     id: 'u007',
@@ -102,6 +105,7 @@ export const DUMMY_USERS = [
     managerId: 'm002',
     salary: 24000,
     staffId: 's004',
+    assignedClientIds: ['c003', 'c005', 'c007'],
   },
   {
     id: 'u008',
@@ -116,6 +120,7 @@ export const DUMMY_USERS = [
     managerId: 'm001',
     salary: 26000,
     staffId: 's005',
+    assignedClientIds: ['c001', 'c006', 'c008'],
   },
   {
     id: 'u009',
@@ -130,6 +135,7 @@ export const DUMMY_USERS = [
     managerId: 'm002',
     salary: 21000,
     staffId: 's006',
+    assignedClientIds: ['c002', 'c007'],
   },
   {
     id: 'u010',
@@ -144,6 +150,7 @@ export const DUMMY_USERS = [
     managerId: 'm001',
     salary: 27000,
     staffId: 's007',
+    assignedClientIds: ['c003', 'c008', 'c009'],
   },
   {
     id: 'u011',
@@ -158,6 +165,7 @@ export const DUMMY_USERS = [
     managerId: 'm002',
     salary: 23000,
     staffId: 's008',
+    assignedClientIds: ['c001', 'c004', 'c010'],
   },
   {
     id: 'u012',
@@ -172,6 +180,7 @@ export const DUMMY_USERS = [
     managerId: 'm001',
     salary: 29000,
     staffId: 's009',
+    assignedClientIds: ['c005', 'c009'],
   },
   {
     id: 'u013',
@@ -186,6 +195,7 @@ export const DUMMY_USERS = [
     managerId: 'm002',
     salary: 20000,
     staffId: 's010',
+    assignedClientIds: ['c002', 'c006', 'c010'],
   },
 
   // ── CLIENTS (PETROL BUNKS & FUEL STATIONS) ───────────────

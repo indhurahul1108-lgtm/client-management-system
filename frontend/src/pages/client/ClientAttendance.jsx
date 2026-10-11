@@ -178,15 +178,23 @@ export default function ClientAttendance() {
           <div className="flex gap-3">
             <button
               onClick={() => startCamera('in')}
-              className="flex-1 flex items-center justify-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 px-4 rounded-xl shadow transition text-xs"
+              className="flex-1 flex flex-col items-center justify-center gap-1 bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3.5 px-4 rounded-2xl shadow transition"
             >
-              <LogIn size={15} /> Punch In (Camera Selfie)
+              <div className="flex items-center gap-2 text-sm">
+                <LogIn size={18} />
+                <span>Punch In</span>
+              </div>
+              <span className="text-[10px] font-normal text-emerald-100">ஆட்கள் பணி தொடங்கு (செல்ஃபி & GPS)</span>
             </button>
             <button
               onClick={() => startCamera('out')}
-              className="flex-1 flex items-center justify-center gap-2 bg-rose-500 hover:bg-rose-600 text-white font-bold py-3 px-4 rounded-xl shadow transition text-xs"
+              className="flex-1 flex flex-col items-center justify-center gap-1 bg-rose-500 hover:bg-rose-600 text-white font-bold py-3.5 px-4 rounded-2xl shadow transition"
             >
-              <LogOut size={15} /> Punch Out (Camera Selfie)
+              <div className="flex items-center gap-2 text-sm">
+                <LogOut size={18} />
+                <span>Punch Out</span>
+              </div>
+              <span className="text-[10px] font-normal text-rose-100">பணி முடிவு பதிவு (செல்ஃபி & GPS)</span>
             </button>
           </div>
         </div>

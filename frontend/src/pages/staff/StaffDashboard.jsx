@@ -12,7 +12,14 @@ const today = new Date().toISOString().split('T')[0];
 export default function StaffDashboard() {
   const { user } = useAuth();
   const todayAtt = DUMMY_ATTENDANCE.find(a => a.userId === user?.id && a.date === today);
-  const myClients = DUMMY_USERS.filter(u => u.role === 'client' && u.assignedStaffId === user?.staffId);
+  
+  // Find all petrol bunks assigned to this staff member (handles multiple bunks)
+  const myClients = DUMMY_USERS.filter(u => {
+    if (u.role !== 'client') return false;
+    const staffObj = DUMMY_USERS.find(s => s.id === user?.id || s.staffId === user?.staffId);
+    const assignedIds = staffObj?.assignedClientIds || user?.assignedClientIds || [];
+    return u.assignedStaffId === user?.staffId || assignedIds.includes(u.clientId);
+  });
   const myWorks = CLIENT_WORKS.filter(w => w.staffId === user?.staffId);
   const myLeave = DUMMY_LEAVES.filter(l => l.staffId === user?.id);
   const latestLeave = myLeave[0];
@@ -115,24 +122,28 @@ export default function StaffDashboard() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-        {/* My Clients */}
+        {/* My Petrol Bunks */}
         <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
           <div className="px-5 py-4 border-b border-slate-50 flex items-center justify-between">
-            <h3 className="font-bold text-slate-800 flex items-center gap-2"><Users size={15} className="text-green-600"/>My Clients</h3>
-            <Link to="/staff/clients" className="text-xs text-green-600 font-semibold">View All →</Link>
+            <h3 className="font-bold text-slate-800 flex items-center gap-2">
+              <Users size={15} className="text-green-600"/>
+              <span>Assigned Petrol Bunks</span>
+              <span className="bg-orange-100 text-orange-700 text-xs px-2 py-0.5 rounded-full font-bold">{myClients.length} Bunks</span>
+            </h3>
+            <Link to="/staff/clients" className="text-xs text-green-600 font-semibold hover:underline">View All Bunks →</Link>
           </div>
           <div className="divide-y divide-slate-50">
-            {myClients.slice(0, 4).map(c => (
-              <div key={c.id} className="px-5 py-3 flex items-center gap-3 hover:bg-slate-50">
-                <img src={c.photo} alt="" className="w-8 h-8 rounded-full object-cover shrink-0"/>
-                <div className="flex-1">
-                  <p className="font-medium text-slate-700 text-sm">{c.name}</p>
-                  <p className="text-xs text-slate-400">{c.service}</p>
+            {myClients.map(c => (
+              <div key={c.id} className="px-5 py-3 flex items-center gap-3 hover:bg-slate-50 transition">
+                <img src={c.photo} alt="" className="w-9 h-9 rounded-xl object-cover shrink-0"/>
+                <div className="flex-1 min-w-0">
+                  <p className="font-bold text-slate-800 text-sm truncate">{c.name}</p>
+                  <p className="text-xs text-slate-500 truncate">{c.service || 'Bunk Attendant Coverage'}</p>
                 </div>
-                <span className={`text-xs px-2 py-0.5 rounded-full font-semibold ${c.status==='active'?'bg-green-100 text-green-700':'bg-red-100 text-red-700'}`}>{c.status}</span>
+                <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${c.status==='active'?'bg-green-100 text-green-700':'bg-red-100 text-red-700'}`}>{c.status}</span>
               </div>
             ))}
-            {myClients.length === 0 && <p className="text-center py-6 text-slate-400 text-sm">No clients assigned</p>}
+            {myClients.length === 0 && <p className="text-center py-6 text-slate-400 text-sm">No petrol bunks assigned</p>}
           </div>
         </div>
 

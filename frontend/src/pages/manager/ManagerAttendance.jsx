@@ -186,15 +186,23 @@ export default function ManagerAttendance() {
             <div className="flex gap-4">
               <button
                 onClick={() => startCamera('in')}
-                className="flex-1 flex items-center justify-center gap-2 bg-green-500 hover:bg-green-600 text-white font-bold py-3.5 px-4 rounded-2xl shadow transition active:scale-95 text-sm"
+                className="flex-1 flex flex-col items-center justify-center gap-1 bg-green-500 hover:bg-green-600 text-white font-bold py-4 px-4 rounded-2xl shadow-lg transition active:scale-95"
               >
-                <LogIn size={18} /> Punch In (Camera)
+                <div className="flex items-center gap-2 text-base">
+                  <LogIn size={20} />
+                  <span>Punch In</span>
+                </div>
+                <span className="text-[11px] font-normal text-green-100">மேலாளர் வருகை (செல்ஃபி & GPS)</span>
               </button>
               <button
                 onClick={() => startCamera('out')}
-                className="flex-1 flex items-center justify-center gap-2 bg-rose-500 hover:bg-rose-600 text-white font-bold py-3.5 px-4 rounded-2xl shadow transition active:scale-95 text-sm"
+                className="flex-1 flex flex-col items-center justify-center gap-1 bg-rose-500 hover:bg-rose-600 text-white font-bold py-4 px-4 rounded-2xl shadow-lg transition active:scale-95"
               >
-                <LogOut size={18} /> Punch Out (Camera)
+                <div className="flex items-center gap-2 text-base">
+                  <LogOut size={20} />
+                  <span>Punch Out</span>
+                </div>
+                <span className="text-[11px] font-normal text-rose-100">பணி முடிவு பதிவு</span>
               </button>
             </div>
           </div>
