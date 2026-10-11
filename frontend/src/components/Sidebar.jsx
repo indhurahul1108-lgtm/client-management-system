@@ -52,15 +52,15 @@ const MENUS = {
     { label: 'Profile',      icon: User,            path: '/staff/profile' },
   ],
   client: [
-    { label: 'Bunk Dashboard',  icon: LayoutDashboard, path: '/client' },
-    { label: 'Deployed Staff',  icon: Users,           path: '/client/work' },
-    { label: 'Bunk Attendance', icon: Clock,           path: '/client/checkin' },
-    { label: 'Manpower Request',icon: FileText,        path: '/client/requests' },
-    { label: 'Messages',        icon: ClipboardList,   path: '/client/messages' },
-    { label: 'Invoices & Bills',icon: BarChart2,       path: '/client/documents' },
-    { label: 'Bunk History',    icon: CalendarCheck,   path: '/client/history' },
-    { label: 'Notifications',   icon: Bell,            path: '/client/notifications' },
-    { label: 'Client Profile',  icon: User,            path: '/client/profile' },
+    { label: 'Candidate Portal', icon: LayoutDashboard, path: '/client' },
+    { label: 'My Bunk Duty',     icon: Building2,       path: '/client' },
+    { label: 'Attendance Punch', icon: Clock,           path: '/client/checkin' },
+    { label: 'My Work / Tasks',  icon: Users,           path: '/client/work' },
+    { label: 'Requests',         icon: FileText,        path: '/client/requests' },
+    { label: 'Messages',         icon: ClipboardList,   path: '/client/messages' },
+    { label: 'My Documents',     icon: BarChart2,       path: '/client/documents' },
+    { label: 'Notifications',    icon: Bell,            path: '/client/notifications' },
+    { label: 'Profile',          icon: User,            path: '/client/profile' },
   ],
 };
 
@@ -72,7 +72,7 @@ const ROLE_COLORS = {
 };
 
 const ROLE_LABELS = {
-  admin: 'Administrator', manager: 'Manager', staff: 'Staff', client: 'Bunk Client',
+  admin: 'Administrator', manager: 'Manager', staff: 'Staff', client: 'Client Candidate',
 };
 
 export default function Sidebar() {
@@ -104,13 +104,18 @@ export default function Sidebar() {
     'My Work': 'என் வேலை',
     'My Bunk Duty': 'இன்றைய பங்க் வேலை',
     'Documents': 'ஆவணங்கள்',
-    'Bunk Dashboard': 'பங்க் முகப்பு',
+    'Candidate Portal': 'கிளைண்ட் முகப்பு',
+    'Attendance Punch': 'வருகைப் பதிவு (Punch In/Out)',
+    'My Work / Tasks': 'பணி விபரங்கள் (Tasks)',
+    'Requests': 'விண்ணப்பங்கள் (Requests)',
+    'My Documents': 'என் ஆவணங்கள் (Documents)',
+    'Bunk Dashboard': 'கிளைண்ட் முகப்பு',
     'Deployed Staff': 'பணியில் உள்ள ஆட்கள்',
-    'Bunk Attendance': 'பங்க் வருகைப் பதிவு',
+    'Bunk Attendance': 'வருகைப் பதிவு (Punch)',
     'Manpower Request': 'ஆட்கள் தேவை கோரிக்கை',
     'Messages': 'செய்திகள் (Messages)',
     'Invoices & Bills': 'பில் & ரசீதுகள்',
-    'Bunk History': 'பங்க் வரலாறு',
+    'Bunk History': 'பணி வரலாறு',
     'Client Profile': 'கிளைண்ட் சுயவிபரம் (Client Profile)',
     'Bunk Profile': 'கிளைண்ட் சுயவிபரம் (Client Profile)',
   };

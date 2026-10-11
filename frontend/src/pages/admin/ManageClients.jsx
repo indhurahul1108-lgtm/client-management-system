@@ -146,7 +146,7 @@ export default function ManageClients() {
           <table className="w-full text-sm">
             <thead className="bg-slate-50">
               <tr>
-                {['Client / Organization', 'Service / Scope', 'Assigned Staff', 'Mobile & Contact', 'Registered', 'Status', 'Actions'].map(h => (
+                {['Candidate (Client)', 'Assigned Petrol Bunk', 'Shift & Role', 'Salary (Admin Fixed)', 'Assigned Staff', 'Mobile', 'Status', 'Actions'].map(h => (
                   <th key={h} className="text-left px-4 py-3 text-xs font-semibold text-slate-400 uppercase whitespace-nowrap">{h}</th>
                 ))}
               </tr>
@@ -160,22 +160,29 @@ export default function ManageClients() {
                       <div className="flex items-center gap-3">
                         <img src={c.photo} alt="" className="w-9 h-9 rounded-xl object-cover shrink-0" />
                         <div>
-                          {/* Click Client Name -> 3-Month Details Modal */}
                           <button
                             onClick={() => openClientDetail(c)}
                             className="font-bold text-slate-800 hover:text-orange-600 text-left text-xs transition underline decoration-dotted"
-                            title="Click to view 3-month history & services"
+                            title="Click to view candidate details"
                           >
                             {c.name}
                           </button>
-                          <p className="text-xs text-slate-400 font-mono">{c.clientId || c.id}</p>
+                          <p className="text-[11px] text-slate-400 font-mono">{c.clientId?.toUpperCase() || c.id}</p>
                         </div>
                       </div>
                     </td>
                     <td className="px-4 py-3">
-                      <span className="text-xs font-medium text-slate-700 bg-slate-100 px-2.5 py-1 rounded-lg">
-                        {c.service || 'Accounts & Audit'}
+                      <p className="text-xs font-semibold text-slate-800">{c.assignedBunk || 'Petrol Bunk'}</p>
+                      <p className="text-[11px] text-slate-400">{c.bunkLocation || 'Chennai'}</p>
+                    </td>
+                    <td className="px-4 py-3">
+                      <span className="text-xs font-medium text-slate-700 bg-slate-100 px-2.5 py-1 rounded-lg block w-fit">
+                        {c.roleAtBunk || 'Worker'}
                       </span>
+                      <p className="text-[10px] text-slate-400 mt-1">{c.shift || 'Shift 1'}</p>
+                    </td>
+                    <td className="px-4 py-3 font-mono font-bold text-slate-800 text-xs">
+                      ₹{(c.salary || 18500).toLocaleString('en-IN')}
                     </td>
                     <td className="px-4 py-3 whitespace-nowrap">
                       <div className="flex items-center gap-2">

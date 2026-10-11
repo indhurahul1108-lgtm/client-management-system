@@ -65,18 +65,21 @@ export default function ReportsAdmin() {
         </head>
         <body>
           <div class="header">
-            <div>
-              <div class="company">Client Management System</div>
-              <div class="report-title">${title}</div>
-              <div class="date">Generated: ${date}</div>
+            <div style="display:flex; align-items:center; gap:12px;">
+              <img src="/logo.png" style="height:44px; width:auto; object-fit:contain;" alt="ELAKIYAA Logo" />
+              <div>
+                <div class="company">ELAKIYAA - JOBS MADE SIMPLE</div>
+                <div class="report-title">${title}</div>
+                <div class="date">Report Generated: ${date}</div>
+              </div>
             </div>
             <div style="text-align:right; color:#64748b; font-size:11px;">
-              <div>Printed by: Admin</div>
-              <div>${new Date().toLocaleTimeString('en-IN')}</div>
+              <div>Verified by: <strong>Admin / Management</strong></div>
+              <div>Time: ${new Date().toLocaleTimeString('en-IN')}</div>
             </div>
           </div>
           ${content.innerHTML}
-          <div class="footer">This is a system-generated report. Client Management System © ${new Date().getFullYear()}</div>
+          <div class="footer">Official Records · ELAKIYAA - Jobs Made Simple © ${new Date().getFullYear()}</div>
         </body>
       </html>
     `);

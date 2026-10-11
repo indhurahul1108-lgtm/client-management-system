@@ -1,125 +1,142 @@
 import React from 'react';
 import DashboardLayout from '../../components/DashboardLayout';
 import { useAuth } from '../../context/AuthContext';
+import { useLanguage } from '../../context/LanguageContext';
 import { DUMMY_USERS } from '../../data/dummyData.jsx';
-import { User, Phone, MapPin, Building2, Briefcase, Calendar, Shield, UserCheck } from 'lucide-react';
+import { User, Phone, MapPin, Building2, Briefcase, Calendar, Shield, UserCheck, IndianRupee, Clock, CreditCard } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 export default function ClientProfile() {
   const { user } = useAuth();
+  const { lang, t } = useLanguage();
   const assignedStaff   = DUMMY_USERS.find(u => u.staffId === user?.assignedStaffId);
-  const assignedManager = DUMMY_USERS.find(u => u.managerId === assignedStaff?.managerId && u.role === 'manager');
+  const assignedManager = DUMMY_USERS.find(u => u.name === user?.bunkManager || (u.role === 'manager' && u.managerId === 'm001'));
 
   const InfoRow = ({ icon, label, value, highlight }) => (
     <div className={`flex items-start gap-3 py-3.5 border-b border-slate-50 last:border-0 ${highlight ? 'bg-orange-50/40 -mx-5 px-5 rounded-xl' : ''}`}>
-      <div className="w-9 h-9 bg-orange-50 rounded-xl flex items-center justify-center shrink-0 mt-0.5">{icon}</div>
+      <div className="w-9 h-9 bg-orange-50 rounded-xl flex items-center justify-center shrink-0 mt-0.5 text-orange-600">{icon}</div>
       <div>
         <p className="text-xs text-slate-400 font-semibold uppercase tracking-wide">{label}</p>
-        <p className={`text-sm font-semibold mt-0.5 ${highlight ? 'text-orange-700' : 'text-slate-700'}`}>{value || '—'}</p>
+        <p className={`text-sm font-semibold mt-0.5 ${highlight ? 'text-orange-700' : 'text-slate-800'}`}>{value || '—'}</p>
       </div>
     </div>
   );
 
   return (
-    <DashboardLayout title="Client Profile">
+    <DashboardLayout title={lang === 'ta' ? 'பணியாளர் சுயவிபரம் (Candidate Profile)' : 'My Profile'}>
 
       {/* Cover + Avatar */}
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden mb-5">
-        <div className="h-32 bg-gradient-to-r from-orange-500 to-amber-500 relative">
-          <div className="absolute -bottom-10 left-6">
+      <div className="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden mb-6">
+        <div className="h-36 bg-gradient-to-r from-orange-600 via-amber-600 to-orange-700 relative">
+          <div className="absolute -bottom-12 left-6">
             <img
-              src={user?.photo || `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || 'Client')}&background=f97316&color=fff&size=128`}
+              src={user?.photo || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150'}
               alt={user?.name}
-              className="w-20 h-20 rounded-2xl object-cover border-4 border-white shadow-lg"
+              className="w-24 h-24 rounded-2xl object-cover border-4 border-white shadow-xl bg-white"
             />
           </div>
         </div>
-        <div className="pt-12 px-6 pb-5">
-          <div className="flex items-start justify-between flex-wrap gap-3">
+        <div className="pt-16 px-6 pb-6">
+          <div className="flex items-start justify-between flex-wrap gap-4">
             <div>
-              <h2 className="text-xl font-bold text-slate-800">{user?.name}</h2>
-              <p className="text-slate-400 text-sm font-mono">{user?.clientId?.toUpperCase()} · Official Client Account</p>
-              <div className="flex items-center gap-2 mt-2">
-                <span className="bg-orange-100 text-orange-700 text-xs font-bold px-3 py-1 rounded-full">Client Partner</span>
-                <span className={`text-xs font-bold px-3 py-1 rounded-full ${user?.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-                  {user?.status || 'Active'}
+              <div className="flex items-center gap-2 flex-wrap">
+                <h2 className="text-2xl font-black text-slate-800">{user?.name}</h2>
+                <span className="bg-emerald-100 text-emerald-800 text-xs font-bold px-3 py-1 rounded-full">
+                  {lang === 'ta' ? 'பணியில் உள்ளார்' : 'Active Deployed Candidate'}
                 </span>
               </div>
+              <p className="text-slate-500 text-sm mt-1">
+                {user?.roleAtBunk || 'Fuel Dispenser Attendant'} &nbsp;·&nbsp;
+                ID: <span className="font-mono font-bold text-orange-600">{user?.clientId?.toUpperCase() || 'C001'}</span>
+              </p>
             </div>
-            <div className="text-right text-xs text-slate-400">
-              <p>Client Partner Since</p>
-              <p className="font-semibold text-slate-600">{user?.joinDate || '2023-01-15'}</p>
+            <div className="text-left sm:text-right text-xs text-slate-500">
+              <p>{lang === 'ta' ? 'சேர்ந்த நாள் (Joining Date)' : 'Date of Joining'}</p>
+              <p className="font-bold text-slate-800 text-sm mt-0.5">{user?.joinDate || '2023-01-15'}</p>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
-        {/* Personal Info */}
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-5">
-          <h3 className="font-bold text-slate-800 mb-3 flex items-center gap-2 text-sm uppercase tracking-wide text-slate-500">
-            <User size={15} className="text-orange-500" /> Personal Information
+        {/* Personal Details */}
+        <div className="bg-white rounded-3xl shadow-sm border border-slate-100 p-6">
+          <h3 className="font-bold text-slate-800 mb-4 flex items-center gap-2 text-sm uppercase tracking-wider text-slate-600">
+            <User size={16} className="text-orange-600" /> {lang === 'ta' ? 'தனிநபர் விவரங்கள்' : 'Personal Information'}
           </h3>
-          <InfoRow icon={<User size={15} className="text-orange-500" />}     label="Full Name"    value={user?.name} />
-          <InfoRow icon={<Phone size={15} className="text-orange-500" />}    label="Mobile"       value={user?.mobile} />
-          <InfoRow icon={<MapPin size={15} className="text-orange-500" />}   label="Address"      value={user?.address} />
-          <InfoRow icon={<Calendar size={15} className="text-orange-500" />} label="Joined Date"  value={user?.joinDate} />
+          <InfoRow icon={<User size={16} />} label={lang === 'ta' ? 'முழு பெயர்' : 'Full Name'} value={user?.name} />
+          <InfoRow icon={<Phone size={16} />} label={lang === 'ta' ? 'மொபைல் எண் (Mobile)' : 'Mobile Phone'} value={user?.mobile} />
+          <InfoRow icon={<MapPin size={16} />} label={lang === 'ta' ? 'முகவரி (Residential Address)' : 'Address'} value={user?.address} />
+          <InfoRow icon={<Shield size={16} />} label={lang === 'ta' ? 'ஆதார் KYC' : 'Aadhaar Number'} value={user?.aadhaar || 'XXXX-XXXX-4512'} />
         </div>
 
-        {/* Service Info */}
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-5">
-          <h3 className="font-bold text-slate-800 mb-3 flex items-center gap-2 text-sm uppercase tracking-wide text-slate-500">
-            <Briefcase size={15} className="text-orange-500" /> Service Details
+        {/* Assigned Bunk & Deployment */}
+        <div className="bg-white rounded-3xl shadow-sm border border-slate-100 p-6">
+          <h3 className="font-bold text-slate-800 mb-4 flex items-center gap-2 text-sm uppercase tracking-wider text-slate-600">
+            <Building2 size={16} className="text-orange-600" /> {lang === 'ta' ? 'ஒதுக்கப்பட்ட பெட்ரோல் பங்க் பணி' : 'Assigned Petrol Bunk'}
           </h3>
-          <InfoRow icon={<Briefcase size={15} className="text-orange-500" />} label="Service Type" value={user?.service} highlight />
-          <InfoRow icon={<Shield size={15} className="text-orange-500" />}    label="Client ID"    value={user?.clientId?.toUpperCase()} />
-          <InfoRow icon={<Building2 size={15} className="text-orange-500" />} label="Status"       value={user?.status === 'active' ? '✅ Active' : '❌ Inactive'} />
+          <InfoRow 
+            icon={<Building2 size={16} />} 
+            label={lang === 'ta' ? 'பெட்ரோல் பங்க் பெயர்' : 'Petrol Bunk'} 
+            value={user?.assignedBunk || 'Indian Oil Petrol Bunk (IOCL)'} 
+            highlight 
+          />
+          <InfoRow icon={<MapPin size={16} />} label={lang === 'ta' ? 'பங்க் இடம்' : 'Station Location'} value={user?.bunkLocation || 'Chennai, Tamil Nadu'} />
+          <InfoRow icon={<Clock size={16} />} label={lang === 'ta' ? 'ஷிப்ட் நேரம்' : 'Duty Shift'} value={user?.shift || 'Shift 1: Morning (06:00 AM - 02:00 PM)'} />
+          <InfoRow icon={<Briefcase size={16} />} label={lang === 'ta' ? 'பணி பதவி' : 'Role at Bunk'} value={user?.roleAtBunk || 'Fuel Dispenser Attendant'} />
         </div>
 
-        {/* Assigned Team */}
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-5 lg:col-span-2">
-          <h3 className="font-bold text-slate-800 mb-4 flex items-center gap-2 text-sm uppercase tracking-wide text-slate-500">
-            <UserCheck size={15} className="text-orange-500" /> Your Dedicated Team
+        {/* Salary & Bank Info (Set by Management) */}
+        <div className="bg-white rounded-3xl shadow-sm border border-slate-100 p-6">
+          <h3 className="font-bold text-slate-800 mb-4 flex items-center gap-2 text-sm uppercase tracking-wider text-slate-600">
+            <IndianRupee size={16} className="text-green-600" /> {lang === 'ta' ? 'சம்பளம் & வங்கி கணக்கு' : 'Salary & Bank Details'}
           </h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {/* Assigned Staff */}
-            {assignedStaff ? (
-              <div className="flex items-center gap-4 bg-orange-50 rounded-2xl p-4 border border-orange-100">
-                <img src={assignedStaff.photo} alt={assignedStaff.name} className="w-14 h-14 rounded-xl object-cover border-2 border-orange-200" />
-                <div>
-                  <p className="text-xs text-orange-500 font-semibold uppercase">Assigned Staff</p>
-                  <p className="font-bold text-slate-800">{assignedStaff.name}</p>
-                  <p className="text-sm text-slate-500">📞 {assignedStaff.mobile}</p>
-                </div>
+          <InfoRow 
+            icon={<IndianRupee size={16} />} 
+            label={lang === 'ta' ? 'மாத சம்பளம் (Fixed by Sir/Admin)' : 'Monthly Salary (Fixed)'} 
+            value={`₹${(user?.salary || 18500).toLocaleString('en-IN')}`} 
+            highlight 
+          />
+          <InfoRow icon={<CreditCard size={16} />} label={lang === 'ta' ? 'வங்கி கணக்கு' : 'Bank Account'} value={user?.bankAccount || 'SBI - 30894512903'} />
+          <InfoRow icon={<Phone size={16} />} label={lang === 'ta' ? 'GPay எண்' : 'GPay Mobile'} value={user?.gpayNumber || user?.mobile} />
+        </div>
+
+        {/* Incharge Team Contacts */}
+        <div className="bg-white rounded-3xl shadow-sm border border-slate-100 p-6">
+          <h3 className="font-bold text-slate-800 mb-4 flex items-center gap-2 text-sm uppercase tracking-wider text-slate-600">
+            <UserCheck size={16} className="text-purple-600" /> {lang === 'ta' ? 'மேலாளர் & மேற்பார்வை ஸ்டாப்' : 'Management & Staff Contacts'}
+          </h3>
+          
+          <div className="space-y-4">
+            {/* Manager */}
+            <div className="flex items-center gap-3 p-3 bg-purple-50 rounded-2xl border border-purple-100">
+              <div className="w-12 h-12 rounded-xl bg-purple-600 text-white flex items-center justify-center font-bold text-base">
+                M
               </div>
-            ) : (
-              <div className="bg-slate-50 rounded-2xl p-4 text-center text-slate-400 text-sm border border-slate-100">No staff assigned</div>
-            )}
-            {/* Assigned Manager */}
-            {assignedManager ? (
-              <div className="flex items-center gap-4 bg-purple-50 rounded-2xl p-4 border border-purple-100">
-                <img src={assignedManager.photo} alt={assignedManager.name} className="w-14 h-14 rounded-xl object-cover border-2 border-purple-200" />
-                <div>
-                  <p className="text-xs text-purple-500 font-semibold uppercase">Manager</p>
-                  <p className="font-bold text-slate-800">{assignedManager.name}</p>
-                  <p className="text-sm text-slate-500">📞 {assignedManager.mobile}</p>
-                </div>
+              <div>
+                <p className="text-[10px] text-purple-700 font-bold uppercase">{lang === 'ta' ? 'பங்க் பீல்டு மேலாளர்' : 'Field Manager'}</p>
+                <p className="font-bold text-slate-800 text-sm">{user?.bunkManager || assignedManager?.name || 'Priya Nair'}</p>
+                <p className="text-xs text-slate-600 mt-0.5">📞 {user?.bunkManagerPhone || assignedManager?.mobile || '9000000002'}</p>
               </div>
-            ) : (
-              <div className="bg-purple-50 rounded-2xl p-4 border border-purple-100">
-                <p className="text-xs text-purple-500 font-semibold uppercase mb-1">Manager</p>
-                <p className="text-sm text-slate-500">Contact admin for manager info</p>
+            </div>
+
+            {/* Staff */}
+            <div className="flex items-center gap-3 p-3 bg-orange-50 rounded-2xl border border-orange-100">
+              <div className="w-12 h-12 rounded-xl bg-orange-600 text-white flex items-center justify-center font-bold text-base">
+                S
               </div>
-            )}
+              <div>
+                <p className="text-[10px] text-orange-700 font-bold uppercase">{lang === 'ta' ? 'மேற்பார்வை ஸ்டாப்' : 'Assigned Field Staff'}</p>
+                <p className="font-bold text-slate-800 text-sm">{assignedStaff?.name || 'Anitha Devi'}</p>
+                <p className="text-xs text-slate-600 mt-0.5">📞 {assignedStaff?.mobile || '9000000004'}</p>
+              </div>
+            </div>
           </div>
         </div>
 
       </div>
 
-      {/* Note */}
-      <div className="mt-5 bg-orange-50 border border-orange-100 rounded-2xl p-4 text-orange-700 text-sm">
-        🔒 To update your profile information, please contact your assigned staff or reach out to our admin.
-      </div>
     </DashboardLayout>
   );
 }

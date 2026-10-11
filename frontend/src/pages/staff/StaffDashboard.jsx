@@ -109,15 +109,15 @@ export default function StaffDashboard() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-        {/* My Petrol Bunks */}
+        {/* My Candidates / Workers Deployed */}
         <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
           <div className="px-5 py-4 border-b border-slate-50 flex items-center justify-between">
             <h3 className="font-bold text-slate-800 flex items-center gap-2">
               <Users size={15} className="text-green-600"/>
-              <span>Assigned Petrol Bunks</span>
-              <span className="bg-orange-100 text-orange-700 text-xs px-2 py-0.5 rounded-full font-bold">{myClients.length} Bunks</span>
+              <span>Deployed Candidates (பணியாளர்கள்)</span>
+              <span className="bg-orange-100 text-orange-700 text-xs px-2 py-0.5 rounded-full font-bold">{myClients.length}</span>
             </h3>
-            <Link to="/staff/clients" className="text-xs text-green-600 font-semibold hover:underline">View All Bunks →</Link>
+            <Link to="/staff/clients" className="text-xs text-green-600 font-semibold hover:underline">View All →</Link>
           </div>
           <div className="divide-y divide-slate-50">
             {myClients.map(c => (
@@ -125,12 +125,14 @@ export default function StaffDashboard() {
                 <img src={c.photo} alt="" className="w-9 h-9 rounded-xl object-cover shrink-0"/>
                 <div className="flex-1 min-w-0">
                   <p className="font-bold text-slate-800 text-sm truncate">{c.name}</p>
-                  <p className="text-xs text-slate-500 truncate">{c.service || 'Bunk Attendant Coverage'}</p>
+                  <p className="text-xs text-slate-500 truncate">
+                    {c.roleAtBunk || 'Worker'} &nbsp;·&nbsp; {c.assignedBunk || 'Petrol Bunk'}
+                  </p>
                 </div>
                 <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${c.status==='active'?'bg-green-100 text-green-700':'bg-red-100 text-red-700'}`}>{c.status}</span>
               </div>
             ))}
-            {myClients.length === 0 && <p className="text-center py-6 text-slate-400 text-sm">No petrol bunks assigned</p>}
+            {myClients.length === 0 && <p className="text-center py-6 text-slate-400 text-sm">No candidates assigned</p>}
           </div>
         </div>
 
