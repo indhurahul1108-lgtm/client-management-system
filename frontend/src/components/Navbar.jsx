@@ -1,7 +1,7 @@
 import React from 'react';
-import { Bell, Search } from 'lucide-react';
+import { Bell, Search, Languages } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
-import { Languages } from 'lucide-react';
 
 const ROLE_LABELS = {
   admin: 'Administrator', manager: 'Manager', staff: 'Staff', client: 'Client',
