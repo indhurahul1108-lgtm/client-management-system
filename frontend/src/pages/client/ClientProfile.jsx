@@ -20,14 +20,14 @@ export default function ClientProfile() {
   );
 
   return (
-    <DashboardLayout title="My Profile">
+    <DashboardLayout title="Client Profile">
 
       {/* Cover + Avatar */}
       <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden mb-5">
-        <div className="h-32 bg-gradient-to-r from-orange-500 to-amber-400 relative">
+        <div className="h-32 bg-gradient-to-r from-orange-500 to-amber-500 relative">
           <div className="absolute -bottom-10 left-6">
             <img
-              src={user?.photo || `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || 'C')}&background=f97316&color=fff&size=128`}
+              src={user?.photo || `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || 'Client')}&background=f97316&color=fff&size=128`}
               alt={user?.name}
               className="w-20 h-20 rounded-2xl object-cover border-4 border-white shadow-lg"
             />
@@ -37,17 +37,17 @@ export default function ClientProfile() {
           <div className="flex items-start justify-between flex-wrap gap-3">
             <div>
               <h2 className="text-xl font-bold text-slate-800">{user?.name}</h2>
-              <p className="text-slate-400 text-sm">{user?.clientId?.toUpperCase()}</p>
+              <p className="text-slate-400 text-sm font-mono">{user?.clientId?.toUpperCase()} · Official Client Account</p>
               <div className="flex items-center gap-2 mt-2">
-                <span className="bg-orange-100 text-orange-700 text-xs font-bold px-3 py-1 rounded-full">Client</span>
+                <span className="bg-orange-100 text-orange-700 text-xs font-bold px-3 py-1 rounded-full">Client Partner</span>
                 <span className={`text-xs font-bold px-3 py-1 rounded-full ${user?.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
                   {user?.status || 'Active'}
                 </span>
               </div>
             </div>
             <div className="text-right text-xs text-slate-400">
-              <p>Member since</p>
-              <p className="font-semibold text-slate-600">{user?.joinDate || '—'}</p>
+              <p>Client Partner Since</p>
+              <p className="font-semibold text-slate-600">{user?.joinDate || '2023-01-15'}</p>
             </div>
           </div>
         </div>

@@ -43,11 +43,26 @@ export default function AuditLog() {
 
   return (
     <DashboardLayout title="Audit Log">
-      <div className="bg-blue-50 border border-blue-100 rounded-xl px-4 py-3 text-xs text-blue-700 mb-5 flex items-center gap-2">
+      {/* Printable Company Letterhead / Header */}
+      <div className="hidden print:flex items-center justify-between pb-4 mb-4 border-b-2 border-slate-800">
+        <div className="flex items-center gap-3">
+          <img src="/logo.png" alt="ELAKIYAA" className="h-10 w-auto object-contain" />
+          <div>
+            <h1 className="text-xl font-black tracking-tight text-slate-900">ELAKIYAA - JOBS MADE SIMPLE</h1>
+            <p className="text-xs text-slate-500">Official System Audit Log & Security Records</p>
+          </div>
+        </div>
+        <div className="text-right text-xs text-slate-600">
+          <p>Export Date: <strong>{new Date().toLocaleDateString('en-IN')}</strong></p>
+          <p>Time: <strong>{new Date().toLocaleTimeString('en-IN')}</strong></p>
+        </div>
+      </div>
+
+      <div className="bg-blue-50 border border-blue-100 rounded-xl px-4 py-3 text-xs text-blue-700 mb-5 flex items-center gap-2 print:hidden">
         🔒 Audit logs cannot be deleted. All important actions are automatically recorded for compliance and security.
       </div>
 
-      <div className="flex flex-wrap gap-3 mb-5 items-center">
+      <div className="flex flex-wrap gap-3 mb-5 items-center print:hidden">
         <div className="relative flex-1 min-w-[200px]">
           <Search size={14} className="absolute left-3.5 top-3 text-slate-400"/>
           <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Search by user or description..."
@@ -56,8 +71,8 @@ export default function AuditLog() {
         <select value={module} onChange={e=>setModule(e.target.value)} className="px-3 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
           {MODULES.map(m=><option key={m} value={m}>{m==='all'?'All Modules':m}</option>)}
         </select>
-        <button onClick={()=>window.print()} className="flex items-center gap-2 bg-slate-100 text-slate-700 px-4 py-2.5 rounded-xl text-sm font-semibold hover:bg-slate-200">
-          <Printer size={14}/> Export
+        <button onClick={()=>window.print()} className="flex items-center gap-2 bg-slate-900 text-white px-4 py-2.5 rounded-xl text-sm font-semibold hover:bg-slate-800 shadow">
+          <Printer size={14}/> Export / Print Log
         </button>
       </div>
 

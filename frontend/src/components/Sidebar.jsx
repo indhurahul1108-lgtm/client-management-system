@@ -60,7 +60,7 @@ const MENUS = {
     { label: 'Invoices & Bills',icon: BarChart2,       path: '/client/documents' },
     { label: 'Bunk History',    icon: CalendarCheck,   path: '/client/history' },
     { label: 'Notifications',   icon: Bell,            path: '/client/notifications' },
-    { label: 'Bunk Profile',    icon: User,            path: '/client/profile' },
+    { label: 'Client Profile',  icon: User,            path: '/client/profile' },
   ],
 };
 
@@ -111,7 +111,8 @@ export default function Sidebar() {
     'Messages': 'செய்திகள் (Messages)',
     'Invoices & Bills': 'பில் & ரசீதுகள்',
     'Bunk History': 'பங்க் வரலாறு',
-    'Bunk Profile': 'பங்க் விபரம்',
+    'Client Profile': 'கிளைண்ட் சுயவிபரம் (Client Profile)',
+    'Bunk Profile': 'கிளைண்ட் சுயவிபரம் (Client Profile)',
   };
 
   const getLabel = (engLabel) => {

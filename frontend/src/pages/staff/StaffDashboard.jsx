@@ -77,36 +77,23 @@ export default function StaffDashboard() {
         </Link>
       )}
 
-      {/* ─ TODAY'S ATTENDANCE ─ */}
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-5 mb-5">
-        <h3 className="font-bold text-slate-800 mb-4 flex items-center gap-2"><Clock size={16} className="text-green-600"/> Today's Attendance</h3>
-
-        {/* Shift info */}
-        <div className="bg-green-50 rounded-xl px-4 py-2.5 flex gap-4 text-xs text-green-700 mb-4">
-          <span>⏰ Shift: <strong>{SHIFT_CONFIG.shiftStart}</strong></span>
-          <span>⚡ Grace: <strong>{SHIFT_CONFIG.graceMins} mins</strong></span>
-          <span>🔴 Late after: <strong>{lateGraceEnd}</strong></span>
+      {/* ── Quick Punch Action Bar (Clean & Simple) ── */}
+      <div className="bg-gradient-to-r from-emerald-600 to-green-700 rounded-2xl p-5 mb-5 text-white shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div>
+          <h3 className="font-bold text-base flex items-center gap-2">
+            <Clock size={18} className="text-emerald-200"/> 
+            <span>இன்றைய வேலை நேரம் (Shift Duty)</span>
+          </h3>
+          <p className="text-xs text-emerald-100 mt-0.5">
+            Shift: <strong>{SHIFT_CONFIG.shiftStart}</strong> · வருகை பதிவு செய்ய கீழே உள்ள பட்டனை அழுத்தவும்
+          </p>
         </div>
-
-        <div className="grid grid-cols-2 gap-3 mb-4">
-          <div className="bg-slate-50 rounded-2xl p-4">
-            <p className="text-xs text-slate-400 font-medium mb-1">Punch In</p>
-            <p className={`text-2xl font-bold ${todayAtt?.punchIn ? 'text-slate-800' : 'text-slate-300'}`}>{todayAtt?.punchIn || '—'}</p>
-            {todayAtt && <p className={`text-xs mt-1 font-semibold ${attColor}`}>{attStatus === 'late' ? '⚠️ Late' : '✓ On Time'}</p>}
-          </div>
-          <div className="bg-slate-50 rounded-2xl p-4">
-            <p className="text-xs text-slate-400 font-medium mb-1">Punch Out</p>
-            <p className={`text-2xl font-bold ${todayAtt?.punchOut ? 'text-slate-800' : 'text-slate-300'}`}>{todayAtt?.punchOut || '—'}</p>
-            {todayAtt?.punchOut && <p className="text-green-600 text-xs mt-1 font-semibold">✓ Recorded</p>}
-          </div>
-        </div>
-
-        <div className="flex gap-3">
-          <Link to="/staff/attendance" className={`flex-1 flex items-center justify-center gap-2 py-3.5 rounded-2xl font-bold text-sm transition ${todayAtt?.punchIn ? 'bg-slate-100 text-slate-400 cursor-default' : 'bg-green-500 hover:bg-green-400 text-white'}`}>
-            <LogIn size={17}/> {todayAtt?.punchIn ? 'Punched In ✓' : 'Punch In'}
-          </Link>
-          <Link to="/staff/attendance" className={`flex-1 flex items-center justify-center gap-2 py-3.5 rounded-2xl font-bold text-sm transition ${!todayAtt?.punchIn || todayAtt?.punchOut ? 'bg-slate-100 text-slate-400 cursor-default' : 'bg-red-500 hover:bg-red-400 text-white'}`}>
-            <LogOut size={17}/> {todayAtt?.punchOut ? 'Punched Out ✓' : 'Punch Out'}
+        <div className="flex gap-2.5 w-full sm:w-auto">
+          <Link
+            to="/staff/attendance"
+            className="flex-1 sm:flex-initial flex items-center justify-center gap-2 bg-white text-emerald-800 hover:bg-emerald-50 px-5 py-2.5 rounded-xl font-bold text-xs shadow transition active:scale-95"
+          >
+            <LogIn size={15}/> Punch In / Out (கேமரா வருகை) →
           </Link>
         </div>
       </div>
