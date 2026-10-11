@@ -98,6 +98,9 @@ export default function StaffLeave() {
                     <td className="px-4 py-3 text-slate-500">{l.toDate}</td>
                     <td className="px-4 py-3 text-slate-400 text-xs max-w-xs">
                       <p className="truncate">{l.reason}</p>
+                      {l.approvalMessage && (
+                        <p className="text-green-600 font-semibold mt-1">✓ Note: {l.approvalMessage}</p>
+                      )}
                       {l.rejectReason && (
                         <p className="text-red-500 font-semibold mt-1">❌ Rejected: {l.rejectReason}</p>
                       )}

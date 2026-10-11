@@ -19,10 +19,20 @@ export default function Navbar({ title }) {
   const dateStr = now.toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
 
   return (
-    <header className="bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between sticky top-0 z-30 shadow-sm">
-      <div className="pl-10 lg:pl-0">
-        <h1 className="text-xl font-bold text-slate-800">{title}</h1>
-        <p className="text-xs text-slate-400 mt-0.5">{dateStr}</p>
+    <header className="bg-white border-b border-slate-200 px-6 py-3.5 flex items-center justify-between sticky top-0 z-30 shadow-sm">
+      <div className="pl-10 lg:pl-0 flex items-center gap-4">
+        <img
+          src="/logo.png"
+          alt="ELAKIYAA"
+          className="h-8 w-auto hidden sm:block object-contain"
+        />
+        <div className="border-l border-slate-200 pl-3 hidden sm:block">
+          <h1 className="text-lg font-bold text-slate-800 leading-tight">{title}</h1>
+          <p className="text-[11px] text-slate-400">{dateStr}</p>
+        </div>
+        <div className="sm:hidden">
+          <h1 className="text-base font-bold text-slate-800">{title}</h1>
+        </div>
       </div>
 
       <div className="flex items-center gap-3">

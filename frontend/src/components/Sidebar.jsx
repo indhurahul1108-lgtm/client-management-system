@@ -13,13 +13,13 @@ const MENUS = {
     { label: 'Dashboard',    icon: LayoutDashboard, path: '/admin' },
     { label: 'Users',        icon: Users,           path: '/admin/users' },
     { label: 'Managers',     icon: UserCheck,       path: '/admin/managers' },
-    { label: 'Staff',        icon: Users,           path: '/admin/staff' },
-    { label: 'Clients',      icon: Building2,       path: '/admin/clients' },
+    { label: 'Bunk Staff',   icon: Users,           path: '/admin/staff' },
+    { label: 'Petrol Bunks', icon: Building2,       path: '/admin/clients' },
     { label: 'Attendance',   icon: CalendarCheck,   path: '/admin/attendance' },
     { label: 'Leave',        icon: FileText,        path: '/admin/leave' },
     { label: 'Salary',       icon: DollarSign,      path: '/admin/salary' },
     { label: 'Work / Tasks', icon: ClipboardList,   path: '/admin/assign-tasks' },
-    { label: 'Bank & Branch Visits', icon: Building2, path: '/admin/visits' },
+    { label: 'Bunk Duty Roster', icon: Building2,   path: '/admin/visits' },
     { label: 'Reports',      icon: BarChart2,       path: '/admin/reports' },
     { label: 'Notifications',icon: Bell,            path: '/admin/notifications' },
     { label: 'Audit Log',    icon: Activity,        path: '/admin/audit-log' },
@@ -28,11 +28,11 @@ const MENUS = {
   manager: [
     { label: 'Dashboard',    icon: LayoutDashboard, path: '/manager' },
     { label: 'My Staff',     icon: Users,           path: '/manager/staff' },
-    { label: 'My Clients',   icon: Building2,       path: '/manager/clients' },
+    { label: 'Petrol Bunks', icon: Building2,       path: '/manager/clients' },
     { label: 'Attendance',   icon: CalendarCheck,   path: '/manager/attendance' },
     { label: 'Leave',        icon: FileText,        path: '/manager/leave' },
     { label: 'Work / Tasks', icon: ClipboardList,   path: '/manager/work' },
-    { label: 'Daily Bank Visits', icon: Building2,   path: '/manager/visits' },
+    { label: 'Bunk Duty Roster', icon: Building2,   path: '/manager/visits' },
     { label: 'Notifications',icon: Bell,            path: '/manager/notifications' },
     { label: 'Reports',      icon: BarChart2,       path: '/manager/reports' },
     { label: 'Profile',      icon: User,            path: '/manager/profile' },
@@ -41,8 +41,8 @@ const MENUS = {
     { label: 'Dashboard',    icon: LayoutDashboard, path: '/staff' },
     { label: 'Attendance',   icon: Clock,           path: '/staff/attendance' },
     { label: 'My Work',      icon: ClipboardList,   path: '/staff/work' },
-    { label: 'My Clients',   icon: Building2,       path: '/staff/clients' },
-    { label: 'Bank & Field Visits', icon: Building2, path: '/staff/visits' },
+    { label: 'My Bunk Duty', icon: Building2,       path: '/staff/visits' },
+    { label: 'Petrol Bunks', icon: Building2,       path: '/staff/clients' },
     { label: 'Leave',        icon: FileText,        path: '/staff/leave' },
     { label: 'Salary',       icon: DollarSign,      path: '/staff/salary' },
     { label: 'Notifications',icon: Bell,            path: '/staff/notifications' },
@@ -51,18 +51,17 @@ const MENUS = {
     { label: 'Profile',      icon: User,            path: '/staff/profile' },
   ],
   client: [
-    { label: 'Dashboard',     icon: LayoutDashboard, path: '/client' },
-    { label: 'My Work',       icon: Briefcase,       path: '/client/work' },
-    { label: 'Office Check In', icon: CalendarCheck, path: '/client/checkin' },
-    { label: 'Requests',      icon: FileText,        path: '/client/requests' },
-    { label: 'Messages',      icon: ClipboardList,   path: '/client/messages' },
-    { label: 'Documents',     icon: BarChart2,       path: '/client/documents' },
-    { label: 'History',       icon: Clock,           path: '/client/history' },
-    { label: 'Notifications', icon: Bell,            path: '/client/notifications' },
-    { label: 'My Profile',    icon: User,            path: '/client/profile' },
+    { label: 'Bunk Dashboard',  icon: LayoutDashboard, path: '/client' },
+    { label: 'Deployed Staff',  icon: Users,           path: '/client/work' },
+    { label: 'Bunk Attendance', icon: Clock,           path: '/client/checkin' },
+    { label: 'Manpower Request',icon: FileText,        path: '/client/requests' },
+    { label: 'Messages',        icon: ClipboardList,   path: '/client/messages' },
+    { label: 'Invoices & Bills',icon: BarChart2,       path: '/client/documents' },
+    { label: 'Bunk History',    icon: CalendarCheck,   path: '/client/history' },
+    { label: 'Notifications',   icon: Bell,            path: '/client/notifications' },
+    { label: 'Bunk Profile',    icon: User,            path: '/client/profile' },
   ],
 };
-
 
 const ROLE_COLORS = {
   admin:   'from-blue-700 to-blue-900',
@@ -72,7 +71,7 @@ const ROLE_COLORS = {
 };
 
 const ROLE_LABELS = {
-  admin: 'Administrator', manager: 'Manager', staff: 'Staff', client: 'Client',
+  admin: 'Administrator', manager: 'Manager', staff: 'Staff', client: 'Bunk Client',
 };
 
 export default function Sidebar() {
@@ -88,13 +87,23 @@ export default function Sidebar() {
 
   const SidebarContent = () => (
     <div className={`flex flex-col h-full bg-gradient-to-b ${gradient} text-white`}>
-      {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-white/20">
+      {/* Header with ELAKIYAA Logo */}
+      <div className="flex items-center justify-between p-3.5 border-b border-white/20">
         {!collapsed && (
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center font-bold text-sm">CMS</div>
-            <span className="font-bold text-sm">Client Manager</span>
-          </div>
+          <Link to="/" className="flex items-center gap-2">
+            <img
+              src="/logo.png"
+              alt="ELAKIYAA Jobs Made Simple"
+              className="h-10 w-auto bg-white px-2 py-1 rounded-xl object-contain shadow"
+            />
+          </Link>
+        )}
+        {collapsed && (
+          <img
+            src="/logo.png"
+            alt="E"
+            className="w-8 h-8 bg-white p-1 rounded-lg object-contain mx-auto"
+          />
         )}
         <button
           onClick={() => setCollapsed(!collapsed)}

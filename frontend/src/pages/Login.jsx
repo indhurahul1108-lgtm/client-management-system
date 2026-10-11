@@ -66,13 +66,13 @@ export default function Login() {
       <div className="relative w-full max-w-md">
         {/* Card */}
         <div className="bg-white rounded-3xl shadow-2xl overflow-hidden">
-          {/* Top banner */}
-          <div className="bg-gradient-to-r from-blue-700 to-blue-900 px-8 pt-10 pb-8 text-white text-center">
-            <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
-              <span className="text-2xl font-bold">CMS</span>
+          {/* Top banner with ELAKIYAA Logo */}
+          <div className="bg-gradient-to-r from-blue-700 to-blue-900 px-8 pt-8 pb-6 text-white text-center">
+            <div className="bg-white p-2.5 rounded-2xl mx-auto mb-3 inline-block shadow-lg">
+              <img src="/logo.png" alt="ELAKIYAA" className="h-12 w-auto object-contain" />
             </div>
-            <h1 className="text-2xl font-bold">Client Management</h1>
-            <p className="text-blue-200 text-sm mt-1">Sign in to your account</p>
+            <h1 className="text-lg font-bold">Petrol Bunk Staffing Portal</h1>
+            <p className="text-blue-200 text-xs mt-0.5">Workforce Allocation & Shift Management</p>
           </div>
 
           <div className="p-8">

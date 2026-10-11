@@ -30,12 +30,20 @@ export default function ManagerLeave() {
 
   const [rejectModal, setRejectModal] = useState(null);
   const [rejectReason, setRejectReason] = useState('');
+  const [approveModal, setApproveModal] = useState(null);
+  const [approveMessage, setApproveMessage] = useState('Approved. Replacement attendant deployed at bunk.');
 
   const showToast = (msg) => { setToastMsg(msg); setTimeout(()=>setToastMsg(''),3000); };
 
-  const handleApprove = (id) => {
-    setStaffLeaves(prev => prev.map(l => l.id===id ? {...l, status:'approved'} : l));
-    showToast('✅ Leave approved!');
+  const openApprove = (leave) => {
+    setApproveMessage('Approved. Replacement attendant arranged at bunk.');
+    setApproveModal(leave);
+  };
+
+  const confirmApprove = () => {
+    setStaffLeaves(prev => prev.map(l => l.id === approveModal.id ? { ...l, status:'approved', approvalMessage: approveMessage || 'Approved' } : l));
+    setApproveModal(null);
+    showToast('✅ Leave approved and message sent to staff!');
   };
 
   const openReject = (leave) => { setRejectReason(''); setRejectModal(leave); };
@@ -91,7 +99,7 @@ export default function ManagerLeave() {
                 <span className={`text-xs px-2.5 py-1 rounded-full font-semibold capitalize ${badgeColor(l.status)}`}>{l.status}</span>
                 {l.status==='pending' && (
                   <div className="flex gap-2">
-                    <button onClick={()=>handleApprove(l.id)} className="flex items-center gap-1 bg-green-100 text-green-700 px-3 py-1.5 rounded-xl text-xs font-bold hover:bg-green-200">
+                    <button onClick={()=>openApprove(l)} className="flex items-center gap-1 bg-green-100 text-green-700 px-3 py-1.5 rounded-xl text-xs font-bold hover:bg-green-200">
                       <CheckCircle size={13}/> Approve
                     </button>
                     <button onClick={()=>openReject(l)} className="flex items-center gap-1 bg-red-100 text-red-700 px-3 py-1.5 rounded-xl text-xs font-bold hover:bg-red-200">
@@ -106,6 +114,24 @@ export default function ManagerLeave() {
         </>
       )}
 
+      {/* Approve Message Modal */}
+      {approveModal && (
+        <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl w-full max-w-sm p-6 shadow-2xl">
+            <h3 className="font-bold text-slate-800 mb-1">Approve Leave Request</h3>
+            <p className="text-xs text-slate-400 mb-4">{approveModal.staffName} — {approveModal.leaveType}</p>
+            <label className="text-xs font-semibold text-slate-500 uppercase block mb-2">Message to Staff (Approval Note)</label>
+            <textarea value={approveMessage} onChange={e=>setApproveMessage(e.target.value)} rows={3}
+              placeholder="e.g. Approved. Replacement attendant deployed at Indian Oil Bunk."
+              className="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-sm resize-none focus:outline-none focus:ring-2 focus:ring-green-400"/>
+            <div className="flex gap-3 mt-4">
+              <button onClick={()=>setApproveModal(null)} className="flex-1 py-2.5 border border-slate-200 rounded-xl text-slate-600 text-sm">Cancel</button>
+              <button onClick={confirmApprove} className="flex-1 py-2.5 bg-green-600 text-white rounded-xl text-sm font-bold hover:bg-green-700">Confirm Approval</button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Reject Reason Modal */}
       {rejectModal && (
         <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
@@ -117,7 +143,7 @@ export default function ManagerLeave() {
             </div>
             <label className="text-xs font-semibold text-slate-500 uppercase block mb-2">Rejection Reason *</label>
             <textarea value={rejectReason} onChange={e=>setRejectReason(e.target.value)} rows={3}
-              placeholder="e.g. Critical deadline / Insufficient balance / Please reschedule..."
+              placeholder="e.g. Critical shift coverage needed at IOCL pump / Please reschedule..."
               className="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-sm resize-none focus:outline-none focus:ring-2 focus:ring-red-400"/>
             <div className="flex gap-3 mt-4">
               <button onClick={()=>setRejectModal(null)} className="flex-1 py-2.5 border border-slate-200 rounded-xl text-slate-600 text-sm">Cancel</button>

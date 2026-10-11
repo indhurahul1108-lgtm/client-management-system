@@ -1,71 +1,97 @@
 import React, { useState } from 'react';
 import DashboardLayout from '../../components/DashboardLayout';
 import { useAuth } from '../../context/AuthContext';
-import { Building2, Calendar, MapPin, CheckCircle, Clock, Plus, X, Users, Briefcase } from 'lucide-react';
+import { DUMMY_USERS } from '../../data/dummyData.jsx';
+import { SHIFTS } from '../../utils/attendanceUtils.js';
+import { Fuel, Calendar, MapPin, CheckCircle, Clock, Plus, X, Users, AlertCircle, Edit2 } from 'lucide-react';
 
-const INITIAL_SCHEDULE = [
-  { id: 'v1', day: 'Monday', date: '2026-10-12', bank: 'State Bank of India — Commercial Hub', branch: 'Anna Salai, Chennai', purpose: 'Bulk Document Verification & Tax Audit', targetVolume: '350 Corporate Files', staffAssigned: 'Anitha Devi, Murugan P', status: 'completed' },
-  { id: 'v2', day: 'Tuesday', date: '2026-10-13', bank: 'HDFC Bank — Corporate Branch', branch: 'Nungambakkam, Chennai', purpose: 'Bulk KYC & Statutory Compliance Review', targetVolume: '280 Accounts', staffAssigned: 'Deepa S, Ravi Kumar', status: 'completed' },
-  { id: 'v3', day: 'Wednesday', date: '2026-10-14', bank: 'ICICI Bank — SME Hub', branch: 'Guindy Industrial Estate', purpose: 'Q2 GST & Financial Reconciliation', targetVolume: '420 Client Entries', staffAssigned: 'Lavanya M, Vijay S', status: 'in_progress' },
-  { id: 'v4', day: 'Thursday', date: '2026-10-15', bank: 'Axis Bank — Tech Park Branch', branch: 'OMR, Chennai', purpose: 'Export Accounts Clearance & Verification', targetVolume: '190 Files', staffAssigned: 'Bala Murugan, Kavitha R', status: 'scheduled' },
-  { id: 'v5', day: 'Friday', date: '2026-10-16', bank: 'Canara Bank — Regional Office', branch: 'T.Nagar, Chennai', purpose: 'Annual Audit & Tax Filing Documentation', targetVolume: '310 Accounts', staffAssigned: 'Sundaram V, Murugan P', status: 'scheduled' },
-  { id: 'v6', day: 'Saturday', date: '2026-10-17', bank: 'Indian Bank — Main Corporate Branch', branch: 'Harbour, Chennai', purpose: 'Weekly Bulk Finalization & Reports', targetVolume: '500 Records', staffAssigned: 'Anitha Devi, Deepa S', status: 'scheduled' },
+const INITIAL_ROSTER = [
+  { id: 'r1', day: 'Monday', date: '2026-10-12', bunkName: 'Indian Oil Petrol Bunk (IOCL) — Anna Salai', shiftId: 'shift_1', shiftName: 'Morning Shift (06:00 AM - 02:00 PM)', staffList: ['Anitha Devi (Operator)', 'Murugan P (Cashier)', 'Deepa S (Attendant)'], requiredCount: 3, deployedCount: 3, status: 'deployed' },
+  { id: 'r2', day: 'Monday', date: '2026-10-12', bunkName: 'Bharat Petroleum Pump (BPCL) — Guindy', shiftId: 'shift_2', shiftName: 'Evening Shift (02:00 PM - 10:00 PM)', staffList: ['Ravi Kumar (Operator)', 'Lavanya M (Attendant)'], requiredCount: 2, deployedCount: 2, status: 'deployed' },
+  { id: 'r3', day: 'Tuesday', date: '2026-10-13', bunkName: 'HPCL 24/7 Fuel Station — OMR Tech Hub', shiftId: 'shift_3', shiftName: 'Night Shift (10:00 PM - 06:00 AM)', staffList: ['Vijay S (Night Operator)', 'Bala Murugan (Attendant)'], requiredCount: 2, deployedCount: 2, status: 'deployed' },
+  { id: 'r4', day: 'Tuesday', date: '2026-10-13', bunkName: 'Shell Petrol Station — Sholinganallur', shiftId: 'shift_1', shiftName: 'Morning Shift (06:00 AM - 02:00 PM)', staffList: ['Kavitha R (Nozzle Attendant)', 'Sundaram V (Cashier)'], requiredCount: 2, deployedCount: 2, status: 'deployed' },
+  { id: 'r5', day: 'Wednesday', date: '2026-10-14', bunkName: 'Nayara Energy Fuel Pump — Poonamallee', shiftId: 'shift_2', shiftName: 'Evening Shift (02:00 PM - 10:00 PM)', staffList: ['Anitha Devi (Lead Operator)', 'Ravi Kumar (Attendant)'], requiredCount: 2, deployedCount: 2, status: 'scheduled' },
+  { id: 'r6', day: 'Thursday', date: '2026-10-15', bunkName: 'Indian Oil Auto Care — Koyambedu', shiftId: 'shift_1', shiftName: 'Morning Shift (06:00 AM - 02:00 PM)', staffList: ['Deepa S (Operator)', 'Lavanya M (Attendant)'], requiredCount: 2, deployedCount: 2, status: 'scheduled' },
+  { id: 'r7', day: 'Friday', date: '2026-10-16', bunkName: 'BPCL Super Station — Tambaram', shiftId: 'shift_3', shiftName: 'Night Shift (10:00 PM - 06:00 AM)', staffList: ['Vijay S (Night Operator)', 'Murugan P (Incharge)'], requiredCount: 2, deployedCount: 2, status: 'scheduled' },
 ];
 
 export default function DailyVisits() {
   const { user } = useAuth();
-  const [schedule, setSchedule] = useState(INITIAL_SCHEDULE);
+  const allBunks = DUMMY_USERS.filter(u => u.role === 'client');
+  const allStaff = DUMMY_USERS.filter(u => u.role === 'staff');
+
+  const [roster, setRoster] = useState(INITIAL_ROSTER);
   const [selectedDay, setSelectedDay] = useState('all');
   const [showAdd, setShowAdd] = useState(false);
-  const [form, setForm] = useState({
-    day: 'Monday', date: '', bank: '', branch: '', purpose: '', targetVolume: '', staffAssigned: 'Anitha Devi'
-  });
   const [toast, setToast] = useState('');
+  const [form, setForm] = useState({
+    day: 'Monday',
+    date: new Date().toISOString().split('T')[0],
+    bunkName: allBunks[0]?.name || 'Indian Oil Petrol Bunk',
+    shiftId: 'shift_1',
+    selectedStaff: ['Anitha Devi (Operator)'],
+    requiredCount: 2,
+  });
 
   const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(''), 3000); };
 
   const handleAdd = () => {
-    if (!form.bank || !form.branch || !form.purpose) { showToast('⚠️ Please fill required fields'); return; }
-    const newVisit = {
-      id: `v_${Date.now()}`,
-      ...form,
-      status: 'scheduled'
+    if (!form.bunkName) { showToast('⚠️ Please select Petrol Bunk'); return; }
+    const shiftObj = SHIFTS.find(s => s.id === form.shiftId) || SHIFTS[0];
+    const newEntry = {
+      id: `r_${Date.now()}`,
+      day: form.day,
+      date: form.date,
+      bunkName: form.bunkName,
+      shiftId: form.shiftId,
+      shiftName: `${shiftObj.name} (${shiftObj.label})`,
+      staffList: form.selectedStaff,
+      requiredCount: Number(form.requiredCount),
+      deployedCount: form.selectedStaff.length,
+      status: 'scheduled',
     };
-    setSchedule(prev => [...prev, newVisit]);
+    setRoster(prev => [newEntry, ...prev]);
     setShowAdd(false);
-    showToast('✅ Bank visit scheduled successfully!');
+    showToast('✅ Bunk shift duty allocated successfully!');
   };
 
   const markComplete = (id) => {
-    setSchedule(prev => prev.map(v => v.id === id ? { ...v, status: 'completed' } : v));
-    showToast('✅ Visit marked as completed!');
+    setRoster(prev => prev.map(r => r.id === id ? { ...r, status: 'deployed' } : r));
+    showToast('✅ Shift marked as completed!');
   };
 
-  const filtered = selectedDay === 'all' ? schedule : schedule.filter(s => s.day === selectedDay || s.status === selectedDay);
+  const filtered = selectedDay === 'all'
+    ? roster
+    : roster.filter(r => r.day === selectedDay || r.shiftId === selectedDay);
 
   return (
-    <DashboardLayout title="Daily Bank & Branch Visits">
+    <DashboardLayout title="Petrol Bunk Duty Roster">
       {toast && (
         <div className="fixed top-4 right-4 z-50 bg-purple-700 text-white px-5 py-3 rounded-2xl shadow-xl text-sm font-semibold flex items-center gap-2">
           {toast}
         </div>
       )}
 
-      {/* Header Banner */}
-      <div className="bg-gradient-to-r from-purple-700 to-indigo-800 rounded-3xl p-6 text-white mb-6 shadow-md">
+      {/* Top Banner with Petrol Bunk Context */}
+      <div className="bg-gradient-to-r from-blue-900 via-indigo-900 to-purple-900 rounded-3xl p-6 text-white mb-6 shadow-xl border border-white/10">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
-            <span className="text-xs bg-white/20 px-3 py-1 rounded-full font-bold uppercase tracking-wider">Bulk Project Management</span>
-            <h1 className="text-2xl font-bold mt-2">Daily Bank Visit Schedule</h1>
-            <p className="text-xs text-purple-200 mt-1 max-w-xl">
-              Organized daily schedule showing which bank branch the team visits each day for bulk client file verification, statutory audits, and corporate clearances.
+            <div className="flex items-center gap-2">
+              <span className="text-[11px] bg-orange-500 text-white px-3 py-1 rounded-full font-bold uppercase tracking-wider flex items-center gap-1.5">
+                <Fuel size={13} /> ELAKIYAA Manpower Supply
+              </span>
+              <span className="text-xs text-purple-200">24/7 Bunk Coverage</span>
+            </div>
+            <h1 className="text-2xl font-bold mt-2">Petrol Bunk Daily Duty Roster</h1>
+            <p className="text-xs text-purple-200 mt-1 max-w-2xl leading-relaxed">
+              Track which fuel attendant & cashier is deployed at which petrol bunk today. Manage 3 shifts (Morning, Evening, Night) and reassign staff as needed.
             </p>
           </div>
           <button
             onClick={() => setShowAdd(true)}
-            className="flex items-center gap-2 bg-white text-purple-800 hover:bg-purple-50 font-bold px-4 py-2.5 rounded-xl text-sm shadow transition"
+            className="flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white font-bold px-4 py-2.5 rounded-xl text-sm shadow transition"
           >
-            <Plus size={16} /> Schedule Bank Visit
+            <Plus size={16} /> Allocate Bunk Shift
           </button>
         </div>
       </div>
@@ -78,68 +104,68 @@ export default function DailyVisits() {
             onClick={() => setSelectedDay(day)}
             className={`px-4 py-2 rounded-xl text-xs font-bold transition whitespace-nowrap ${selectedDay === day ? 'bg-purple-700 text-white shadow' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'}`}
           >
-            {day === 'all' ? 'All Days' : day}
+            {day === 'all' ? 'All Bunks & Days' : day}
           </button>
         ))}
       </div>
 
-      {/* Visits Grid / Cards */}
+      {/* Roster Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
         {filtered.map(item => (
           <div key={item.id} className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 hover:shadow-md transition hover:border-purple-200 flex flex-col justify-between">
             <div>
-              {/* Day & Status Header */}
+              {/* Day & Shift Badge */}
               <div className="flex items-center justify-between mb-3">
-                <span className="text-xs font-bold text-purple-700 bg-purple-50 px-2.5 py-1 rounded-lg flex items-center gap-1.5">
-                  <Calendar size={13} /> {item.day} {item.date && `(${item.date})`}
+                <span className="text-xs font-bold text-slate-700 bg-slate-100 px-2.5 py-1 rounded-lg flex items-center gap-1.5">
+                  <Calendar size={13} className="text-purple-600" /> {item.day}
                 </span>
-                <span className={`text-[11px] px-2.5 py-0.5 rounded-full font-bold capitalize ${item.status === 'completed' ? 'bg-green-100 text-green-700' : item.status === 'in_progress' ? 'bg-blue-100 text-blue-700' : 'bg-yellow-100 text-yellow-700'}`}>
-                  {item.status === 'in_progress' ? 'In Progress' : item.status}
+                <span className={`text-[11px] px-2.5 py-0.5 rounded-full font-bold capitalize ${item.status === 'deployed' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>
+                  {item.status === 'deployed' ? '✓ On Duty' : 'Scheduled'}
                 </span>
               </div>
 
-              {/* Bank Name */}
+              {/* Petrol Bunk Name */}
               <div className="flex items-start gap-3 mb-3">
-                <div className="p-2.5 bg-indigo-50 text-indigo-700 rounded-xl mt-0.5 shrink-0">
-                  <Building2 size={20} />
+                <div className="p-2.5 bg-orange-50 text-orange-600 rounded-xl mt-0.5 shrink-0">
+                  <Fuel size={22} />
                 </div>
                 <div>
-                  <h3 className="font-bold text-slate-800 text-sm">{item.bank}</h3>
-                  <p className="text-xs text-slate-400 flex items-center gap-1 mt-0.5">
-                    <MapPin size={11} /> {item.branch}
+                  <h3 className="font-bold text-slate-800 text-sm leading-tight">{item.bunkName}</h3>
+                  <p className="text-xs font-semibold text-purple-700 mt-1 flex items-center gap-1">
+                    <Clock size={11} /> {item.shiftName}
                   </p>
                 </div>
               </div>
 
-              {/* Scope & Target */}
-              <div className="bg-slate-50 rounded-xl p-3 mb-4 space-y-1.5 text-xs">
-                <div>
-                  <span className="text-slate-400 font-semibold block text-[10px] uppercase">Purpose / Task:</span>
-                  <span className="font-medium text-slate-700">{item.purpose}</span>
+              {/* Staff Deployed at this Bunk */}
+              <div className="bg-slate-50 rounded-xl p-3.5 mb-4">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Bunk Staff Deployed</span>
+                  <span className="text-xs font-bold text-green-700">{item.deployedCount} / {item.requiredCount} Present</span>
                 </div>
-                <div className="flex justify-between items-center pt-1 border-t border-slate-200/60">
-                  <span className="text-slate-400 text-[11px]">Target Volume:</span>
-                  <span className="font-bold text-purple-800">{item.targetVolume}</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-slate-400 text-[11px]">Staff Deployed:</span>
-                  <span className="font-semibold text-slate-700">{item.staffAssigned}</span>
+                <div className="space-y-1">
+                  {item.staffList.map((st, i) => (
+                    <div key={i} className="flex items-center gap-2 text-xs text-slate-700 bg-white p-1.5 rounded-lg border border-slate-100 font-medium">
+                      <span className="text-blue-500 text-xs">👤</span>
+                      <span>{st}</span>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
 
-            {/* Actions */}
+            {/* Action */}
             <div className="pt-2 border-t border-slate-50 flex gap-2">
-              {item.status !== 'completed' ? (
+              {item.status !== 'deployed' ? (
                 <button
                   onClick={() => markComplete(item.id)}
                   className="w-full py-2 bg-green-50 text-green-700 hover:bg-green-100 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5"
                 >
-                  <CheckCircle size={13} /> Mark Done
+                  <CheckCircle size={13} /> Confirm Bunk Duty
                 </button>
               ) : (
                 <span className="w-full py-2 text-center text-xs text-green-600 font-bold bg-green-50/50 rounded-xl">
-                  ✓ Visit Completed
+                  ✓ Staff Working at Bunk
                 </span>
               )}
             </div>
@@ -147,89 +173,89 @@ export default function DailyVisits() {
         ))}
       </div>
 
-      {/* Add Visit Modal */}
+      {/* Allocate Bunk Shift Modal */}
       {showAdd && (
         <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
           <div className="bg-white rounded-3xl w-full max-w-md p-6 shadow-2xl">
             <div className="flex justify-between items-center mb-4 pb-2 border-b border-slate-100">
-              <h3 className="font-bold text-slate-800">Schedule Bank Visit</h3>
+              <h3 className="font-bold text-slate-800 text-base">Allocate Staff to Petrol Bunk</h3>
               <button onClick={() => setShowAdd(false)}><X size={18} className="text-slate-400" /></button>
             </div>
-            <div className="space-y-3">
+            <div className="space-y-3.5">
+              <div>
+                <label className="text-xs font-semibold text-slate-500 block mb-1">Select Petrol Bunk *</label>
+                <select
+                  value={form.bunkName}
+                  onChange={e => setForm({ ...form, bunkName: e.target.value })}
+                  className="w-full p-2.5 border border-slate-200 rounded-xl text-xs bg-slate-50"
+                >
+                  {allBunks.map(b => (
+                    <option key={b.id} value={b.name}>{b.name}</option>
+                  ))}
+                </select>
+              </div>
+
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="text-xs font-semibold text-slate-500 block mb-1">Day of Week</label>
                   <select
                     value={form.day}
                     onChange={e => setForm({ ...form, day: e.target.value })}
-                    className="w-full p-2.5 border rounded-xl text-xs bg-slate-50"
+                    className="w-full p-2.5 border border-slate-200 rounded-xl text-xs bg-slate-50"
                   >
-                    {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].map(d => (
+                    {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map(d => (
                       <option key={d} value={d}>{d}</option>
                     ))}
                   </select>
                 </div>
                 <div>
-                  <label className="text-xs font-semibold text-slate-500 block mb-1">Date</label>
-                  <input
-                    type="date"
-                    value={form.date}
-                    onChange={e => setForm({ ...form, date: e.target.value })}
-                    className="w-full p-2 border rounded-xl text-xs"
-                  />
+                  <label className="text-xs font-semibold text-slate-500 block mb-1">Shift Time *</label>
+                  <select
+                    value={form.shiftId}
+                    onChange={e => setForm({ ...form, shiftId: e.target.value })}
+                    className="w-full p-2.5 border border-slate-200 rounded-xl text-xs bg-slate-50"
+                  >
+                    {SHIFTS.map(s => (
+                      <option key={s.id} value={s.id}>{s.name} ({s.start}-{s.end})</option>
+                    ))}
+                  </select>
                 </div>
               </div>
+
               <div>
-                <label className="text-xs font-semibold text-slate-500 block mb-1">Bank Name *</label>
-                <input
-                  value={form.bank}
-                  onChange={e => setForm({ ...form, bank: e.target.value })}
-                  placeholder="e.g. State Bank of India — Corporate Hub"
-                  className="w-full p-2.5 border rounded-xl text-xs"
-                />
-              </div>
-              <div>
-                <label className="text-xs font-semibold text-slate-500 block mb-1">Branch / Location *</label>
-                <input
-                  value={form.branch}
-                  onChange={e => setForm({ ...form, branch: e.target.value })}
-                  placeholder="e.g. Anna Salai, Chennai"
-                  className="w-full p-2.5 border rounded-xl text-xs"
-                />
-              </div>
-              <div>
-                <label className="text-xs font-semibold text-slate-500 block mb-1">Purpose / Task *</label>
-                <input
-                  value={form.purpose}
-                  onChange={e => setForm({ ...form, purpose: e.target.value })}
-                  placeholder="e.g. Bulk Document Clearance"
-                  className="w-full p-2.5 border rounded-xl text-xs"
-                />
-              </div>
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="text-xs font-semibold text-slate-500 block mb-1">Target Volume</label>
-                  <input
-                    value={form.targetVolume}
-                    onChange={e => setForm({ ...form, targetVolume: e.target.value })}
-                    placeholder="e.g. 250 Accounts"
-                    className="w-full p-2.5 border rounded-xl text-xs"
-                  />
+                <label className="text-xs font-semibold text-slate-500 block mb-1">Select Bunk Attendants (Staff)</label>
+                <div className="max-h-32 overflow-y-auto border border-slate-200 rounded-xl p-2 bg-slate-50 space-y-1 text-xs">
+                  {allStaff.map(s => {
+                    const label = `${s.name} (${s.designation || 'Attendant'})`;
+                    const isChecked = form.selectedStaff.includes(label);
+                    return (
+                      <label key={s.id} className="flex items-center gap-2 p-1 hover:bg-white rounded cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={isChecked}
+                          onChange={() => {
+                            setForm(prev => {
+                              const list = prev.selectedStaff.includes(label)
+                                ? prev.selectedStaff.filter(x => x !== label)
+                                : [...prev.selectedStaff, label];
+                              return { ...prev, selectedStaff: list };
+                            });
+                          }}
+                          className="rounded text-orange-600 focus:ring-orange-500"
+                        />
+                        <span className="text-slate-700 font-medium">{s.name}</span>
+                        <span className="text-slate-400 text-[10px]">({s.staffId})</span>
+                      </label>
+                    );
+                  })}
                 </div>
-                <div>
-                  <label className="text-xs font-semibold text-slate-500 block mb-1">Staff Assigned</label>
-                  <input
-                    value={form.staffAssigned}
-                    onChange={e => setForm({ ...form, staffAssigned: e.target.value })}
-                    placeholder="Staff names"
-                    className="w-full p-2.5 border rounded-xl text-xs"
-                  />
-                </div>
+                <p className="text-[10px] text-slate-400 mt-1">{form.selectedStaff.length} staff selected</p>
               </div>
             </div>
+
             <div className="flex gap-2 mt-5">
               <button onClick={() => setShowAdd(false)} className="flex-1 py-2.5 border rounded-xl text-xs font-semibold text-slate-600">Cancel</button>
-              <button onClick={handleAdd} className="flex-1 py-2.5 bg-purple-700 text-white rounded-xl text-xs font-bold hover:bg-purple-800">Add Schedule</button>
+              <button onClick={handleAdd} className="flex-1 py-2.5 bg-orange-500 hover:bg-orange-600 text-white rounded-xl text-xs font-bold">Save Allocation</button>
             </div>
           </div>
         </div>
