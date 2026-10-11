@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { useLanguage } from '../../context/LanguageContext';
 
 const today = new Date().toISOString().split('T')[0];
 
@@ -28,18 +29,18 @@ const pendingW    = allWorks.filter(w => w.status === 'pending').length;
 const overdueW    = allWorks.filter(w => w.status === 'overdue' || (calcOverdueDays(w.dueDate) > 0 && w.status !== 'completed')).length;
 
 const RECENT_ACTIVITY = [
-  { id:1, user:'Anitha Devi',  action:'Punched In',             time:'10:05 AM', icon:'🟢', module:'Attendance' },
-  { id:2, user:'Murugan P',    action:'Applied for Sick Leave',  time:'09:30 AM', icon:'📋', module:'Leave' },
-  { id:3, user:'Admin',        action:'Added New Client: XYZ Co',time:'09:00 AM', icon:'🏢', module:'Clients' },
-  { id:4, user:'Deepa S',      action:'Completed Work WRK-003',  time:'Yesterday', icon:'✅', module:'Work' },
-  { id:5, user:'Vijay S',      action:'Marked Late',             time:'10:35 AM', icon:'🔴', module:'Attendance' },
+  { id:1, user:'Anitha Devi',  action:'Punched In', actionTa:'பணி தொடங்கினார்', time:'10:05 AM', icon:'🟢', module:'Attendance' },
+  { id:2, user:'Murugan P',    action:'Applied for Sick Leave', actionTa:'விடுப்பு விண்ணப்பித்தார்', time:'09:30 AM', icon:'📋', module:'Leave' },
+  { id:3, user:'Admin',        action:'Added New Bunk: Nayara', actionTa:'புதிய பங்க் சேர்த்தார்', time:'09:00 AM', icon:'⛽', module:'Clients' },
+  { id:4, user:'Deepa S',      action:'Completed Morning Shift', actionTa:'காலை ஷிப்ட் முடித்தார்', time:'Yesterday', icon:'✅', module:'Work' },
+  { id:5, user:'Vijay S',      action:'Marked Late', actionTa:'தாமதமாக வந்தார்', time:'10:35 AM', icon:'🔴', module:'Attendance' },
 ];
 
 const NOTIFICATIONS = [
-  { id:1, msg:'Murugan P applied for Sick Leave — pending approval', type:'leave',   icon:'📋', unread:true },
-  { id:2, msg:'IOCL Anna Salai requests 2 additional fuel operators for evening shift', type:'overdue',  icon:'⚠️', unread:true },
-  { id:3, msg:'BPCL Guindy submitted monthly manpower verification', type:'client',   icon:'🏢', unread:false },
-  { id:4, msg:'Vijay S reported 15 mins late for Morning Shift at HPCL Bunk', type:'attend',   icon:'🕐', unread:true },
+  { id:1, msg:'Murugan P applied for Sick Leave — pending approval', msgTa:'முருகன் P மருத்துவ விடுப்பு விண்ணப்பித்துள்ளார் — ஒப்புதல் நிலுவையில் உள்ளது', type:'leave', icon:'📋', unread:true },
+  { id:2, msg:'IOCL Anna Salai requests 2 additional fuel operators for evening shift', msgTa:'IOCL அண்ணா சாலை மாலை ஷிப்டிற்கு 2 கூடுதல் ஆட்கள் கோரியுள்ளது', type:'overdue', icon:'⚠️', unread:true },
+  { id:3, msg:'BPCL Guindy submitted monthly manpower verification', msgTa:'BPCL கிண்டி மாதாந்திர பணியாளர் வருகையை சரிபார்த்துள்ளது', type:'client', icon:'🏢', unread:false },
+  { id:4, msg:'Vijay S reported 15 mins late for Morning Shift at HPCL Bunk', msgTa:'விஜய் S காலை ஷிப்டிற்கு 15 நிமிடம் தாமதமாக வந்தார்', type:'attend', icon:'🕐', unread:true },
 ];
 
 function StatCard({ label, value, color, icon, to }) {
@@ -57,9 +58,11 @@ function StatCard({ label, value, color, icon, to }) {
 
 export default function AdminDashboard() {
   const { user } = useAuth();
+  const { lang } = useLanguage();
+  const isTa = lang === 'ta';
 
   return (
-    <DashboardLayout title="Admin Dashboard">
+    <DashboardLayout title={isTa ? "நிர்வாகி முகப்பு (Admin Dashboard)" : "Admin Dashboard"}>
 
       {/* Welcome */}
       <div className="bg-gradient-to-r from-blue-700 to-blue-900 rounded-3xl p-6 text-white mb-6 flex items-center gap-4">
@@ -67,41 +70,47 @@ export default function AdminDashboard() {
           {user?.name?.charAt(0) || 'A'}
         </div>
         <div className="flex-1">
-          <p className="text-blue-200 text-sm">Welcome back,</p>
+          <p className="text-blue-200 text-sm">{isTa ? 'நல்வரவு,' : 'Welcome back,'}</p>
           <h1 className="text-xl font-bold">{user?.name || 'Admin'}</h1>
-          <p className="text-blue-300 text-xs mt-0.5">{new Date().toLocaleDateString('en-IN', { weekday:'long', day:'numeric', month:'long', year:'numeric' })}</p>
+          <p className="text-blue-300 text-xs mt-0.5">{new Date().toLocaleDateString(isTa ? 'ta-IN' : 'en-IN', { weekday:'long', day:'numeric', month:'long', year:'numeric' })}</p>
         </div>
         <div className="text-right text-sm text-blue-200">
           <p className="font-bold text-white text-lg">{new Date().toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit' })}</p>
-          <p>System Active</p>
+          <p>{isTa ? 'கணினி செயல்படுகிறது' : 'System Active'}</p>
         </div>
       </div>
 
       {/* ── Section 1: People ── */}
-      <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">👥 Organization</p>
+      <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">
+        {isTa ? '👥 அமைப்பு & ஆட்கள் (Organization)' : '👥 Organization'}
+      </p>
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <StatCard label="Total Managers" value={managers.length}  color="purple" icon={<UserCheck  size={20} className="text-white"/>} to="/admin/managers" />
-        <StatCard label="Total Staff"    value={staff.length}     color="blue"   icon={<Users      size={20} className="text-white"/>} to="/admin/staff" />
-        <StatCard label="Total Clients"  value={clients.length}   color="orange" icon={<Building2  size={20} className="text-white"/>} to="/admin/clients" />
-        <StatCard label="Total Users"    value={DUMMY_USERS.length} color="slate" icon={<Users     size={20} className="text-white"/>} to="/admin/users" />
+        <StatCard label={isTa ? "மொத்த மேலாளர்கள்" : "Total Managers"} value={managers.length}  color="purple" icon={<UserCheck  size={20} className="text-white"/>} to="/admin/managers" />
+        <StatCard label={isTa ? "பங்க் பணியாளர்கள்" : "Total Staff"}    value={staff.length}     color="blue"   icon={<Users      size={20} className="text-white"/>} to="/admin/staff" />
+        <StatCard label={isTa ? "பெட்ரோல் பங்குகள்" : "Total Bunks"}  value={clients.length}   color="orange" icon={<Building2  size={20} className="text-white"/>} to="/admin/clients" />
+        <StatCard label={isTa ? "மொத்த பயனர்கள்" : "Total Users"}    value={DUMMY_USERS.length} color="slate" icon={<Users     size={20} className="text-white"/>} to="/admin/users" />
       </div>
 
       {/* ── Section 2: Attendance ── */}
-      <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">📅 Today's Attendance</p>
+      <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">
+        {isTa ? "📅 இன்றைய வருகை விபரம் (Today's Attendance)" : "📅 Today's Attendance"}
+      </p>
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <StatCard label="Present Today"  value={presentToday}   color="green"  icon={<CalendarCheck size={20} className="text-white"/>} to="/admin/attendance" />
-        <StatCard label="Absent Today"   value={absentToday}    color="red"    icon={<Users         size={20} className="text-white"/>} to="/admin/attendance" />
-        <StatCard label="Late Today"     value={lateToday}      color="yellow" icon={<Clock         size={20} className="text-white"/>} to="/admin/attendance" />
-        <StatCard label="On Leave"       value={onLeave}        color="slate"  icon={<LogOut        size={20} className="text-white"/>} to="/admin/leave" />
+        <StatCard label={isTa ? "வந்தவர்கள் (Present)" : "Present Today"}  value={presentToday}   color="green"  icon={<CalendarCheck size={20} className="text-white"/>} to="/admin/attendance" />
+        <StatCard label={isTa ? "வரவில்லை (Absent)" : "Absent Today"}   value={absentToday}    color="red"    icon={<Users         size={20} className="text-white"/>} to="/admin/attendance" />
+        <StatCard label={isTa ? "தாமதம் (Late)" : "Late Today"}     value={lateToday}      color="yellow" icon={<Clock         size={20} className="text-white"/>} to="/admin/attendance" />
+        <StatCard label={isTa ? "விடுப்பில் (On Leave)" : "On Leave"}       value={onLeave}        color="slate"  icon={<LogOut        size={20} className="text-white"/>} to="/admin/leave" />
       </div>
 
       {/* ── Section 3: Work ── */}
-      <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">📋 Work Status</p>
+      <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">
+        {isTa ? "📋 பங்க் வேலை & ஷிப்ட் நிலை (Work Status)" : "📋 Work Status"}
+      </p>
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <StatCard label="Active Work"    value={activeWork}   color="blue"   icon={<TrendingUp  size={20} className="text-white"/>} to="/admin/assign-tasks" />
-        <StatCard label="Completed"      value={completedW}   color="green"  icon={<CheckCircle size={20} className="text-white"/>} to="/admin/assign-tasks" />
-        <StatCard label="Pending Work"   value={pendingW}     color="yellow" icon={<Clock       size={20} className="text-white"/>} to="/admin/assign-tasks" />
-        <StatCard label="Daily Bank Visits" value="6 Scheduled" color="indigo" icon={<Building2 size={20} className="text-white"/>} to="/admin/visits" />
+        <StatCard label={isTa ? "செயலில் உள்ள வேலை" : "Active Work"}    value={activeWork}   color="blue"   icon={<TrendingUp  size={20} className="text-white"/>} to="/admin/assign-tasks" />
+        <StatCard label={isTa ? "முடிந்த வேலை" : "Completed"}      value={completedW}   color="green"  icon={<CheckCircle size={20} className="text-white"/>} to="/admin/assign-tasks" />
+        <StatCard label={isTa ? "நிலுவையில் உள்ளவை" : "Pending Work"}   value={pendingW}     color="yellow" icon={<Clock       size={20} className="text-white"/>} to="/admin/assign-tasks" />
+        <StatCard label={isTa ? "பங்க் பணி அட்டவணை" : "Bunk Duty Roster"} value={isTa ? "6 பங்குகள்" : "6 Scheduled"} color="indigo" icon={<Building2 size={20} className="text-white"/>} to="/admin/visits" />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
@@ -109,16 +118,19 @@ export default function AdminDashboard() {
         {/* Today's Attendance Table */}
         <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
           <div className="px-5 py-4 border-b border-slate-50 flex items-center justify-between">
-            <h3 className="font-bold text-slate-800 flex items-center gap-2"><CalendarCheck size={16} className="text-blue-600"/>Today's Attendance</h3>
-            <Link to="/admin/attendance" className="text-xs text-blue-600 font-semibold">View All →</Link>
+            <h3 className="font-bold text-slate-800 flex items-center gap-2">
+              <CalendarCheck size={16} className="text-blue-600"/>
+              {isTa ? "இன்றைய வருகைப் பதிவு" : "Today's Attendance"}
+            </h3>
+            <Link to="/admin/attendance" className="text-xs text-blue-600 font-semibold">{isTa ? "அனைத்தும் பார்க்க →" : "View All →"}</Link>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead className="bg-slate-50">
                 <tr>
-                  <th className="text-left px-4 py-2 text-xs text-slate-400 font-semibold">Name</th>
-                  <th className="text-left px-4 py-2 text-xs text-slate-400 font-semibold">Punch In</th>
-                  <th className="text-left px-4 py-2 text-xs text-slate-400 font-semibold">Status</th>
+                  <th className="text-left px-4 py-2 text-xs text-slate-400 font-semibold">{isTa ? "பெயர்" : "Name"}</th>
+                  <th className="text-left px-4 py-2 text-xs text-slate-400 font-semibold">{isTa ? "வந்த நேரம் (Punch In)" : "Punch In"}</th>
+                  <th className="text-left px-4 py-2 text-xs text-slate-400 font-semibold">{isTa ? "நிலை" : "Status"}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-50">
@@ -129,7 +141,7 @@ export default function AdminDashboard() {
                     <td className="px-4 py-2.5">
                       <span className={`text-xs px-2 py-0.5 rounded-full font-semibold capitalize
                         ${a.status==='present'?'bg-green-100 text-green-700':a.status==='late'?'bg-yellow-100 text-yellow-700':'bg-red-100 text-red-700'}`}>
-                        {a.status}
+                        {isTa ? (a.status === 'present' ? 'வந்தவர்' : a.status === 'late' ? 'தாமதம்' : 'வரவில்லை') : a.status}
                       </span>
                     </td>
                   </tr>
@@ -143,10 +155,11 @@ export default function AdminDashboard() {
         <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
           <div className="px-5 py-4 border-b border-slate-50 flex items-center justify-between">
             <h3 className="font-bold text-slate-800 flex items-center gap-2">
-              <Briefcase size={16} className="text-purple-600"/>Pending Leave
+              <Briefcase size={16} className="text-purple-600"/>
+              {isTa ? "நிலுவையில் உள்ள விடுப்பு" : "Pending Leave"}
               {pendingLeave > 0 && <span className="bg-red-500 text-white text-xs font-bold px-1.5 py-0.5 rounded-full">{pendingLeave}</span>}
             </h3>
-            <Link to="/admin/leave" className="text-xs text-purple-600 font-semibold">Manage →</Link>
+            <Link to="/admin/leave" className="text-xs text-purple-600 font-semibold">{isTa ? "நிர்வகி →" : "Manage →"}</Link>
           </div>
           <div className="divide-y divide-slate-50">
             {DUMMY_LEAVES.filter(l=>l.status==='pending').map(l => (
@@ -155,31 +168,36 @@ export default function AdminDashboard() {
                   <p className="font-medium text-slate-700 text-sm">{l.staffName}</p>
                   <p className="text-xs text-slate-400">{l.leaveType} · {l.fromDate} → {l.toDate}</p>
                 </div>
-                <span className="text-xs bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded-full font-semibold">Pending</span>
+                <span className="text-xs bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded-full font-semibold">
+                  {isTa ? "நிலுவையில்" : "Pending"}
+                </span>
               </div>
             ))}
-            {pendingLeave === 0 && <p className="text-center py-6 text-slate-400 text-sm">No pending requests</p>}
+            {pendingLeave === 0 && <p className="text-center py-6 text-slate-400 text-sm">{isTa ? "நிலுவையில் விடுப்பு இல்லை" : "No pending requests"}</p>}
           </div>
         </div>
 
-        {/* Daily Bank Visits Preview */}
+        {/* Daily Bunk Duty Visits Preview */}
         <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
           <div className="px-5 py-4 border-b border-slate-50 flex items-center justify-between">
-            <h3 className="font-bold text-slate-800 flex items-center gap-2"><Building2 size={16} className="text-indigo-600"/>Daily Bank & Branch Visits</h3>
-            <Link to="/admin/visits" className="text-xs text-indigo-600 font-semibold">View Schedule →</Link>
+            <h3 className="font-bold text-slate-800 flex items-center gap-2">
+              <Building2 size={16} className="text-indigo-600"/>
+              {isTa ? "தினசரி பங்க் பணி & மேற்பார்வை அட்டவணை" : "Daily Petrol Bunk Duty Roster"}
+            </h3>
+            <Link to="/admin/visits" className="text-xs text-indigo-600 font-semibold">{isTa ? "அட்டவணை பார்க்க →" : "View Schedule →"}</Link>
           </div>
           <div className="divide-y divide-slate-50">
             {[
-              { day: 'Mon', bank: 'State Bank of India — Commercial Hub', branch: 'Anna Salai', purpose: 'Bulk Document Audit', staff: 'Anitha, Murugan' },
-              { day: 'Tue', bank: 'HDFC Bank — Corporate Branch', branch: 'Nungambakkam', purpose: 'Bulk KYC Review', staff: 'Deepa, Ravi' },
-              { day: 'Wed', bank: 'ICICI Bank — SME Hub', branch: 'Guindy Industrial', purpose: 'Q2 GST Clearance', staff: 'Lavanya, Vijay' },
-              { day: 'Thu', bank: 'Axis Bank — Tech Park', branch: 'OMR Chennai', purpose: 'Export Accounts Check', staff: 'Bala, Kavitha' },
+              { day: 'Mon', bunk: 'Indian Oil Petrol Bunk (IOCL)', branch: 'Anna Salai', purpose: isTa ? 'காலை & இரவு ஷிப்ட் மேற்பார்வை' : 'Morning & Night Shift Roster', staff: 'Anitha, Murugan' },
+              { day: 'Tue', bunk: 'Bharat Petroleum Pump (BPCL)', branch: 'Guindy', purpose: isTa ? 'கேஷியர் & POS பில் கணக்கு' : 'Cashier & POS Verification', staff: 'Deepa, Ravi' },
+              { day: 'Wed', bunk: 'Hindustan Petroleum (HPCL)', branch: 'OMR Tech Hub', purpose: isTa ? 'தொட்டி அளவு & அடர்த்தி சோதனை' : 'Tank Dip & Density Testing', staff: 'Lavanya, Vijay' },
+              { day: 'Thu', bunk: 'Shell Petrol Station', branch: 'Sholinganallur', purpose: isTa ? 'பிரீமியம் ஆட்கள் பாதுகாப்பு' : 'Premium Pump Manning', staff: 'Bala, Kavitha' },
             ].map((v, i) => (
               <div key={i} className="px-5 py-3 flex items-center justify-between hover:bg-slate-50">
                 <div>
                   <p className="font-medium text-slate-700 text-sm flex items-center gap-2">
                     <span className="text-[10px] font-bold bg-purple-50 text-purple-700 px-1.5 py-0.5 rounded">{v.day}</span>
-                    {v.bank}
+                    {v.bunk}
                   </p>
                   <p className="text-xs text-slate-400">{v.branch} · {v.purpose}</p>
                 </div>
@@ -192,15 +210,20 @@ export default function AdminDashboard() {
         {/* Recent Activity */}
         <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
           <div className="px-5 py-4 border-b border-slate-50 flex items-center justify-between">
-            <h3 className="font-bold text-slate-800 flex items-center gap-2"><Activity size={16} className="text-blue-600"/>Recent Activity</h3>
-            <Link to="/admin/audit-log" className="text-xs text-blue-600 font-semibold">Audit Log →</Link>
+            <h3 className="font-bold text-slate-800 flex items-center gap-2">
+              <Activity size={16} className="text-blue-600"/>
+              {isTa ? "சமீபத்திய நடவடிக்கைகள்" : "Recent Activity"}
+            </h3>
+            <Link to="/admin/audit-log" className="text-xs text-blue-600 font-semibold">{isTa ? "பதிவேடு →" : "Audit Log →"}</Link>
           </div>
           <div className="divide-y divide-slate-50">
             {RECENT_ACTIVITY.map(a => (
               <div key={a.id} className="px-5 py-3 flex items-center gap-3 hover:bg-slate-50">
                 <span className="text-lg shrink-0">{a.icon}</span>
                 <div className="flex-1">
-                  <p className="text-sm font-medium text-slate-700"><span className="text-slate-500">{a.user}</span> · {a.action}</p>
+                  <p className="text-sm font-medium text-slate-700">
+                    <span className="text-slate-500">{a.user}</span> · {isTa ? a.actionTa : a.action}
+                  </p>
                   <p className="text-xs text-slate-400">{a.module} · {a.time}</p>
                 </div>
               </div>
@@ -214,16 +237,19 @@ export default function AdminDashboard() {
       <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
         <div className="px-5 py-4 border-b border-slate-50 flex items-center justify-between">
           <h3 className="font-bold text-slate-800 flex items-center gap-2">
-            <Bell size={16} className="text-blue-600"/>Notifications
+            <Bell size={16} className="text-blue-600"/>
+            {isTa ? "அறிவிப்புகள்" : "Notifications"}
             <span className="bg-red-500 text-white text-xs font-bold px-1.5 py-0.5 rounded-full">{NOTIFICATIONS.filter(n=>n.unread).length}</span>
           </h3>
-          <Link to="/admin/notifications" className="text-xs text-blue-600 font-semibold">View All →</Link>
+          <Link to="/admin/notifications" className="text-xs text-blue-600 font-semibold">{isTa ? "அனைத்தும் பார்க்க →" : "View All →"}</Link>
         </div>
         <div className="divide-y divide-slate-50">
           {NOTIFICATIONS.map(n => (
             <div key={n.id} className={`px-5 py-3 flex items-center gap-3 hover:bg-slate-50 ${n.unread ? 'bg-blue-50/30 border-l-4 border-blue-400' : ''}`}>
               <span className="text-lg shrink-0">{n.icon}</span>
-              <p className={`text-sm flex-1 ${n.unread ? 'font-semibold text-slate-800' : 'text-slate-600'}`}>{n.msg}</p>
+              <p className={`text-sm flex-1 ${n.unread ? 'font-semibold text-slate-800' : 'text-slate-600'}`}>
+                {isTa ? n.msgTa : n.msg}
+              </p>
               {n.unread && <div className="w-2 h-2 bg-blue-500 rounded-full shrink-0" />}
             </div>
           ))}
@@ -233,3 +259,4 @@ export default function AdminDashboard() {
     </DashboardLayout>
   );
 }
+
