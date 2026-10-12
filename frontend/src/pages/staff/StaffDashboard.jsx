@@ -63,20 +63,6 @@ export default function StaffDashboard() {
         </Link>
       </div>
 
-      {/* ─ Overdue Alert ─ */}
-      {overdueW > 0 && (
-        <Link to="/staff/overdue" className="block mb-5">
-          <div className="bg-red-50 border-2 border-red-200 rounded-2xl p-4 flex items-center gap-3">
-            <div className="w-11 h-11 bg-red-500 rounded-xl flex items-center justify-center shrink-0"><AlertTriangle size={22} className="text-white"/></div>
-            <div className="flex-1">
-              <p className="font-bold text-red-700">⚠️ {overdueW} Overdue Work!</p>
-              <p className="text-red-500 text-sm">Requires immediate attention</p>
-            </div>
-            <ChevronRight size={18} className="text-red-400"/>
-          </div>
-        </Link>
-      )}
-
       {/* ── Quick Punch Action Bar (Clean & Simple) ── */}
       <div className="bg-gradient-to-r from-emerald-600 to-green-700 rounded-2xl p-5 mb-5 text-white shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
         <div>
@@ -99,11 +85,11 @@ export default function StaffDashboard() {
       </div>
 
       {/* ─ Work Summary ─ */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-5">
-        {[['Active',activeW,'blue','/staff/work'],['Pending',pendingW,'yellow','/staff/work'],['Completed',completedW,'green','/staff/work'],['Overdue',overdueW,'red','/staff/overdue']].map(([l,v,c,to])=>(
-          <Link key={l} to={to} className={`bg-${c}-50 border border-${c}-100 rounded-2xl p-4 hover:shadow-md transition`}>
+      <div className="grid grid-cols-3 gap-4 mb-5">
+        {[['Active',activeW,'blue','/staff/work'],['Pending',pendingW,'yellow','/staff/work'],['Completed',completedW,'green','/staff/work']].map(([l,v,c,to])=>(
+          <Link key={l} to={to} className={`bg-${c}-50 border border-${c}-100 rounded-2xl p-4 hover:shadow-md transition text-center`}>
             <p className={`text-2xl font-bold text-${c}-800`}>{v}</p>
-            <p className="text-xs text-slate-500">{l} Work</p>
+            <p className="text-xs text-slate-500 font-medium">{l} Work</p>
           </Link>
         ))}
       </div>

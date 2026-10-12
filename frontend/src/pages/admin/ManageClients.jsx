@@ -251,10 +251,9 @@ export default function ManageClients() {
             {/* Modal Tabs */}
             <div className="flex border-b border-slate-100 px-6 pt-3 gap-2 overflow-x-auto bg-slate-50">
               {[
-                { id: 'attendance', label: '📅 3-Month Staff Attendance' },
-                { id: 'billing', label: '💰 3-Month Salary & Bunk Billing' },
-                { id: 'staff', label: '⛽ Deployed Crew (3 Shifts)' },
-                { id: 'details', label: 'ℹ️ Petrol Bunk Info' },
+                { id: 'attendance', label: '📅 3-Month Attendance (வருகை)' },
+                { id: 'salary', label: '💰 3-Month Salary (சம்பளம்)' },
+                { id: 'details', label: '⛽ Assigned Bunk & KYC Info' },
               ].map(t => (
                 <button
                   key={t.id}
@@ -270,15 +269,18 @@ export default function ManageClients() {
               {detailTab === 'attendance' && (
                 <div>
                   <div className="flex items-center justify-between mb-3">
-                    <p className="text-xs text-slate-500">Staff attendance log at <span className="font-bold text-slate-700">{detailModal.name}</span> (Last 3 Months):</p>
-                    <span className="text-[10px] bg-green-100 text-green-800 font-bold px-2 py-0.5 rounded-full">3 Shifts Active</span>
+                    <p className="text-xs text-slate-500">
+                      Attendance Log for <span className="font-bold text-slate-800">{detailModal.name}</span> (Last 3 Months):
+                    </p>
+                    <span className="text-[10px] bg-green-100 text-green-800 font-bold px-2 py-0.5 rounded-full">
+                      {detailModal.shift || 'Shift 1'}
+                    </span>
                   </div>
                   <table className="w-full text-xs">
                     <thead className="bg-slate-100">
                       <tr>
-                        <th className="p-2 text-left">Staff Name</th>
                         <th className="p-2 text-left">Date</th>
-                        <th className="p-2 text-left">Shift</th>
+                        <th className="p-2 text-left">Assigned Bunk</th>
                         <th className="p-2 text-left">Punch In</th>
                         <th className="p-2 text-left">Punch Out</th>
                         <th className="p-2 text-left">Status</th>
@@ -286,22 +288,21 @@ export default function ManageClients() {
                     </thead>
                     <tbody className="divide-y divide-slate-100">
                       {[
-                        { name: 'Anitha Devi', date: '2026-10-10', shift: 'Morning Shift', in: '05:55 AM', out: '02:05 PM', status: 'present' },
-                        { name: 'Murugan P', date: '2026-10-10', shift: 'Evening Shift', in: '02:00 PM', out: '10:00 PM', status: 'present' },
-                        { name: 'Vijay S', date: '2026-10-09', shift: 'Night Shift', in: '10:00 PM', out: '06:05 AM', status: 'present' },
-                        { name: 'Deepa S', date: '2026-10-09', shift: 'Morning Shift', in: '06:15 AM', out: '02:00 PM', status: 'late' },
-                        { name: 'Ravi Kumar', date: '2026-10-08', shift: 'Evening Shift', in: '01:58 PM', out: '10:02 PM', status: 'present' },
-                        { name: 'Lavanya M', date: '2026-10-07', shift: 'Morning Shift', in: '06:00 AM', out: '02:00 PM', status: 'present' },
-                        { name: 'Anitha Devi', date: '2026-09-30', shift: 'Morning Shift', in: '05:58 AM', out: '02:00 PM', status: 'present' },
-                        { name: 'Murugan P', date: '2026-09-29', shift: 'Evening Shift', in: '02:05 PM', out: '10:00 PM', status: 'present' },
-                        { name: 'Vijay S', date: '2026-08-31', shift: 'Night Shift', in: '10:00 PM', out: '06:00 AM', status: 'present' },
+                        { date: '2026-10-10', bunk: detailModal.assignedBunk || 'IOCL Anna Salai', in: '05:55 AM', out: '02:05 PM', status: 'present' },
+                        { date: '2026-10-09', bunk: detailModal.assignedBunk || 'IOCL Anna Salai', in: '05:58 AM', out: '02:00 PM', status: 'present' },
+                        { date: '2026-10-08', bunk: detailModal.assignedBunk || 'IOCL Anna Salai', in: '06:12 AM', out: '02:00 PM', status: 'late' },
+                        { date: '2026-10-07', bunk: detailModal.assignedBunk || 'IOCL Anna Salai', in: '06:00 AM', out: '02:00 PM', status: 'present' },
+                        { date: '2026-09-30', bunk: detailModal.assignedBunk || 'IOCL Anna Salai', in: '05:55 AM', out: '02:00 PM', status: 'present' },
+                        { date: '2026-09-29', bunk: detailModal.assignedBunk || 'IOCL Anna Salai', in: '06:00 AM', out: '02:00 PM', status: 'present' },
+                        { date: '2026-09-28', bunk: detailModal.assignedBunk || 'IOCL Anna Salai', in: '06:15 AM', out: '02:00 PM', status: 'late' },
+                        { date: '2026-08-31', bunk: detailModal.assignedBunk || 'IOCL Anna Salai', in: '05:58 AM', out: '02:00 PM', status: 'present' },
+                        { date: '2026-08-30', bunk: detailModal.assignedBunk || 'IOCL Anna Salai', in: '06:00 AM', out: '02:00 PM', status: 'present' },
                       ].map((a, idx) => (
                         <tr key={idx} className="hover:bg-slate-50">
-                          <td className="p-2 font-bold text-slate-800">{a.name}</td>
                           <td className="p-2 text-slate-500 font-mono">{a.date}</td>
-                          <td className="p-2 text-purple-700 font-medium">{a.shift}</td>
-                          <td className="p-2 font-mono text-slate-700">{a.in}</td>
-                          <td className="p-2 font-mono text-slate-500">{a.out}</td>
+                          <td className="p-2 font-medium text-slate-700 truncate max-w-[150px]">{a.bunk}</td>
+                          <td className="p-2 font-mono text-slate-800 font-bold">{a.in}</td>
+                          <td className="p-2 font-mono text-slate-600">{a.out}</td>
                           <td className="p-2">
                             <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold capitalize ${a.status === 'present' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>
                               {a.status}
@@ -314,52 +315,30 @@ export default function ManageClients() {
                 </div>
               )}
 
-              {detailTab === 'billing' && (
+              {detailTab === 'salary' && (
                 <div>
-                  <p className="text-xs text-slate-500 mb-3">3-Month Staff Salary Payout & Bunk Manpower Billing:</p>
+                  <p className="text-xs text-slate-500 mb-3">
+                    3-Month Salary Payouts for <span className="font-bold text-slate-800">{detailModal.name}</span>:
+                  </p>
                   <div className="space-y-3">
                     {[
-                      { month: 'October 2026', staffCount: 5, dutyDays: 28, totalSalary: 135000, agencyBill: 162000, status: 'Active (Current)' },
-                      { month: 'September 2026', staffCount: 5, dutyDays: 30, totalSalary: 142000, agencyBill: 170400, status: 'Paid & Cleared' },
-                      { month: 'August 2026', staffCount: 4, dutyDays: 31, totalSalary: 118000, agencyBill: 141600, status: 'Paid & Cleared' },
+                      { month: 'October 2026', basic: (detailModal.salary || 18500) - 2500, allowance: 2500, deduction: 0, netSalary: detailModal.salary || 18500, mode: 'GPay / Pending', status: 'Pending' },
+                      { month: 'September 2026', basic: (detailModal.salary || 18500) - 2500, allowance: 2500, deduction: 0, netSalary: detailModal.salary || 18500, mode: 'GPay Transferred', status: 'Paid' },
+                      { month: 'August 2026', basic: (detailModal.salary || 18500) - 2500, allowance: 2500, deduction: 0, netSalary: detailModal.salary || 18500, mode: 'Bank Transfer', status: 'Paid' },
                     ].map((m, i) => (
                       <div key={i} className="p-4 border border-slate-200 rounded-2xl bg-slate-50 flex items-center justify-between">
                         <div>
                           <p className="text-sm font-bold text-slate-800">{m.month}</p>
                           <p className="text-xs text-slate-500 mt-0.5">
-                            {m.staffCount} Deployed Staff · {m.dutyDays} Operating Days · Total Salary Paid: <span className="font-mono font-bold text-slate-700">₹{m.totalSalary.toLocaleString('en-IN')}</span>
+                            Basic: ₹{m.basic.toLocaleString('en-IN')} | Allowance: +₹{m.allowance} | Mode: <span className="font-semibold text-blue-600">{m.mode}</span>
                           </p>
                         </div>
                         <div className="text-right">
-                          <p className="text-sm font-bold text-orange-600 font-mono">Bunk Bill: ₹{m.agencyBill.toLocaleString('en-IN')}</p>
-                          <span className="text-[10px] font-bold text-green-700 bg-green-100 px-2 py-0.5 rounded-full inline-block mt-0.5">{m.status}</span>
+                          <p className="text-base font-black text-slate-900 font-mono">₹{m.netSalary.toLocaleString('en-IN')}</p>
+                          <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full inline-block mt-0.5 ${m.status === 'Paid' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>
+                            {m.status}
+                          </span>
                         </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {detailTab === 'staff' && (
-                <div>
-                  <p className="text-xs text-slate-500 mb-3">ELAKIYAA Staff Currently Assigned to this Petrol Bunk:</p>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    {[
-                      { name: 'Anitha Devi', role: 'Lead Fuel Operator', shift: 'Morning (06:00 AM - 02:00 PM)', phone: '9000000004' },
-                      { name: 'Murugan P', role: 'Cashier & Accounts', shift: 'Evening (02:00 PM - 10:00 PM)', phone: '9000000005' },
-                      { name: 'Vijay S', role: 'Night Attendant', shift: 'Night (10:00 PM - 06:00 AM)', phone: '9000000011' },
-                      { name: 'Deepa S', role: 'Nozzle Attendant', shift: 'Morning (06:00 AM - 02:00 PM)', phone: '9000000006' },
-                    ].map((st, i) => (
-                      <div key={i} className="p-3 border border-slate-200 rounded-xl bg-orange-50/20">
-                        <div className="flex items-center gap-2">
-                          <span className="text-xl">⛽</span>
-                          <div>
-                            <p className="font-bold text-slate-800 text-xs">{st.name}</p>
-                            <p className="text-[11px] text-slate-500">{st.role}</p>
-                          </div>
-                        </div>
-                        <p className="text-[10px] text-purple-700 font-semibold mt-2">Shift: {st.shift}</p>
-                        <p className="text-[10px] text-slate-400 font-mono">📞 {st.phone}</p>
                       </div>
                     ))}
                   </div>
@@ -369,17 +348,22 @@ export default function ManageClients() {
               {detailTab === 'details' && (
                 <div className="space-y-3">
                   {[
-                    ['Company / Org', detailModal.name],
-                    ['Client ID', detailModal.clientId],
-                    ['Primary Phone', detailModal.mobile],
-                    ['Registered Address', detailModal.address || 'Chennai, Tamil Nadu'],
-                    ['Active Service', detailModal.service || 'Accounts & Tax Audit'],
-                    ['Account Status', detailModal.status],
-                    ['Registration Date', detailModal.joinDate || '2025-01-10'],
+                    ['Candidate Name', detailModal.name],
+                    ['Candidate / Client ID', detailModal.clientId?.toUpperCase()],
+                    ['Mobile / GPay', detailModal.mobile],
+                    ['Assigned Petrol Bunk', detailModal.assignedBunk || 'Indian Oil Petrol Bunk'],
+                    ['Station Location', detailModal.bunkLocation || 'Chennai, Tamil Nadu'],
+                    ['Role / Duty', detailModal.roleAtBunk || 'Fuel Dispenser Attendant'],
+                    ['Assigned Shift', detailModal.shift || 'Shift 1: Morning (06:00 AM - 02:00 PM)'],
+                    ['Field Manager', `${detailModal.bunkManager || 'Priya Nair'} (📞 ${detailModal.bunkManagerPhone || '9000000002'})`],
+                    ['Monthly Salary (Fixed)', `₹${(detailModal.salary || 18500).toLocaleString('en-IN')}`],
+                    ['Aadhaar KYC', detailModal.aadhaar || 'XXXX-XXXX-4512'],
+                    ['Bank Account', detailModal.bankAccount || 'SBI - 30894512903'],
+                    ['Deployment Date', detailModal.joinDate || '2023-01-15'],
                   ].map(([label, val]) => (
-                    <div key={label} className="flex justify-between py-2 border-b border-slate-50 text-xs">
+                    <div key={label} className="flex justify-between py-2 border-b border-slate-100 text-xs">
                       <span className="text-slate-400 uppercase font-semibold">{label}</span>
-                      <span className="font-bold text-slate-700">{val}</span>
+                      <span className="font-bold text-slate-800 text-right">{val}</span>
                     </div>
                   ))}
                 </div>

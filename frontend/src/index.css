@@ -26,3 +26,53 @@ body {
   border-radius: 3px;
 }
 
+/* ── Global Print Styles for Clean Official Reports & Letters ── */
+@media print {
+  /* Hide UI elements: sidebars, navbars, buttons, inputs, breadcrumbs, search bars */
+  nav,
+  aside,
+  header,
+  button,
+  input,
+  select,
+  .no-print,
+  [role="navigation"] {
+    display: none !important;
+  }
+
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+    font-size: 11pt !important;
+  }
+
+  /* Expand main container to full page width */
+  main,
+  .flex-1 {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  /* Remove shadows, borders, backgrounds that waste ink */
+  .shadow-sm,
+  .shadow-md,
+  .shadow-lg,
+  .shadow-xl,
+  .shadow-2xl {
+    box-shadow: none !important;
+  }
+
+  /* Ensure tables print with clean borders */
+  table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+  }
+
+  th, td {
+    border: 1px solid #cbd5e1 !important;
+    padding: 6px 10px !important;
+  }
+}
+

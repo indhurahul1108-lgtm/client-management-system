@@ -55,11 +55,36 @@ export default function ManageManagers() {
     m.name.toLowerCase().includes(search.toLowerCase()) || (m.mobile||'').includes(search)
   );
 
-  // Get 3-month data for selected manager
-  const getAttendance = (m) => DUMMY_ATTENDANCE.filter(a => a.userId === m.id).slice(0, 20);
-  const getLeaves     = (m) => DUMMY_LEAVES.filter(l => l.staffId === m.id);
-  const getSalaries   = (m) => DUMMY_SALARIES.filter(s => s.staffId === m.id || s.staffName === m.name);
-  const getStaff      = (m) => DUMMY_USERS.filter(u => u.role==='staff' && u.managerId === m.managerId);
+  // Get full 3-month data for selected manager (Oct, Sep, Aug 2026)
+  const getAttendance = (m) => [
+    // October 2026
+    { id: 'ma1', date: '2026-10-10', punchIn: '09:45 AM', punchOut: '06:15 PM', status: 'present', location: 'Chennai HQ' },
+    { id: 'ma2', date: '2026-10-09', punchIn: '09:50 AM', punchOut: '06:30 PM', status: 'present', location: 'Chennai HQ' },
+    { id: 'ma3', date: '2026-10-08', punchIn: '10:15 AM', punchOut: '06:00 PM', status: 'late', lateMinutes: 15, location: 'Chennai HQ' },
+    { id: 'ma4', date: '2026-10-07', punchIn: '09:40 AM', punchOut: '06:20 PM', status: 'present', location: 'Chennai HQ' },
+    // September 2026
+    { id: 'ma5', date: '2026-09-30', punchIn: '09:45 AM', punchOut: '06:30 PM', status: 'present', location: 'Chennai HQ' },
+    { id: 'ma6', date: '2026-09-29', punchIn: '09:50 AM', punchOut: '06:15 PM', status: 'present', location: 'Chennai HQ' },
+    { id: 'ma7', date: '2026-09-28', punchIn: '09:40 AM', punchOut: '06:00 PM', status: 'present', location: 'Chennai HQ' },
+    // August 2026
+    { id: 'ma8', date: '2026-08-31', punchIn: '09:45 AM', punchOut: '06:20 PM', status: 'present', location: 'Chennai HQ' },
+    { id: 'ma9', date: '2026-08-30', punchIn: '09:50 AM', punchOut: '06:10 PM', status: 'present', location: 'Chennai HQ' },
+    { id: 'ma10', date: '2026-08-29', punchIn: '09:40 AM', punchOut: '06:00 PM', status: 'present', location: 'Chennai HQ' },
+  ];
+
+  const getLeaves = (m) => [
+    { id: 'ml1', leaveType: 'Casual Leave', fromDate: '2026-10-02', toDate: '2026-10-02', reason: 'Personal work', status: 'approved' },
+    { id: 'ml2', leaveType: 'Sick Leave',   fromDate: '2026-09-15', toDate: '2026-09-16', reason: 'Health checkup', status: 'approved' },
+    { id: 'ml3', leaveType: 'Annual Leave', fromDate: '2026-08-20', toDate: '2026-08-22', reason: 'Family trip', status: 'approved' },
+  ];
+
+  const getSalaries = (m) => [
+    { id: 'ms_oct', month: 'October 2026', basic: 40000, allowance: 5000, deduction: 0, net: 45000, netSalary: 45000, status: 'pending' },
+    { id: 'ms_sep', month: 'September 2026', basic: 40000, allowance: 5000, deduction: 0, net: 45000, netSalary: 45000, status: 'paid' },
+    { id: 'ms_aug', month: 'August 2026', basic: 40000, allowance: 5000, deduction: 0, net: 45000, netSalary: 45000, status: 'paid' },
+  ];
+
+  const getStaff = (m) => DUMMY_USERS.filter(u => u.role==='staff' && u.managerId === m.managerId);
 
   return (
     <DashboardLayout title="Managers">

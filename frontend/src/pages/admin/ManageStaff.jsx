@@ -122,10 +122,52 @@ export default function ManageStaff() {
     return matchSearch && matchStatus && matchShift;
   });
 
-  // 3-Month Data for selected staff
-  const staffAttendance = (s) => DUMMY_ATTENDANCE.filter(a => a.userId === s?.id || a.staffName === s?.name).slice(0, 30);
-  const staffLeaves = (s) => DUMMY_LEAVES.filter(l => l.staffId === s?.id || l.staffName === s?.name);
-  const staffSalaries = (s) => DUMMY_SALARIES.filter(sal => sal.staffId === s?.id || sal.staffName === s?.name);
+  // Full 3-Month Data Generator for selected staff (Oct, Sep, Aug 2026)
+  const staffAttendance = (s) => {
+    const list = [];
+    const dates = [
+      // October 2026
+      { d: '2026-10-10', in: '10:05 AM', out: '07:05 PM', st: 'present', late: 0, loc: 'Anna Salai Bunk' },
+      { d: '2026-10-09', in: '10:00 AM', out: '07:00 PM', st: 'present', late: 0, loc: 'Anna Salai Bunk' },
+      { d: '2026-10-08', in: '10:15 AM', out: '07:15 PM', st: 'late', late: 15, loc: 'Anna Salai Bunk' },
+      { d: '2026-10-07', in: '10:02 AM', out: '07:00 PM', st: 'present', late: 0, loc: 'Anna Salai Bunk' },
+      { d: '2026-10-06', in: '09:58 AM', out: '06:55 PM', st: 'present', late: 0, loc: 'Anna Salai Bunk' },
+      // September 2026
+      { d: '2026-09-30', in: '10:00 AM', out: '07:00 PM', st: 'present', late: 0, loc: 'Anna Salai Bunk' },
+      { d: '2026-09-29', in: '10:20 AM', out: '07:20 PM', st: 'late', late: 20, loc: 'Anna Salai Bunk' },
+      { d: '2026-09-28', in: '10:05 AM', out: '07:00 PM', st: 'present', late: 0, loc: 'Anna Salai Bunk' },
+      { d: '2026-09-27', in: '10:00 AM', out: '07:05 PM', st: 'present', late: 0, loc: 'Anna Salai Bunk' },
+      { d: '2026-09-26', in: '09:55 AM', out: '07:00 PM', st: 'present', late: 0, loc: 'Anna Salai Bunk' },
+      // August 2026
+      { d: '2026-08-31', in: '10:00 AM', out: '07:00 PM', st: 'present', late: 0, loc: 'Anna Salai Bunk' },
+      { d: '2026-08-30', in: '10:05 AM', out: '07:02 PM', st: 'present', late: 0, loc: 'Anna Salai Bunk' },
+      { d: '2026-08-29', in: '10:30 AM', out: '07:30 PM', st: 'late', late: 30, loc: 'Anna Salai Bunk' },
+      { d: '2026-08-28', in: '10:00 AM', out: '07:00 PM', st: 'present', late: 0, loc: 'Anna Salai Bunk' },
+      { d: '2026-08-27', in: '10:02 AM', out: '07:00 PM', st: 'present', late: 0, loc: 'Anna Salai Bunk' },
+    ];
+    return dates.map((item, i) => ({
+      id: `att_${i}`,
+      date: item.d,
+      punchIn: item.in,
+      punchOut: item.out,
+      status: item.st,
+      lateMinutes: item.late,
+      location: item.loc,
+    }));
+  };
+
+  const staffLeaves = (s) => [
+    { id: 'sl1', leaveType: 'Casual Leave', fromDate: '2026-10-04', toDate: '2026-10-04', reason: 'Personal work in town', status: 'approved' },
+    { id: 'sl2', leaveType: 'Sick Leave',   fromDate: '2026-09-18', toDate: '2026-09-19', reason: 'Viral fever and rest', status: 'approved' },
+    { id: 'sl3', leaveType: 'Annual Leave', fromDate: '2026-08-12', toDate: '2026-08-14', reason: 'Family temple visit', status: 'approved' },
+  ];
+
+  const staffSalaries = (s) => [
+    { id: 'sal_oct', month: 'October 2026', basic: (s?.salary || 28000) - 3000, allowance: 3000, deduction: 0, netSalary: s?.salary || 28000, status: 'pending' },
+    { id: 'sal_sep', month: 'September 2026', basic: (s?.salary || 28000) - 3000, allowance: 3000, deduction: 500, netSalary: (s?.salary || 28000) - 500, status: 'paid' },
+    { id: 'sal_aug', month: 'August 2026', basic: (s?.salary || 28000) - 3000, allowance: 3000, deduction: 0, netSalary: s?.salary || 28000, status: 'paid' },
+  ];
+
   const staffClients = (s) => allClients.filter(c => (s?.assignedClientIds || []).includes(c.clientId) || c.assignedStaffId === s?.staffId);
 
   return (
