@@ -85,10 +85,10 @@ export default function AdminDashboard() {
         {isTa ? '👥 அமைப்பு & ஆட்கள் (Organization)' : '👥 Organization'}
       </p>
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <StatCard label={isTa ? "மொத்த மேலாளர்கள்" : "Total Managers"} value={managers.length}  color="purple" icon={<UserCheck  size={20} className="text-white"/>} to="/admin/managers" />
-        <StatCard label={isTa ? "பங்க் பணியாளர்கள்" : "Total Staff"}    value={staff.length}     color="blue"   icon={<Users      size={20} className="text-white"/>} to="/admin/staff" />
-        <StatCard label={isTa ? "பெட்ரோல் பங்குகள்" : "Total Bunks"}  value={clients.length}   color="orange" icon={<Building2  size={20} className="text-white"/>} to="/admin/clients" />
-        <StatCard label={isTa ? "மொத்த பயனர்கள்" : "Total Users"}    value={DUMMY_USERS.length} color="slate" icon={<Users     size={20} className="text-white"/>} to="/admin/users" />
+        <StatCard label={isTa ? "மேலாளர்கள்" : "Total Managers"}        value={managers.length}    color="purple" icon={<UserCheck  size={20} className="text-white"/>} to="/admin/managers" />
+        <StatCard label={isTa ? "பணியாளர்கள் (Staff)" : "Total Staff"}  value={staff.length}       color="blue"   icon={<Users      size={20} className="text-white"/>} to="/admin/staff" />
+        <StatCard label={isTa ? "கிளைண்ட்கள் (Clients)" : "Total Clients"} value={clients.length}   color="orange" icon={<Building2  size={20} className="text-white"/>} to="/admin/clients" />
+        <StatCard label={isTa ? "மொத்த பயனர்கள்" : "Total Users"}      value={DUMMY_USERS.length} color="slate"  icon={<Users      size={20} className="text-white"/>} to="/admin/users" />
       </div>
 
       {/* ── Section 2: Attendance ── */}
@@ -104,13 +104,12 @@ export default function AdminDashboard() {
 
       {/* ── Section 3: Work ── */}
       <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">
-        {isTa ? "📋 பங்க் வேலை & ஷிப்ட் நிலை (Work Status)" : "📋 Work Status"}
+        {isTa ? "📋 பணி & வேலை நிலை (Work Status)" : "📋 Work Status"}
       </p>
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
         <StatCard label={isTa ? "செயலில் உள்ள வேலை" : "Active Work"}    value={activeWork}   color="blue"   icon={<TrendingUp  size={20} className="text-white"/>} to="/admin/assign-tasks" />
         <StatCard label={isTa ? "முடிந்த வேலை" : "Completed"}      value={completedW}   color="green"  icon={<CheckCircle size={20} className="text-white"/>} to="/admin/assign-tasks" />
         <StatCard label={isTa ? "நிலுவையில் உள்ளவை" : "Pending Work"}   value={pendingW}     color="yellow" icon={<Clock       size={20} className="text-white"/>} to="/admin/assign-tasks" />
-        <StatCard label={isTa ? "பங்க் பணி அட்டவணை" : "Bunk Duty Roster"} value={isTa ? "6 பங்குகள்" : "6 Scheduled"} color="indigo" icon={<Building2 size={20} className="text-white"/>} to="/admin/visits" />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
@@ -177,35 +176,6 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        {/* Daily Bunk Duty Visits Preview */}
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-          <div className="px-5 py-4 border-b border-slate-50 flex items-center justify-between">
-            <h3 className="font-bold text-slate-800 flex items-center gap-2">
-              <Building2 size={16} className="text-indigo-600"/>
-              {isTa ? "தினசரி பங்க் பணி & மேற்பார்வை அட்டவணை" : "Daily Petrol Bunk Duty Roster"}
-            </h3>
-            <Link to="/admin/visits" className="text-xs text-indigo-600 font-semibold">{isTa ? "அட்டவணை பார்க்க →" : "View Schedule →"}</Link>
-          </div>
-          <div className="divide-y divide-slate-50">
-            {[
-              { day: 'Mon', bunk: 'Indian Oil Petrol Bunk (IOCL)', branch: 'Anna Salai', purpose: isTa ? 'காலை & இரவு ஷிப்ட் மேற்பார்வை' : 'Morning & Night Shift Roster', staff: 'Anitha, Murugan' },
-              { day: 'Tue', bunk: 'Bharat Petroleum Pump (BPCL)', branch: 'Guindy', purpose: isTa ? 'கேஷியர் & POS பில் கணக்கு' : 'Cashier & POS Verification', staff: 'Deepa, Ravi' },
-              { day: 'Wed', bunk: 'Hindustan Petroleum (HPCL)', branch: 'OMR Tech Hub', purpose: isTa ? 'தொட்டி அளவு & அடர்த்தி சோதனை' : 'Tank Dip & Density Testing', staff: 'Lavanya, Vijay' },
-              { day: 'Thu', bunk: 'Shell Petrol Station', branch: 'Sholinganallur', purpose: isTa ? 'பிரீமியம் ஆட்கள் பாதுகாப்பு' : 'Premium Pump Manning', staff: 'Bala, Kavitha' },
-            ].map((v, i) => (
-              <div key={i} className="px-5 py-3 flex items-center justify-between hover:bg-slate-50">
-                <div>
-                  <p className="font-medium text-slate-700 text-sm flex items-center gap-2">
-                    <span className="text-[10px] font-bold bg-purple-50 text-purple-700 px-1.5 py-0.5 rounded">{v.day}</span>
-                    {v.bunk}
-                  </p>
-                  <p className="text-xs text-slate-400">{v.branch} · {v.purpose}</p>
-                </div>
-                <span className="text-xs text-indigo-600 font-semibold bg-indigo-50 px-2 py-0.5 rounded-full">{v.staff}</span>
-              </div>
-            ))}
-          </div>
-        </div>
 
         {/* Recent Activity */}
         <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">

@@ -1,9 +1,10 @@
 import React, { useState, useRef } from 'react';
 import DashboardLayout from '../../components/DashboardLayout';
 import { useAuth } from '../../context/AuthContext';
-import { DUMMY_ATTENDANCE } from '../../data/dummyData.jsx';
+import { DUMMY_ATTENDANCE, DUMMY_USERS } from '../../data/dummyData.jsx';
 import { calcLateMinutes, formatLate, SHIFT_CONFIG } from '../../utils/attendanceUtils.js';
-import { Camera, MapPin, Clock, CheckCircle, LogIn, LogOut, CalendarCheck, X, AlertTriangle } from 'lucide-react';
+import { printIndividualRecord } from '../../utils/printUtils.js';
+import { Camera, MapPin, Clock, CheckCircle, LogIn, LogOut, CalendarCheck, X, AlertTriangle, Users, Printer, ShieldCheck } from 'lucide-react';
 
 function Badge({ status }) {
   const map = { present: 'bg-green-100 text-green-700', absent: 'bg-red-100 text-red-700', late: 'bg-yellow-100 text-yellow-700' };
@@ -15,6 +16,7 @@ export default function StaffAttendance() {
   const videoRef  = useRef(null);
   const canvasRef = useRef(null);
 
+  const [activeTab, setActiveTab] = useState('client_attendance'); // default to client attendance since staff marks clients
   const [punchType,     setPunchType]     = useState(null);   // 'in' | 'out'
   const [step,          setStep]          = useState('idle'); // idle | camera | composing | confirm
   const [composedPhoto, setComposedPhoto] = useState(null);  // final photo with overlay
@@ -22,6 +24,58 @@ export default function StaffAttendance() {
   const [locationText,  setLocationText]  = useState('');
   const [loadingLoc,    setLoadingLoc]    = useState(false);
   const [punched,       setPunched]       = useState({ in: null, out: null });
+  const [toast,         setToast]         = useState('');
+
+  const [clientList, setClientList] = useState(() => {
+    const clients = DUMMY_USERS.filter(u => u.role === 'client');
+    return clients.map((c, i) => ({
+      ...c,
+      todayStatus: i % 4 === 0 ? 'late' : i % 3 === 0 ? 'absent' : 'present',
+      markedAt: i % 3 === 0 ? '—' : i % 4 === 0 ? '06:15 AM' : '05:58 AM',
+    }));
+  });
+
+  const showToast = (msg) => {
+    setToast(msg);
+    setTimeout(() => setToast(''), 3000);
+  };
+
+  const updateClientStatus = (clientId, status) => {
+    const now = new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true });
+    setClientList(prev => prev.map(c => {
+      if (c.id === clientId || c.clientId === clientId) {
+        return { ...c, todayStatus: status, markedAt: status === 'absent' ? '—' : now };
+      }
+      return c;
+    }));
+    const clientObj = clientList.find(c => c.id === clientId || c.clientId === clientId);
+    showToast(`✅ ${clientObj?.name || 'Client'} வருகை '${status.toUpperCase()}' என பதிவு செய்யப்பட்டது!`);
+  };
+
+  const printClientRecord = (c) => {
+    printIndividualRecord({
+      title: 'Candidate / Worker Attendance Record (3-Month Statement)',
+      person: {
+        name: c.name,
+        staffId: c.clientId,
+        mobile: c.mobile,
+        role: 'Client Candidate',
+        roleAtBunk: c.roleAtBunk || 'Worker',
+        assignedBunk: c.assignedBunk || 'Petrol Bunk',
+        shift: c.shift || 'Shift 1: Morning',
+      },
+      type: 'attendance',
+      records: [
+        { date: '2026-10-10', punchIn: c.markedAt || '06:00 AM', punchOut: '02:00 PM', location: c.assignedBunk || 'Petrol Bunk', status: c.todayStatus || 'present' },
+        { date: '2026-10-09', punchIn: '05:58 AM', punchOut: '02:00 PM', location: c.assignedBunk || 'Petrol Bunk', status: 'present' },
+        { date: '2026-10-08', punchIn: '06:12 AM', punchOut: '02:05 PM', location: c.assignedBunk || 'Petrol Bunk', status: 'late', lateMinutes: 12 },
+        { date: '2026-10-07', punchIn: '06:00 AM', punchOut: '02:00 PM', location: c.assignedBunk || 'Petrol Bunk', status: 'present' },
+        { date: '2026-09-30', punchIn: '05:55 AM', punchOut: '02:00 PM', location: c.assignedBunk || 'Petrol Bunk', status: 'present' },
+        { date: '2026-09-29', punchIn: '06:00 AM', punchOut: '02:00 PM', location: c.assignedBunk || 'Petrol Bunk', status: 'present' },
+        { date: '2026-08-31', punchIn: '05:58 AM', punchOut: '02:00 PM', location: c.assignedBunk || 'Petrol Bunk', status: 'present' },
+      ]
+    });
+  };
 
   const myHistory = DUMMY_ATTENDANCE.filter(a => a.userId === user?.id);
 
@@ -167,62 +221,241 @@ export default function StaffAttendance() {
   /* ── render ──────────────────────────────────── */
   return (
     <DashboardLayout title="Attendance">
-
-      {/* ── Punch Card ── */}
-      <div className="bg-gradient-to-br from-blue-700 to-blue-900 rounded-3xl p-6 text-white mb-6">
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <h2 className="text-lg font-bold">Today's Attendance</h2>
-            <p className="text-blue-200 text-xs mt-0.5">
-              {new Date().toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
-            </p>
-          </div>
-          <div className="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center">
-            <Clock size={24} />
-          </div>
+      {toast && (
+        <div className="fixed top-4 right-4 z-50 bg-green-600 text-white px-5 py-3 rounded-2xl shadow-xl text-sm font-semibold flex items-center gap-2 animate-bounce">
+          {toast}
         </div>
+      )}
 
-        <div className="grid grid-cols-2 gap-3 mb-4">
-          <div className="bg-white/10 rounded-2xl p-4">
-            <p className="text-blue-200 text-xs font-medium mb-1">Punch In</p>
-            <p className="text-2xl font-bold">{punched.in?.time || '—'}</p>
-            {punched.in && punched.in.lateMinutes > 0
-              ? <p className="text-red-300 text-xs mt-1 flex items-center gap-1"><AlertTriangle size={10} /> {formatLate(punched.in.lateMinutes)}</p>
-              : punched.in && <p className="text-green-300 text-xs mt-1">✓ On Time</p>}
-          </div>
-          <div className="bg-white/10 rounded-2xl p-4">
-            <p className="text-blue-200 text-xs font-medium mb-1">Punch Out</p>
-            <p className="text-2xl font-bold">{punched.out?.time || '—'}</p>
-            {punched.out && <p className="text-green-300 text-xs mt-1">✓ Recorded</p>}
-          </div>
-        </div>
-
-        {/* Shift info */}
-        <div className="bg-white/10 rounded-xl px-4 py-2 flex items-center justify-between text-xs text-blue-200 mb-1">
-          <span>⏰ Shift: <strong className="text-white">{SHIFT_CONFIG.shiftStart}</strong></span>
-          <span>⚡ Grace: <strong className="text-white">{SHIFT_CONFIG.graceMins} mins</strong></span>
-          <span>🔴 Late after: <strong className="text-white">{(() => { const [h,m]=SHIFT_CONFIG.shiftStart.split(':').map(Number); const t=h*60+m+SHIFT_CONFIG.graceMins; return `${String(Math.floor(t/60)).padStart(2,'0')}:${String(t%60).padStart(2,'0')}`; })()} </strong></span>
-        </div>
-
-        <div className="flex gap-3">
-          <button onClick={() => openCamera('in')} disabled={!!punched.in}
-            className="flex-1 flex flex-col items-center justify-center gap-1 bg-green-500 hover:bg-green-400 disabled:opacity-40 disabled:cursor-not-allowed text-white py-4 rounded-2xl font-bold transition shadow-lg">
-            <div className="flex items-center gap-2 text-base">
-              <LogIn size={20} />
-              <span>Punch In</span>
-            </div>
-            <span className="text-[11px] font-normal text-green-100">வேலை தொடங்கு (செல்ஃபி & GPS)</span>
-          </button>
-          <button onClick={() => openCamera('out')} disabled={!punched.in || !!punched.out}
-            className="flex-1 flex flex-col items-center justify-center gap-1 bg-red-500 hover:bg-red-400 disabled:opacity-40 disabled:cursor-not-allowed text-white py-4 rounded-2xl font-bold transition shadow-lg">
-            <div className="flex items-center gap-2 text-base">
-              <LogOut size={20} />
-              <span>Punch Out</span>
-            </div>
-            <span className="text-[11px] font-normal text-red-100">வேலை முடி (போட்டோ பதிவு)</span>
-          </button>
-        </div>
+      {/* ── Mode Switcher Tabs ── */}
+      <div className="flex bg-slate-100 p-1.5 rounded-2xl mb-6 max-w-lg">
+        <button
+          onClick={() => setActiveTab('client_attendance')}
+          className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-bold transition ${activeTab === 'client_attendance' ? 'bg-white text-orange-700 shadow-sm' : 'text-slate-600 hover:text-slate-900'}`}
+        >
+          <Users size={16} /> கிளைண்ட் பணியாளர்கள் வருகை (Clients)
+        </button>
+        <button
+          onClick={() => setActiveTab('my_attendance')}
+          className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-bold transition ${activeTab === 'my_attendance' ? 'bg-white text-blue-700 shadow-sm' : 'text-slate-600 hover:text-slate-900'}`}
+        >
+          <Clock size={16} /> என் சுய வருகை (My Punch)
+        </button>
       </div>
+
+      {activeTab === 'client_attendance' ? (
+        /* ── CLIENT ATTENDANCE MARKING TAB ── */
+        <div className="space-y-6">
+          {/* Information Notice Banner */}
+          <div className="bg-gradient-to-r from-orange-500 to-amber-500 rounded-3xl p-5 text-white shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <div className="p-3 bg-white/20 rounded-2xl shrink-0">
+                <ShieldCheck size={24} />
+              </div>
+              <div>
+                <h3 className="font-bold text-base">கிளைண்ட் வருகை பதிவு (Marking by Staff)</h3>
+                <p className="text-xs text-orange-100 mt-0.5 leading-relaxed">
+                  கிளைண்ட்கள் செல்ஃபி பஞ்ச் செய்யத் தேவையில்லை. ஸ்டாப் ஆகிய நீங்கள் தான் அவர்கள் வந்திருப்பதை உறுதி செய்து வருகைப் பதிவு செய்ய வேண்டும்.
+                </p>
+              </div>
+            </div>
+            <div className="text-xs font-mono bg-white/20 px-3 py-1.5 rounded-xl shrink-0">
+              📅 {new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
+            </div>
+          </div>
+
+          {/* Quick Stats for Clients */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            <div className="bg-white border border-slate-200/80 rounded-2xl p-4">
+              <p className="text-2xl font-bold text-slate-800">{clientList.length}</p>
+              <p className="text-xs text-slate-500 font-medium">Total Assigned Clients</p>
+            </div>
+            <div className="bg-emerald-50 border border-emerald-100 rounded-2xl p-4">
+              <p className="text-2xl font-bold text-emerald-700">{clientList.filter(c => c.todayStatus === 'present').length}</p>
+              <p className="text-xs text-emerald-600 font-medium">Present Today</p>
+            </div>
+            <div className="bg-amber-50 border border-amber-100 rounded-2xl p-4">
+              <p className="text-2xl font-bold text-amber-700">{clientList.filter(c => c.todayStatus === 'late').length}</p>
+              <p className="text-xs text-amber-600 font-medium">Late Today</p>
+            </div>
+            <div className="bg-rose-50 border border-rose-100 rounded-2xl p-4">
+              <p className="text-2xl font-bold text-rose-700">{clientList.filter(c => c.todayStatus === 'absent').length}</p>
+              <p className="text-xs text-rose-600 font-medium">Absent Today</p>
+            </div>
+          </div>
+
+          {/* Clients List with Attendance Actions */}
+          <div className="bg-white rounded-3xl shadow-sm border border-slate-200/80 overflow-hidden">
+            <div className="p-5 border-b border-slate-100 flex items-center justify-between">
+              <div>
+                <h3 className="font-bold text-slate-800 text-base">Assigned Clients / Candidates Today</h3>
+                <p className="text-xs text-slate-400">Click Present / Late / Absent to mark attendance</p>
+              </div>
+            </div>
+
+            <div className="divide-y divide-slate-100">
+              {clientList.map(c => (
+                <div key={c.id} className="p-4 sm:p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:bg-slate-50/80 transition">
+                  <div className="flex items-center gap-3">
+                    <img src={c.photo} alt={c.name} className="w-12 h-12 rounded-2xl object-cover border border-slate-200 shrink-0" />
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <p className="font-bold text-slate-800 text-sm">{c.name}</p>
+                        <span className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-slate-100 text-slate-600">{c.clientId?.toUpperCase()}</span>
+                      </div>
+                      <p className="text-xs text-slate-500 mt-0.5">
+                        {c.assignedBunk || 'Petrol Bunk'} &nbsp;·&nbsp; <span className="text-orange-600 font-semibold">{c.roleAtBunk || 'Worker'}</span>
+                      </p>
+                      <p className="text-[11px] text-slate-400 mt-0.5 font-mono">
+                        Shift: {c.shift || 'Shift 1: Morning'} &nbsp;|&nbsp; Marked: <strong className="text-slate-700">{c.markedAt || '—'}</strong>
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-wrap items-center gap-2">
+                    {/* Mark Buttons */}
+                    <button
+                      onClick={() => updateClientStatus(c.id, 'present')}
+                      className={`px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${c.todayStatus === 'present' ? 'bg-emerald-600 text-white shadow-md' : 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100'}`}
+                    >
+                      🟢 Present
+                    </button>
+                    <button
+                      onClick={() => updateClientStatus(c.id, 'late')}
+                      className={`px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${c.todayStatus === 'late' ? 'bg-amber-500 text-white shadow-md' : 'bg-amber-50 text-amber-700 hover:bg-amber-100'}`}
+                    >
+                      🟡 Late
+                    </button>
+                    <button
+                      onClick={() => updateClientStatus(c.id, 'absent')}
+                      className={`px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${c.todayStatus === 'absent' ? 'bg-rose-600 text-white shadow-md' : 'bg-rose-50 text-rose-700 hover:bg-rose-100'}`}
+                    >
+                      🔴 Absent
+                    </button>
+
+                    {/* Single Person Print Button */}
+                    <button
+                      onClick={() => printClientRecord(c)}
+                      className="ml-auto md:ml-2 px-3 py-2 bg-blue-50 text-blue-700 hover:bg-blue-100 rounded-xl text-xs font-bold flex items-center gap-1.5 transition"
+                      title="Print 3-Month Statement for this client"
+                    >
+                      <Printer size={13} /> Print Statement
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      ) : (
+        /* ── STAFF'S OWN ATTENDANCE TAB ── */
+        <div>
+          {/* ── Punch Card ── */}
+          <div className="bg-gradient-to-br from-blue-700 to-blue-900 rounded-3xl p-6 text-white mb-6">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h2 className="text-lg font-bold">My Personal Attendance</h2>
+                <p className="text-blue-200 text-xs mt-0.5">
+                  {new Date().toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
+                </p>
+              </div>
+              <div className="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center">
+                <Clock size={24} />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3 mb-4">
+              <div className="bg-white/10 rounded-2xl p-4">
+                <p className="text-blue-200 text-xs font-medium mb-1">Punch In</p>
+                <p className="text-2xl font-bold">{punched.in?.time || '—'}</p>
+                {punched.in && punched.in.lateMinutes > 0
+                  ? <p className="text-red-300 text-xs mt-1 flex items-center gap-1"><AlertTriangle size={10} /> {formatLate(punched.in.lateMinutes)}</p>
+                  : punched.in && <p className="text-green-300 text-xs mt-1">✓ On Time</p>}
+              </div>
+              <div className="bg-white/10 rounded-2xl p-4">
+                <p className="text-blue-200 text-xs font-medium mb-1">Punch Out</p>
+                <p className="text-2xl font-bold">{punched.out?.time || '—'}</p>
+                {punched.out && <p className="text-green-300 text-xs mt-1">✓ Recorded</p>}
+              </div>
+            </div>
+
+            {/* Shift info */}
+            <div className="bg-white/10 rounded-xl px-4 py-2 flex items-center justify-between text-xs text-blue-200 mb-1">
+              <span>⏰ Shift: <strong className="text-white">{SHIFT_CONFIG.shiftStart}</strong></span>
+              <span>⚡ Grace: <strong className="text-white">{SHIFT_CONFIG.graceMins} mins</strong></span>
+              <span>🔴 Late after: <strong className="text-white">{(() => { const [h,m]=SHIFT_CONFIG.shiftStart.split(':').map(Number); const t=h*60+m+SHIFT_CONFIG.graceMins; return `${String(Math.floor(t/60)).padStart(2,'0')}:${String(t%60).padStart(2,'0')}`; })()} </strong></span>
+            </div>
+
+            <div className="flex gap-3">
+              <button onClick={() => openCamera('in')} disabled={!!punched.in}
+                className="flex-1 flex flex-col items-center justify-center gap-1 bg-green-500 hover:bg-green-400 disabled:opacity-40 disabled:cursor-not-allowed text-white py-4 rounded-2xl font-bold transition shadow-lg">
+                <div className="flex items-center gap-2 text-base">
+                  <LogIn size={20} />
+                  <span>Punch In</span>
+                </div>
+                <span className="text-[11px] font-normal text-green-100">வேலை தொடங்கு (செல்ஃபி & GPS)</span>
+              </button>
+              <button onClick={() => openCamera('out')} disabled={!punched.in || !!punched.out}
+                className="flex-1 flex flex-col items-center justify-center gap-1 bg-red-500 hover:bg-red-400 disabled:opacity-40 disabled:cursor-not-allowed text-white py-4 rounded-2xl font-bold transition shadow-lg">
+                <div className="flex items-center gap-2 text-base">
+                  <LogOut size={20} />
+                  <span>Punch Out</span>
+                </div>
+                <span className="text-[11px] font-normal text-red-100">வேலை முடி (போட்டோ பதிவு)</span>
+              </button>
+            </div>
+          </div>
+
+          {/* ── Attendance History ── */}
+          <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+            <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+              <h2 className="font-bold text-slate-800">My Attendance History</h2>
+              <button
+                onClick={() => printIndividualRecord({
+                  title: 'Staff Personal Attendance Statement',
+                  person: user,
+                  type: 'attendance',
+                  records: myHistory
+                })}
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-700 hover:bg-blue-100 rounded-xl text-xs font-bold"
+              >
+                <Printer size={13} /> Print My Statement
+              </button>
+            </div>
+            {myHistory.length > 0 ? (
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead className="bg-slate-50">
+                    <tr>
+                      <th className="text-left px-6 py-3 text-xs font-semibold text-slate-500 uppercase">Date</th>
+                      <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase">Punch In</th>
+                      <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase">Punch Out</th>
+                      <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase">Location</th>
+                      <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-50">
+                    {myHistory.map(a => (
+                      <tr key={a.id} className="hover:bg-slate-50 transition">
+                        <td className="px-6 py-3 font-medium text-slate-700">{a.date}</td>
+                        <td className="px-4 py-3 text-slate-500">{a.punchIn || '—'}</td>
+                        <td className="px-4 py-3 text-slate-500">{a.punchOut || '—'}</td>
+                        <td className="px-4 py-3 text-slate-400 text-xs">{a.location || '—'}</td>
+                        <td className="px-4 py-3"><Badge status={a.status} /></td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <div className="text-center py-12 text-slate-400">
+                <CalendarCheck size={40} className="mx-auto mb-3 opacity-30" />
+                <p className="text-sm">No attendance records yet</p>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* ── Hidden canvas for composing photo ── */}
       <canvas ref={canvasRef} className="hidden" />
@@ -285,44 +518,6 @@ export default function StaffAttendance() {
           </div>
         </div>
       )}
-
-      {/* ── Attendance History (no photos — admin only sees photos) ── */}
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-        <div className="px-6 py-4 border-b border-slate-100">
-          <h2 className="font-bold text-slate-800">My Attendance History</h2>
-        </div>
-        {myHistory.length > 0 ? (
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead className="bg-slate-50">
-                <tr>
-                  <th className="text-left px-6 py-3 text-xs font-semibold text-slate-500 uppercase">Date</th>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase">Punch In</th>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase">Punch Out</th>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase">Location</th>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase">Status</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-50">
-                {myHistory.map(a => (
-                  <tr key={a.id} className="hover:bg-slate-50 transition">
-                    <td className="px-6 py-3 font-medium text-slate-700">{a.date}</td>
-                    <td className="px-4 py-3 text-slate-500">{a.punchIn || '—'}</td>
-                    <td className="px-4 py-3 text-slate-500">{a.punchOut || '—'}</td>
-                    <td className="px-4 py-3 text-slate-400 text-xs">{a.location || '—'}</td>
-                    <td className="px-4 py-3"><Badge status={a.status} /></td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        ) : (
-          <div className="text-center py-12 text-slate-400">
-            <CalendarCheck size={40} className="mx-auto mb-3 opacity-30" />
-            <p className="text-sm">No attendance records yet</p>
-          </div>
-        )}
-      </div>
     </DashboardLayout>
   );
 }

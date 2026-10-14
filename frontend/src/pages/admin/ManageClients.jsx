@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import DashboardLayout from '../../components/DashboardLayout';
 import { DUMMY_USERS } from '../../data/dummyData.jsx';
 import { CLIENT_WORKS, getClientData } from '../../data/clientData.js';
-import { Search, Plus, Edit2, X, Save, Building2, Phone, MapPin, User, Eye, Briefcase, FileText, CalendarCheck } from 'lucide-react';
+import { Search, Plus, Edit2, X, Save, Building2, Phone, MapPin, User, Eye, Briefcase, FileText, CalendarCheck, Printer } from 'lucide-react';
+import { printIndividualRecord } from '../../utils/printUtils.js';
 
 const staffList = DUMMY_USERS.filter(u => u.role === 'staff');
 const initialClients = DUMMY_USERS.filter(u => u.role === 'client');
@@ -209,6 +210,34 @@ export default function ManageClients() {
                           <Eye size={13} />
                         </button>
                         <button
+                          onClick={() => printIndividualRecord({
+                            title: 'Candidate / Client 3-Month Attendance Statement',
+                            person: {
+                              name: c.name,
+                              staffId: c.clientId,
+                              mobile: c.mobile,
+                              role: 'Client Candidate',
+                              roleAtBunk: c.roleAtBunk || 'Worker',
+                              assignedBunk: c.assignedBunk || 'Petrol Bunk',
+                              shift: c.shift || 'Shift 1: Morning',
+                            },
+                            type: 'attendance',
+                            records: [
+                              { date: '2026-10-10', bunk: c.assignedBunk || 'IOCL Petrol Bunk', in: '05:55 AM', out: '02:05 PM', status: 'present' },
+                              { date: '2026-10-09', bunk: c.assignedBunk || 'IOCL Petrol Bunk', in: '05:58 AM', out: '02:00 PM', status: 'present' },
+                              { date: '2026-10-08', bunk: c.assignedBunk || 'IOCL Petrol Bunk', in: '06:12 AM', out: '02:00 PM', status: 'late', lateMinutes: 12 },
+                              { date: '2026-10-07', bunk: c.assignedBunk || 'IOCL Petrol Bunk', in: '06:00 AM', out: '02:00 PM', status: 'present' },
+                              { date: '2026-09-30', bunk: c.assignedBunk || 'IOCL Petrol Bunk', in: '05:55 AM', out: '02:00 PM', status: 'present' },
+                              { date: '2026-09-29', bunk: c.assignedBunk || 'IOCL Petrol Bunk', in: '06:00 AM', out: '02:00 PM', status: 'present' },
+                              { date: '2026-08-31', bunk: c.assignedBunk || 'IOCL Petrol Bunk', in: '05:58 AM', out: '02:00 PM', status: 'present' },
+                            ]
+                          })}
+                          className="p-1.5 bg-orange-50 text-orange-700 hover:bg-orange-100 rounded-lg text-xs font-bold"
+                          title="Print 3-Month Attendance Statement"
+                        >
+                          <Printer size={13} />
+                        </button>
+                        <button
                           onClick={() => openEdit(c)}
                           className="p-1.5 bg-slate-100 text-slate-600 hover:bg-slate-200 rounded-lg text-xs font-bold"
                           title="Edit Client"
@@ -245,7 +274,53 @@ export default function ManageClients() {
                   <p className="text-xs text-orange-200 mt-0.5">Service: {detailModal.service || 'Accounts & Audit'}</p>
                 </div>
               </div>
-              <button onClick={() => setDetailModal(null)} className="p-2 bg-white/20 rounded-xl hover:bg-white/30"><X size={18} /></button>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => {
+                    const p = {
+                      name: detailModal.name,
+                      staffId: detailModal.clientId,
+                      mobile: detailModal.mobile,
+                      role: 'Client Candidate',
+                      roleAtBunk: detailModal.roleAtBunk || 'Worker',
+                      assignedBunk: detailModal.assignedBunk || 'Petrol Bunk',
+                      shift: detailModal.shift || 'Shift 1: Morning',
+                    };
+                    if (detailTab === 'salary') {
+                      printIndividualRecord({
+                        title: 'Candidate 3-Month Salary Statement',
+                        person: p,
+                        type: 'salary',
+                        records: [
+                          { month: 'October 2026', basic: (detailModal.salary || 18500) - 2500, allowance: 2500, deduction: 0, netSalary: detailModal.salary || 18500, status: 'pending' },
+                          { month: 'September 2026', basic: (detailModal.salary || 18500) - 2500, allowance: 2500, deduction: 0, netSalary: detailModal.salary || 18500, status: 'paid' },
+                          { month: 'August 2026', basic: (detailModal.salary || 18500) - 2500, allowance: 2500, deduction: 0, netSalary: detailModal.salary || 18500, status: 'paid' },
+                        ]
+                      });
+                    } else {
+                      printIndividualRecord({
+                        title: 'Candidate 3-Month Attendance Statement',
+                        person: p,
+                        type: 'attendance',
+                        records: [
+                          { date: '2026-10-10', bunk: detailModal.assignedBunk || 'IOCL Anna Salai', in: '05:55 AM', out: '02:05 PM', status: 'present' },
+                          { date: '2026-10-09', bunk: detailModal.assignedBunk || 'IOCL Anna Salai', in: '05:58 AM', out: '02:00 PM', status: 'present' },
+                          { date: '2026-10-08', bunk: detailModal.assignedBunk || 'IOCL Anna Salai', in: '06:12 AM', out: '02:00 PM', status: 'late', lateMinutes: 12 },
+                          { date: '2026-10-07', bunk: detailModal.assignedBunk || 'IOCL Anna Salai', in: '06:00 AM', out: '02:00 PM', status: 'present' },
+                          { date: '2026-09-30', bunk: detailModal.assignedBunk || 'IOCL Anna Salai', in: '05:55 AM', out: '02:00 PM', status: 'present' },
+                          { date: '2026-09-29', bunk: detailModal.assignedBunk || 'IOCL Anna Salai', in: '06:00 AM', out: '02:00 PM', status: 'present' },
+                          { date: '2026-08-31', bunk: detailModal.assignedBunk || 'IOCL Anna Salai', in: '05:58 AM', out: '02:00 PM', status: 'present' },
+                        ]
+                      });
+                    }
+                  }}
+                  className="flex items-center gap-1.5 bg-white/20 hover:bg-white/30 text-white px-3 py-1.5 rounded-xl text-xs font-bold transition shadow-sm"
+                  title="Print this candidate record"
+                >
+                  <Printer size={13} /> Print
+                </button>
+                <button onClick={() => setDetailModal(null)} className="p-2 bg-white/20 rounded-xl hover:bg-white/30"><X size={18} /></button>
+              </div>
             </div>
 
             {/* Modal Tabs */}

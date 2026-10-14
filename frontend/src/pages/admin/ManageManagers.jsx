@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import DashboardLayout from '../../components/DashboardLayout';
 import { DUMMY_USERS, DUMMY_ATTENDANCE, DUMMY_LEAVES, DUMMY_SALARIES } from '../../data/dummyData.jsx';
-import { Search, Plus, X, UserCheck, UserX } from 'lucide-react';
+import { Search, Plus, X, UserCheck, UserX, Printer } from 'lucide-react';
+import { printIndividualRecord } from '../../utils/printUtils.js';
 
 const MONTHS3 = (() => {
   const months = [];
@@ -141,6 +142,18 @@ export default function ManageManagers() {
               </div>
               <div className="flex gap-2">
                 <button onClick={() => openDetail(m)} className="flex-1 py-2 bg-purple-50 text-purple-700 rounded-xl text-xs font-bold hover:bg-purple-100">View Details</button>
+                <button
+                  onClick={() => printIndividualRecord({
+                    title: 'Manager 3-Month Attendance Statement',
+                    person: m,
+                    type: 'attendance',
+                    records: getAttendance(m),
+                  })}
+                  className="px-3 py-2 bg-purple-50 text-purple-700 hover:bg-purple-100 rounded-xl text-xs font-bold"
+                  title="Print Attendance Record"
+                >
+                  <Printer size={13} />
+                </button>
                 <button onClick={() => toggleStatus(m.id)} className={`px-3 py-2 rounded-xl text-xs font-bold ${m.status==='active'?'bg-red-50 text-red-600 hover:bg-red-100':'bg-green-50 text-green-600 hover:bg-green-100'}`}>
                   {m.status==='active'?'Deactivate':'Activate'}
                 </button>
@@ -162,7 +175,25 @@ export default function ManageManagers() {
                   <h3 className="font-bold text-lg">{detail.name}</h3>
                   <p className="text-purple-200 text-sm">{detail.managerId?.toUpperCase()} · {detail.department||'—'}</p>
                 </div>
-                <button onClick={() => setDetail(null)} className="ml-auto bg-white/20 rounded-xl p-2"><X size={16}/></button>
+                <div className="ml-auto flex items-center gap-2">
+                  <button
+                    onClick={() => {
+                      if (detailTab === 'attendance') {
+                        printIndividualRecord({ title: 'Manager 3-Month Attendance Statement', person: detail, type: 'attendance', records: getAttendance(detail) });
+                      } else if (detailTab === 'leave') {
+                        printIndividualRecord({ title: 'Manager Leave Record', person: detail, type: 'leaves', records: getLeaves(detail) });
+                      } else if (detailTab === 'salary') {
+                        printIndividualRecord({ title: 'Manager Salary Statement', person: detail, type: 'salary', records: getSalaries(detail) });
+                      } else {
+                        printIndividualRecord({ title: 'Manager 3-Month Attendance Statement', person: detail, type: 'attendance', records: getAttendance(detail) });
+                      }
+                    }}
+                    className="flex items-center gap-1.5 bg-white/20 hover:bg-white/30 text-white px-3 py-1.5 rounded-xl text-xs font-bold transition shadow-sm"
+                  >
+                    <Printer size={13} /> Print
+                  </button>
+                  <button onClick={() => setDetail(null)} className="bg-white/20 rounded-xl p-2"><X size={16}/></button>
+                </div>
               </div>
             </div>
 

@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import DashboardLayout from '../../components/DashboardLayout';
 import { DUMMY_USERS, DUMMY_MANAGERS, DUMMY_ATTENDANCE, DUMMY_LEAVES, DUMMY_SALARIES } from '../../data/dummyData.jsx';
 import { SHIFTS, getShiftById } from '../../utils/attendanceUtils.js';
-import { Search, Plus, Edit2, X, Save, Users, Calendar, IndianRupee, Clock, Briefcase, Eye } from 'lucide-react';
+import { Search, Plus, Edit2, X, Save, Users, Calendar, IndianRupee, Clock, Briefcase, Eye, Printer } from 'lucide-react';
+import { printIndividualRecord } from '../../utils/printUtils.js';
 
 const managerList = DUMMY_MANAGERS;
 const initialClients = DUMMY_USERS.filter(u => u.role === 'client');
@@ -314,6 +315,18 @@ export default function ManageStaff() {
                           <Eye size={13} />
                         </button>
                         <button
+                          onClick={() => printIndividualRecord({
+                            title: 'Staff 3-Month Attendance Statement',
+                            person: s,
+                            type: 'attendance',
+                            records: staffAttendance(s),
+                          })}
+                          className="p-1.5 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 rounded-lg text-xs font-bold"
+                          title="Print 3-Month Attendance Record"
+                        >
+                          <Printer size={13} />
+                        </button>
+                        <button
                           onClick={() => openEdit(s)}
                           className="p-1.5 bg-slate-100 text-slate-600 hover:bg-slate-200 rounded-lg text-xs font-bold"
                           title="Edit Staff"
@@ -350,7 +363,46 @@ export default function ManageStaff() {
                   <p className="text-xs text-green-200 font-mono mt-0.5">Salary: ₹{(detailModal.salary || 30000).toLocaleString('en-IN')}/mo</p>
                 </div>
               </div>
-              <button onClick={() => setDetailModal(null)} className="p-2 bg-white/20 rounded-xl hover:bg-white/30"><X size={18} /></button>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => {
+                    if (detailTab === 'attendance') {
+                      printIndividualRecord({
+                        title: '3-Month Attendance Statement',
+                        person: detailModal,
+                        type: 'attendance',
+                        records: staffAttendance(detailModal),
+                      });
+                    } else if (detailTab === 'leaves') {
+                      printIndividualRecord({
+                        title: 'Leave Record & History',
+                        person: detailModal,
+                        type: 'leaves',
+                        records: staffLeaves(detailModal),
+                      });
+                    } else if (detailTab === 'salary') {
+                      printIndividualRecord({
+                        title: 'Salary & Payout Statement',
+                        person: detailModal,
+                        type: 'salary',
+                        records: staffSalaries(detailModal),
+                      });
+                    } else {
+                      printIndividualRecord({
+                        title: 'Staff 3-Month Attendance Statement',
+                        person: detailModal,
+                        type: 'attendance',
+                        records: staffAttendance(detailModal),
+                      });
+                    }
+                  }}
+                  className="flex items-center gap-1.5 bg-white/20 hover:bg-white/30 text-white px-3 py-1.5 rounded-xl text-xs font-bold transition shadow-sm"
+                  title="Print this person's record"
+                >
+                  <Printer size={13} /> Print
+                </button>
+                <button onClick={() => setDetailModal(null)} className="p-2 bg-white/20 rounded-xl hover:bg-white/30"><X size={18} /></button>
+              </div>
             </div>
 
             {/* Modal Tabs */}

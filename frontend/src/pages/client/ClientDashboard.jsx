@@ -13,7 +13,7 @@ import {
   Phone, 
   User, 
   FileText, 
-  ShieldCheck, 
+  ShieldCheck,                
   CreditCard, 
   Smartphone,
   ChevronRight,
@@ -65,12 +65,10 @@ export default function ClientDashboard() {
           </div>
 
           <div className="flex items-center gap-3">
-            <Link
-              to="/client/checkin"
-              className="flex items-center gap-2 bg-white text-orange-700 hover:bg-orange-50 font-bold text-xs sm:text-sm px-5 py-3 rounded-2xl transition shadow-lg"
-            >
-              <Clock size={16} /> {lang === 'ta' ? 'இன்றைய வருகை பதிவு' : 'Punch Attendance'}
-            </Link>
+            <div className="bg-white/20 backdrop-blur-sm border border-white/30 text-white font-semibold text-xs sm:text-sm px-4 py-2.5 rounded-2xl flex items-center gap-2">
+              <ShieldCheck size={16} className="text-emerald-300" />
+              <span>{lang === 'ta' ? 'வருகை: ஸ்டாப் பதிவு செய்கிறார்' : 'Attendance: Marked by Staff'}</span>
+            </div>
           </div>
         </div>
 
@@ -197,55 +195,49 @@ export default function ClientDashboard() {
         {/* Left Column: Work & Bunk Duties (2 cols) */}
         <div className="lg:col-span-2 space-y-6">
 
-          {/* Today's Punch Action Card */}
+          {/* Today's Attendance Status Card (Marked by Staff - No Punch In/Out for Client) */}
           <div className="bg-white border border-slate-200/80 rounded-3xl p-6 shadow-sm">
             <div className="flex items-center justify-between mb-4">
               <div>
                 <h2 className="text-base font-bold text-slate-800 flex items-center gap-2">
-                  <Clock size={18} className="text-orange-600" />
-                  {lang === 'ta' ? 'இன்றைய பங்க் வருகை பதிவு (Selfie Punch)' : "Today's Bunk Punch In / Out"}
+                  <CheckCircle size={18} className="text-emerald-600" />
+                  {lang === 'ta' ? 'இன்றைய வருகை நிலை (ஸ்டாப் சரிபார்ப்பு)' : "Today's Attendance Status"}
                 </h2>
                 <p className="text-xs text-slate-500 mt-0.5">
-                  {lang === 'ta' ? 'பங்க் இடத்தில் இருந்து கேமரா செல்ஃபி எடுத்து பதிவு செய்யவும்' : 'Punch attendance at your assigned bunk location'}
+                  {lang === 'ta' ? 'கிளைண்ட் பஞ்ச் செய்ய தேவையில்லை — மேற்பார்வை ஸ்டாப் வருகையை பதிவு செய்கிறார்' : 'Marked directly by your assigned field staff'}
                 </p>
               </div>
-              <Link
-                to="/client/checkin"
-                className="text-xs font-bold text-orange-600 hover:text-orange-700 flex items-center gap-1"
-              >
-                {lang === 'ta' ? 'முழு பக்கம்' : 'Full Page'} <ChevronRight size={14} />
-              </Link>
+              <span className="px-3 py-1 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full text-xs font-bold flex items-center gap-1.5">
+                <ShieldCheck size={13} /> {lang === 'ta' ? 'நேரில் சரிபார்க்கப்பட்டது' : 'Verified by Staff'}
+              </span>
             </div>
 
-            <div className="bg-gradient-to-br from-amber-50 to-orange-50 border border-orange-200/60 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="bg-gradient-to-br from-emerald-50 to-teal-50 border border-emerald-200/60 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-xl bg-orange-600 text-white flex items-center justify-center font-bold text-lg shadow-sm">
-                  IOCL
+                <div className="w-12 h-12 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-bold text-lg shadow-sm">
+                  ✓
                 </div>
                 <div>
-                  <p className="font-bold text-slate-800 text-sm">{user?.assignedBunk || 'Indian Oil Petrol Bunk'}</p>
-                  <p className="text-xs text-slate-500 flex items-center gap-1 mt-0.5">
-                    <MapPin size={12} className="text-orange-600" /> {user?.bunkLocation || 'Anna Salai, Chennai'}
+                  <div className="flex items-center gap-2">
+                    <p className="font-bold text-slate-800 text-sm">{user?.name || 'Karthik Velu'}</p>
+                    <span className="bg-emerald-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">
+                      Present
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-600 flex items-center gap-1 mt-0.5">
+                    <User size={12} className="text-emerald-600" />
+                    <span>{lang === 'ta' ? 'பதிவு செய்த ஸ்டாப்:' : 'Marked by Staff:'} <strong>{assignedStaff?.name || 'Anitha Devi'}</strong></span>
                   </p>
-                  <p className="text-[11px] text-orange-700 font-semibold mt-1">
+                  <p className="text-[11px] text-emerald-800 font-semibold mt-1">
                     {user?.shift || 'Shift 1: Morning (06:00 AM - 02:00 PM)'}
                   </p>
                 </div>
               </div>
 
-              <div className="flex items-center gap-2 w-full sm:w-auto">
-                <Link
-                  to="/client/checkin"
-                  className="flex-1 sm:flex-none text-center bg-green-600 hover:bg-green-700 text-white font-bold text-xs px-4 py-2.5 rounded-xl shadow-sm transition"
-                >
-                  🟢 {lang === 'ta' ? 'பணி தொடங்கு (Punch In)' : 'Punch In'}
-                </Link>
-                <Link
-                  to="/client/checkin"
-                  className="flex-1 sm:flex-none text-center bg-red-600 hover:bg-red-700 text-white font-bold text-xs px-4 py-2.5 rounded-xl shadow-sm transition"
-                >
-                  🔴 {lang === 'ta' ? 'பணி முடி (Punch Out)' : 'Punch Out'}
-                </Link>
+              <div className="text-xs bg-white/80 border border-emerald-200 rounded-xl px-4 py-2.5 text-center sm:text-right">
+                <p className="text-slate-400 text-[10px] uppercase font-bold">{lang === 'ta' ? 'இன்றைய நிலை' : 'Today Status'}</p>
+                <p className="text-emerald-700 font-bold text-sm">🟢 On Duty (பணியில்)</p>
+                <p className="text-slate-400 text-[10px] mt-0.5">Time: 06:00 AM</p>
               </div>
             </div>
           </div>

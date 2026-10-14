@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import DashboardLayout from '../../components/DashboardLayout';
 import { useLanguage } from '../../context/LanguageContext';
 import { DUMMY_USERS, DUMMY_SALARIES } from '../../data/dummyData.jsx';
-import { IndianRupee, CreditCard, Smartphone, Check, Edit2, X, Plus, User, Building2, Search } from 'lucide-react';
+import { IndianRupee, CreditCard, Smartphone, Check, Edit2, X, Plus, User, Building2, Search, Printer } from 'lucide-react';
+import { printIndividualRecord } from '../../utils/printUtils.js';
 
 const PAYMENT_METHODS = [
   { id: 'gpay',   label: 'GPay',          icon: '📲', color: 'bg-blue-50 border-blue-200 text-blue-700' },
@@ -297,6 +298,26 @@ export default function SalaryAdmin() {
                             <IndianRupee size={12} /> Pay Now
                           </button>
                         )}
+                        <button
+                          onClick={() => printIndividualRecord({
+                            title: `Official Salary Statement & Payslip (${s.month})`,
+                            person: {
+                              name: s.staffName,
+                              staffId: s.staffId,
+                              mobile: '—',
+                              role: s.userRole === 'client' ? 'Client Candidate' : 'Staff Member',
+                              roleAtBunk: s.roleTag,
+                              assignedBunk: s.assignedBunk,
+                              salary: s.netSalary,
+                            },
+                            type: 'salary',
+                            records: [s],
+                          })}
+                          className="flex items-center gap-1 bg-blue-50 text-blue-700 px-3 py-1.5 rounded-xl text-xs font-bold hover:bg-blue-100"
+                          title="Print Individual Payslip"
+                        >
+                          <Printer size={12} /> Payslip
+                        </button>
                         <button
                           onClick={() => openEdit(s)}
                           className="flex items-center gap-1 bg-slate-100 text-slate-700 px-3 py-1.5 rounded-xl text-xs font-bold hover:bg-slate-200"

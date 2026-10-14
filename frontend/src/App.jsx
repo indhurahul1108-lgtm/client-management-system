@@ -90,7 +90,6 @@ export default function App() {
             <Route path="/admin/leave"         element={AR(['admin'], LeaveAdmin)} />
             <Route path="/admin/salary"        element={AR(['admin'], SalaryAdmin)} />
             <Route path="/admin/assign-tasks"  element={AR(['admin'], AssignTasks)} />
-            <Route path="/admin/visits"        element={AR(['admin'], DailyVisits)} />
             <Route path="/admin/overdue"       element={AR(['admin'], OverdueAdmin)} />
             <Route path="/admin/reports"       element={AR(['admin'], ReportsAdmin)} />
             <Route path="/admin/notifications" element={AR(['admin'], AdminNotifications)} />
@@ -104,7 +103,6 @@ export default function App() {
             <Route path="/manager/attendance"    element={AR(['manager'], ManagerAttendance)} />
             <Route path="/manager/leave"         element={AR(['manager'], ManagerLeave)} />
             <Route path="/manager/work"          element={AR(['manager'], ManagerWork)} />
-            <Route path="/manager/visits"        element={AR(['manager'], DailyVisits)} />
             <Route path="/manager/overdue"       element={AR(['manager'], ManagerOverdue)} />
             <Route path="/manager/notifications" element={AR(['manager'], ManagerNotifications)} />
             <Route path="/manager/reports"       element={AR(['manager'], ManagerReports)} />
@@ -115,7 +113,6 @@ export default function App() {
             <Route path="/staff/attendance"    element={AR(['staff'], Attendance)} />
             <Route path="/staff/work"          element={AR(['staff'], StaffWork)} />
             <Route path="/staff/clients"       element={AR(['staff'], StaffClients)} />
-            <Route path="/staff/visits"        element={AR(['staff'], DailyVisits)} />
             <Route path="/staff/overdue"       element={AR(['staff'], StaffOverdue)} />
             <Route path="/staff/leave"         element={AR(['staff'], StaffLeave)} />
             <Route path="/staff/salary"        element={AR(['staff'], StaffSalary)} />
@@ -127,7 +124,6 @@ export default function App() {
             {/* ── CLIENT ── */}
             <Route path="/client"               element={AR(['client'], ClientDashboard)} />
             <Route path="/client/work"          element={AR(['client'], ClientWork)} />
-            <Route path="/client/checkin"       element={AR(['client'], ClientAttendance)} />
             <Route path="/client/overdue"       element={AR(['client'], ClientOverdue)} />
             <Route path="/client/requests"      element={AR(['client'], ClientRequests)} />
             <Route path="/client/notifications" element={AR(['client'], ClientNotifications)} />
