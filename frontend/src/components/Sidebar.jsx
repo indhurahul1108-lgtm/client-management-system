@@ -6,7 +6,6 @@ import {
   FileText, DollarSign, AlertTriangle, BarChart2, LogOut,
   ChevronLeft, ChevronRight, ClipboardList, User, Clock, Menu, X, Settings, Briefcase, Bell, Activity
 } from 'lucide-react';
-import { useLanguage } from '../context/LanguageContext';
 
 
 const MENUS = {
@@ -50,11 +49,8 @@ const MENUS = {
   ],
   client: [
     { label: 'Candidate Portal', icon: LayoutDashboard, path: '/client' },
-    { label: 'My Work / Tasks',  icon: ClipboardList,   path: '/client/work' },
-    { label: 'Requests',         icon: FileText,        path: '/client/requests' },
-    { label: 'Messages',         icon: Users,           path: '/client/messages' },
+    { label: 'My Attendance',    icon: CalendarCheck,   path: '/client/attendance' },
     { label: 'My Documents',     icon: Briefcase,       path: '/client/documents' },
-    { label: 'Notifications',    icon: Bell,            path: '/client/notifications' },
     { label: 'Profile',          icon: User,            path: '/client/profile' },
   ],
 };
@@ -72,56 +68,11 @@ const ROLE_LABELS = {
 
 export default function Sidebar() {
   const { user, logout } = useAuth();
-  const { lang, t } = useLanguage();
   const location = useLocation();
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
 
   if (!user) return null;
-
-  const TAMIL_LABELS = {
-    'Dashboard': 'முகப்பு (Dashboard)',
-    'Users': 'பயனர்கள் (Users)',
-    'Managers': 'மேலாளர்கள் (Managers)',
-    'Staff': 'பணியாளர்கள் (Staff)',
-    'Clients': 'கிளைண்ட்கள் (Clients)',
-    'My Clients': 'என் கிளைண்ட்கள் (My Clients)',
-    'Attendance': 'வருகைப் பதிவு (Punch)',
-    'Leave': 'விடுப்பு (Leave)',
-    'Salary': 'சம்பளம் (Salary)',
-    'Work / Tasks': 'வேலை ஒதுக்கீடு',
-    'Bunk Duty Roster': 'பங்க் பணி அட்டவணை',
-    'Reports': 'அறிக்கைகள் (Reports)',
-    'Notifications': 'அறிவிப்புகள்',
-    'Audit Log': 'பதிவேடு (Audit Log)',
-    'Settings': 'அமைப்புகள்',
-    'My Staff': 'என் பணியாளர்கள்',
-    'Profile': 'சுயவிபரம் (Profile)',
-    'My Work': 'என் வேலை',
-    'My Bunk Duty': 'இன்றைய பங்க் வேலை',
-    'Documents': 'ஆவணங்கள்',
-    'Candidate Portal': 'கிளைண்ட் முகப்பு',
-    'Attendance Punch': 'வருகைப் பதிவு (Punch In/Out)',
-    'My Work / Tasks': 'பணி விபரங்கள் (Tasks)',
-    'Requests': 'விண்ணப்பங்கள் (Requests)',
-    'My Documents': 'என் ஆவணங்கள் (Documents)',
-    'Bunk Dashboard': 'கிளைண்ட் முகப்பு',
-    'Deployed Staff': 'பணியில் உள்ள ஆட்கள்',
-    'Bunk Attendance': 'வருகைப் பதிவு (Punch)',
-    'Manpower Request': 'ஆட்கள் தேவை கோரிக்கை',
-    'Messages': 'செய்திகள் (Messages)',
-    'Invoices & Bills': 'பில் & ரசீதுகள்',
-    'Bunk History': 'பணி வரலாறு',
-    'Client Profile': 'கிளைண்ட் சுயவிபரம் (Client Profile)',
-    'Bunk Profile': 'கிளைண்ட் சுயவிபரம் (Client Profile)',
-  };
-
-  const getLabel = (engLabel) => {
-    if (lang === 'ta' && TAMIL_LABELS[engLabel]) {
-      return TAMIL_LABELS[engLabel];
-    }
-    return engLabel;
-  };
 
   const menus = MENUS[user.role] || [];
   const gradient = ROLE_COLORS[user.role];
@@ -186,7 +137,7 @@ export default function Sidebar() {
                 ${active ? 'bg-white/20 text-white' : 'text-white/70 hover:bg-white/10 hover:text-white'}`}
             >
               <Icon size={18} className="shrink-0" />
-              {!collapsed && <span>{getLabel(label)}</span>}
+              {!collapsed && <span>{label}</span>}
             </Link>
           );
         })}
@@ -199,7 +150,7 @@ export default function Sidebar() {
           className="flex items-center gap-3 w-full px-4 py-3 rounded-lg text-white/70 hover:bg-white/10 hover:text-white transition text-sm font-medium"
         >
           <LogOut size={18} className="shrink-0" />
-          {!collapsed && <span>{lang === 'ta' ? 'வெளியேறு (Logout)' : 'Logout'}</span>}
+          {!collapsed && <span>Logout</span>}
         </button>
       </div>
     </div>

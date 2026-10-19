@@ -68,10 +68,10 @@ export default function StaffDashboard() {
         <div>
           <h3 className="font-bold text-base flex items-center gap-2">
             <Clock size={18} className="text-emerald-200"/> 
-            <span>இன்றைய வேலை நேரம் (Shift Duty)</span>
+            <span>Shift Duty Schedule</span>
           </h3>
           <p className="text-xs text-emerald-100 mt-0.5">
-            Shift: <strong>{SHIFT_CONFIG.shiftStart}</strong> · வருகை பதிவு செய்ய கீழே உள்ள பட்டனை அழுத்தவும்
+            Shift starts at <strong>{SHIFT_CONFIG.shiftStart}</strong> · Click below to verify clients or record attendance
           </p>
         </div>
         <div className="flex gap-2.5 w-full sm:w-auto">
@@ -79,7 +79,7 @@ export default function StaffDashboard() {
             to="/staff/attendance"
             className="flex-1 sm:flex-initial flex items-center justify-center gap-2 bg-white text-emerald-800 hover:bg-emerald-50 px-5 py-2.5 rounded-xl font-bold text-xs shadow transition active:scale-95"
           >
-            <LogIn size={15}/> Punch In / Out (கேமரா வருகை) →
+            <LogIn size={15}/> Punch In / Out (Attendance Portal) →
           </Link>
         </div>
       </div>
@@ -100,7 +100,7 @@ export default function StaffDashboard() {
           <div className="px-5 py-4 border-b border-slate-50 flex items-center justify-between">
             <h3 className="font-bold text-slate-800 flex items-center gap-2">
               <Users size={15} className="text-green-600"/>
-              <span>Deployed Candidates (பணியாளர்கள்)</span>
+              <span>Deployed Candidates</span>
               <span className="bg-orange-100 text-orange-700 text-xs px-2 py-0.5 rounded-full font-bold">{myClients.length}</span>
             </h3>
             <Link to="/staff/clients" className="text-xs text-green-600 font-semibold hover:underline">View All →</Link>

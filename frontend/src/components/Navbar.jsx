@@ -1,7 +1,6 @@
 import React from 'react';
-import { Bell, Search, Languages } from 'lucide-react';
+import { Bell, Search } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import { useLanguage } from '../context/LanguageContext';
 
 const ROLE_LABELS = {
   admin: 'Administrator', manager: 'Manager', staff: 'Staff', client: 'Client',
@@ -16,9 +15,8 @@ const ROLE_BADGE = {
 
 export default function Navbar({ title }) {
   const { user } = useAuth();
-  const { lang, toggleLanguage } = useLanguage();
   const now = new Date();
-  const dateStr = now.toLocaleDateString(lang === 'ta' ? 'ta-IN' : 'en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+  const dateStr = now.toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
 
   return (
     <header className="bg-white border-b border-slate-200 px-4 sm:px-6 py-3 flex items-center justify-between sticky top-0 z-30 shadow-sm">
@@ -38,16 +36,6 @@ export default function Navbar({ title }) {
       </div>
 
       <div className="flex items-center gap-2 sm:gap-3">
-        {/* Tamil / English One-Click Switcher */}
-        <button
-          onClick={toggleLanguage}
-          title="Switch Language / மொழியை மாற்றுக"
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-orange-300 bg-orange-50 hover:bg-orange-100 text-orange-800 font-bold text-xs transition shadow-sm"
-        >
-          <Languages size={14} className="text-orange-600" />
-          <span>{lang === 'en' ? 'தமிழ்' : 'English'}</span>
-        </button>
-
         {/* Notification bell */}
         <button className="relative w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 flex items-center justify-center transition">
           <Bell size={16} className="text-slate-600" />

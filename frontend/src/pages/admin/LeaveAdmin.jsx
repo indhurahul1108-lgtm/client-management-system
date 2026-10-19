@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import DashboardLayout from '../../components/DashboardLayout';
-import { useLanguage } from '../../context/LanguageContext';
 import { DUMMY_LEAVES, DUMMY_USERS } from '../../data/dummyData.jsx';
 import { Check, X, MessageSquare, CheckCircle, Users, UserCheck, Building2, Calendar } from 'lucide-react';
 
@@ -39,7 +38,6 @@ const INITIAL_LEAVES = [
 ];
 
 export default function LeaveAdmin() {
-  const { lang } = useLanguage();
   const [leaves, setLeaves] = useState(INITIAL_LEAVES);
   const [roleTab, setRoleTab] = useState('all'); // 'all' | 'manager' | 'staff' | 'client'
   const [filter, setFilter] = useState('all');
@@ -65,7 +63,7 @@ export default function LeaveAdmin() {
       : l
     ));
     setApproveModal(null);
-    showToast(`✅ ${approveModal.staffName} விடுப்பு ஒப்புதல் அளிக்கப்பட்டது!`);
+    showToast(`✅ Leave approved for ${approveModal.staffName}!`);
   };
 
   const openReject = (leave) => {
@@ -74,13 +72,13 @@ export default function LeaveAdmin() {
   };
 
   const confirmReject = () => {
-    if (!rejectReason.trim()) { showToast('⚠️ காரணம் குறிப்பிடவும்', 'bg-red-500'); return; }
+    if (!rejectReason.trim()) { showToast('⚠️ Please specify rejection reason', 'bg-red-500'); return; }
     setLeaves(prev => prev.map(l => l.id === rejectModal.id
       ? { ...l, status: 'rejected', rejectReason }
       : l
     ));
     setRejectModal(null);
-    showToast(`❌ ${rejectModal.staffName} விடுப்பு நிராகரிக்கப்பட்டது.`);
+    showToast(`❌ Leave rejected for ${rejectModal.staffName}.`);
   };
 
   const filtered = leaves.filter(l => {
@@ -90,16 +88,16 @@ export default function LeaveAdmin() {
   });
 
   return (
-    <DashboardLayout title={lang === 'ta' ? 'விடுப்பு மேலாண்மை (Leave Management)' : 'Leave Management'}>
+    <DashboardLayout title="Leave Management">
       {toast && <Toast msg={toast.msg} color={toast.color} />}
 
       {/* ── Separate Role Selection Tabs (Manager, Staff, Clients) ── */}
       <div className="bg-white rounded-2xl p-2 mb-5 border border-slate-200/80 shadow-sm flex flex-wrap gap-2">
         {[
-          { id: 'all',     label: lang === 'ta' ? 'அனைத்து விடுப்புகள் (All)' : 'All Leaves', icon: Users, color: 'bg-slate-900 text-white' },
-          { id: 'manager', label: lang === 'ta' ? 'மேலாளர்கள் விடுப்பு (Managers)' : 'Managers Leaves', icon: UserCheck, color: 'bg-purple-700 text-white' },
-          { id: 'staff',   label: lang === 'ta' ? 'ஸ்டாஃப் விடுப்பு (Staff)' : 'Staff Leaves', icon: Users, color: 'bg-green-700 text-white' },
-          { id: 'client',  label: lang === 'ta' ? 'பங்க் பணியாளர்கள் விடுப்பு (Clients / Workers)' : 'Clients / Bunk Workers', icon: Building2, color: 'bg-orange-600 text-white' },
+          { id: 'all',     label: 'All Leaves', icon: Users, color: 'bg-slate-900 text-white' },
+          { id: 'manager', label: 'Managers Leaves', icon: UserCheck, color: 'bg-purple-700 text-white' },
+          { id: 'staff',   label: 'Staff Leaves', icon: Users, color: 'bg-green-700 text-white' },
+          { id: 'client',  label: 'Clients / Bunk Candidates', icon: Building2, color: 'bg-orange-600 text-white' },
         ].map(tab => {
           const Icon = tab.icon;
           const active = roleTab === tab.id;

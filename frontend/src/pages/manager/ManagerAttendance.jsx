@@ -215,7 +215,7 @@ export default function ManagerAttendance() {
                   <LogIn size={20} />
                   <span>Punch In</span>
                 </div>
-                <span className="text-[11px] font-normal text-green-100">மேலாளர் வருகை (செல்ஃபி & GPS)</span>
+                <span className="text-[11px] font-normal text-green-100">Manager Attendance (Selfie & GPS)</span>
               </button>
               <button
                 onClick={() => startCamera('out')}
@@ -225,7 +225,7 @@ export default function ManagerAttendance() {
                   <LogOut size={20} />
                   <span>Punch Out</span>
                 </div>
-                <span className="text-[11px] font-normal text-rose-100">பணி முடிவு பதிவு</span>
+                <span className="text-[11px] font-normal text-rose-100">Shift Completion Record</span>
               </button>
             </div>
           </div>

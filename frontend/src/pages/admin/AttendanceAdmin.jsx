@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import DashboardLayout from '../../components/DashboardLayout';
-import { useLanguage } from '../../context/LanguageContext';
 import { DUMMY_ATTENDANCE, DUMMY_USERS } from '../../data/dummyData.jsx';
 import { calcLateMinutes, formatLate, SHIFT_CONFIG } from '../../utils/attendanceUtils.js';
 import { Users, Clock, X, AlertTriangle, Settings, UserCheck, Building2, Eye } from 'lucide-react';
@@ -54,7 +53,6 @@ const INITIAL_ATTENDANCE = [
 ];
 
 export default function AttendanceAdmin() {
-  const { lang } = useLanguage();
   const [roleTab, setRoleTab] = useState('all'); // 'all' | 'manager' | 'staff' | 'client'
   const [filter, setFilter] = useState('all');
   const [previewPhoto, setPreviewPhoto] = useState(null);
@@ -78,15 +76,15 @@ export default function AttendanceAdmin() {
   const late    = filtered.filter(a => a.status === 'late').length;
 
   return (
-    <DashboardLayout title={lang === 'ta' ? 'வருகைப் பதிவு மேலாண்மை (Attendance)' : 'Attendance Management'}>
+    <DashboardLayout title="Attendance Management">
 
       {/* ── Separate Role Selection Tabs (Manager, Staff, Clients) ── */}
       <div className="bg-white rounded-2xl p-2 mb-5 border border-slate-200/80 shadow-sm flex flex-wrap gap-2">
         {[
-          { id: 'all',     label: lang === 'ta' ? 'அனைத்து வருகை (All)' : 'All Attendance', icon: Users, color: 'bg-slate-900 text-white' },
-          { id: 'manager', label: lang === 'ta' ? 'மேலாளர்கள் வருகை (Managers)' : 'Managers Attendance', icon: UserCheck, color: 'bg-purple-700 text-white' },
-          { id: 'staff',   label: lang === 'ta' ? 'ஸ்டாஃப் வருகை (Staff)' : 'Staff Attendance', icon: Users, color: 'bg-green-700 text-white' },
-          { id: 'client',  label: lang === 'ta' ? 'பங்க் பணியாளர்கள் (Clients / Workers)' : 'Clients / Bunk Workers', icon: Building2, color: 'bg-orange-600 text-white' },
+          { id: 'all',     label: 'All Attendance', icon: Users, color: 'bg-slate-900 text-white' },
+          { id: 'manager', label: 'Managers Attendance', icon: UserCheck, color: 'bg-purple-700 text-white' },
+          { id: 'staff',   label: 'Staff Attendance', icon: Users, color: 'bg-green-700 text-white' },
+          { id: 'client',  label: 'Clients / Bunk Candidates', icon: Building2, color: 'bg-orange-600 text-white' },
         ].map(tab => {
           const Icon = tab.icon;
           const active = roleTab === tab.id;

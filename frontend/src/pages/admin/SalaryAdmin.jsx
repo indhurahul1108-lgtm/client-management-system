@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import DashboardLayout from '../../components/DashboardLayout';
-import { useLanguage } from '../../context/LanguageContext';
 import { DUMMY_USERS, DUMMY_SALARIES } from '../../data/dummyData.jsx';
 import { IndianRupee, CreditCard, Smartphone, Check, Edit2, X, Plus, User, Building2, Search, Printer } from 'lucide-react';
 import { printIndividualRecord } from '../../utils/printUtils.js';
@@ -22,8 +21,6 @@ function Toast({ msg, onClose }) {
 }
 
 export default function SalaryAdmin() {
-  const { lang, t } = useLanguage();
-
   // Combine Staff & Deployed Candidates into a comprehensive salary list
   const clientCandidates = DUMMY_USERS.filter(u => u.role === 'client');
   const candidateSalaries = clientCandidates.map((c, idx) => ({
@@ -85,7 +82,7 @@ export default function SalaryAdmin() {
     ));
     setPayModal(null);
     const pm = PAYMENT_METHODS.find(p => p.id === payModal.method);
-    showToast(`✅ ${payModal.salary.staffName} சம்பளம் (${pm?.label}) மூலம் வழங்கப்பட்டது!`);
+    showToast(`✅ ${payModal.salary.staffName} salary paid via ${pm?.label}!`);
   };
 
   const openEdit = (s) => setEditModal({ ...s });
@@ -93,7 +90,7 @@ export default function SalaryAdmin() {
     const net = Number(editModal.basic) + Number(editModal.allowance) - Number(editModal.deduction);
     setSalaries(prev => prev.map(s => s.id === editModal.id ? { ...editModal, netSalary: net } : s));
     setEditModal(null);
-    showToast(`✅ ${editModal.staffName} சம்பளம் மாற்றியமைக்கப்பட்டது! (₹${net.toLocaleString('en-IN')})`);
+    showToast(`✅ ${editModal.staffName} salary updated! (₹${net.toLocaleString('en-IN')})`);
   };
 
   const handleCreateNewSalary = () => {
@@ -118,7 +115,7 @@ export default function SalaryAdmin() {
     };
     setSalaries(prev => [newEntry, ...prev]);
     setSetNewSalaryModal(false);
-    showToast(`✅ ${userObj.name} புதிய சம்பளம் ₹${net.toLocaleString('en-IN')} நிர்ணயிக்கப்பட்டது!`);
+    showToast(`✅ New salary of ₹${net.toLocaleString('en-IN')} allocated for ${userObj.name}!`);
   };
 
   const filtered = salaries.filter(s => {
@@ -134,7 +131,7 @@ export default function SalaryAdmin() {
   const clientSalaryTotal = salaries.filter(s => s.userRole === 'client').reduce((sum, s) => sum + (s.netSalary || 0), 0);
 
   return (
-    <DashboardLayout title={lang === 'ta' ? 'சம்பள மேலாண்மை (Salary Management)' : 'Salary Management'}>
+    <DashboardLayout title="Salary Management">
       {toast && <Toast msg={toast} onClose={() => setToast('')} />}
 
       {/* Top Banner Notice */}
@@ -142,29 +139,27 @@ export default function SalaryAdmin() {
         <div>
           <h2 className="text-base sm:text-lg font-bold flex items-center gap-2">
             <IndianRupee size={20} className="text-amber-400" />
-            {lang === 'ta' ? 'அட்மின் சம்பள நிர்ணயம் & பேமென்ட் (Staff & Bunk Workers)' : 'Admin Salary Setting & Payouts'}
+            Admin Salary Setting & Payouts (Staff & Bunk Candidates)
           </h2>
           <p className="text-xs text-blue-200 mt-1">
-            {lang === 'ta' 
-              ? 'பங்க் பணியாளர்கள் மற்றும் ஸ்டாஃப்களுக்கு நிர்வாகமே சம்பளத்தை நிர்ணயித்து GPay அல்லது வங்கி மூலம் வழங்குகிறது.'
-              : 'Management sets individual salary amounts for deployed manpower & staff with instant payment modes.'}
+            Management sets individual salary amounts for deployed manpower & staff with instant payment modes (GPay / Bank Transfer).
           </p>
         </div>
         <button
           onClick={() => setSetNewSalaryModal(true)}
           className="flex items-center gap-2 bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold text-xs px-4 py-2.5 rounded-xl shadow-lg transition shrink-0"
         >
-          <Plus size={16} /> {lang === 'ta' ? 'புதிய சம்பளம் நிர்ணயி' : 'Set Worker Salary'}
+          <Plus size={16} /> Set Worker Salary
         </button>
       </div>
 
       {/* Summary Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         {[
-          [lang === 'ta' ? 'வழங்கப்பட்டது (Paid)' : 'Total Paid', salaries.filter(s => s.status === 'paid').length, `₹${totalPaid.toLocaleString('en-IN')}`, 'emerald'],
-          [lang === 'ta' ? 'நிலுவை (Pending)' : 'Pending Payout', salaries.filter(s => s.status === 'pending').length, `₹${totalPending.toLocaleString('en-IN')}`, 'amber'],
-          [lang === 'ta' ? 'பங்க் பணியாளர்கள் சம்பளம்' : 'Deployed Crew Salaries', salaries.filter(s => s.userRole === 'client').length, `₹${clientSalaryTotal.toLocaleString('en-IN')}`, 'orange'],
-          [lang === 'ta' ? 'GPay வழிகள்' : 'GPay Payment Mode', salaries.filter(s => s.paymentMethod === 'gpay').length, 'GPay / Bank', 'blue'],
+          ['Total Paid', salaries.filter(s => s.status === 'paid').length, `₹${totalPaid.toLocaleString('en-IN')}`, 'emerald'],
+          ['Pending Payout', salaries.filter(s => s.status === 'pending').length, `₹${totalPending.toLocaleString('en-IN')}`, 'amber'],
+          ['Deployed Crew Salaries', salaries.filter(s => s.userRole === 'client').length, `₹${clientSalaryTotal.toLocaleString('en-IN')}`, 'orange'],
+          ['GPay Payment Mode', salaries.filter(s => s.paymentMethod === 'gpay').length, 'GPay / Bank', 'blue'],
         ].map(([label, count, sub, c]) => (
           <div key={label} className={`bg-${c}-50 border border-${c}-100 rounded-2xl p-4 shadow-sm`}>
             <p className={`text-2xl font-bold text-${c}-700`}>{count}</p>
@@ -182,7 +177,7 @@ export default function SalaryAdmin() {
             <input
               value={search}
               onChange={e => setSearch(e.target.value)}
-              placeholder={lang === 'ta' ? 'பெயர் அல்லது பங்க் தேட...' : 'Search by worker name, bunk...'}
+              placeholder="Search by worker name, bunk..."
               className="w-full pl-10 pr-4 py-2.5 border border-slate-200 rounded-xl text-xs bg-white focus:outline-none focus:ring-2 focus:ring-blue-400"
             />
           </div>
@@ -190,9 +185,9 @@ export default function SalaryAdmin() {
           {/* Role Filter */}
           <div className="flex gap-1 bg-slate-100 p-1 rounded-xl">
             {[
-              ['all', lang === 'ta' ? 'அனைத்தும்' : 'All'],
-              ['client', lang === 'ta' ? 'பங்க் பணியாளர்கள்' : 'Bunk Workers'],
-              ['staff', lang === 'ta' ? 'ஸ்டாப்' : 'Office Staff'],
+              ['all', 'All Roles'],
+              ['client', 'Bunk Candidates'],
+              ['staff', 'Field Staff'],
             ].map(([val, label]) => (
               <button
                 key={val}
@@ -207,7 +202,7 @@ export default function SalaryAdmin() {
           {/* Status Filter */}
           <div className="flex gap-1 bg-slate-100 p-1 rounded-xl">
             {[
-              ['all', 'All'],
+              ['all', 'All Status'],
               ['pending', 'Pending'],
               ['paid', 'Paid'],
             ].map(([val, label]) => (
@@ -230,9 +225,9 @@ export default function SalaryAdmin() {
             <thead className="bg-slate-50/80">
               <tr>
                 {[
-                  lang === 'ta' ? 'பணியாளர் பெயர்' : 'Worker / Staff Name',
-                  lang === 'ta' ? 'வகை / பணி' : 'Role & Category',
-                  lang === 'ta' ? 'ஒதுக்கப்பட்ட பங்க்' : 'Assigned Bunk',
+                  'Worker / Staff Name',
+                  'Role & Category',
+                  'Assigned Bunk',
                   'Month',
                   'Basic',
                   'Allowance',
@@ -339,7 +334,7 @@ export default function SalaryAdmin() {
         <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4 backdrop-blur-sm">
           <div className="bg-white rounded-3xl w-full max-w-sm p-6 shadow-2xl">
             <h3 className="font-bold text-slate-800 text-base mb-1">
-              {lang === 'ta' ? 'சம்பளம் வழங்குதல் (Pay Salary)' : 'Pay Salary'}
+              Pay Salary
             </h3>
             <p className="text-xs text-slate-500 mb-4">
               {payModal.salary.staffName} — {payModal.salary.month} —
@@ -349,7 +344,7 @@ export default function SalaryAdmin() {
             </p>
 
             <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">
-              {lang === 'ta' ? 'பேமென்ட் முறை தேர்வு செய்க' : 'Select Payment Mode'}
+              Select Payment Mode
             </p>
             <div className="grid grid-cols-2 gap-3 mb-5">
               {PAYMENT_METHODS.map(pm => (
@@ -382,14 +377,14 @@ export default function SalaryAdmin() {
             <div className="flex items-center justify-between mb-4">
               <div>
                 <h3 className="font-bold text-slate-800 text-base">
-                  {lang === 'ta' ? 'சம்பளம் நிர்ணயம் செய்தல்' : 'Set / Edit Salary'}
+                  Set / Edit Salary
                 </h3>
                 <p className="text-xs text-slate-400">{editModal.staffName} ({editModal.roleTag})</p>
               </div>
               <button onClick={() => setEditModal(null)}><X size={18} className="text-slate-400" /></button>
             </div>
 
-            {[['Basic Pay (அடிப்படை)', 'basic'], ['Shift Allowance (அலவன்ஸ்)', 'allowance'], ['Deduction (பிடித்தம்)', 'deduction']].map(([label, key]) => (
+            {[['Basic Pay', 'basic'], ['Shift Allowance', 'allowance'], ['Deduction', 'deduction']].map(([label, key]) => (
               <div key={key} className="mb-3">
                 <label className="text-xs font-bold text-slate-500 uppercase block mb-1.5">{label}</label>
                 <input
@@ -402,7 +397,7 @@ export default function SalaryAdmin() {
             ))}
 
             <div className="bg-blue-50 border border-blue-100 rounded-2xl p-3.5 mb-5 text-center">
-              <p className="text-xs text-blue-600 font-semibold">{lang === 'ta' ? 'மொத்த நிகர சம்பளம் (Net Salary)' : 'Calculated Net Salary'}</p>
+              <p className="text-xs text-blue-600 font-semibold">Calculated Net Salary</p>
               <p className="text-2xl font-black text-blue-900 mt-0.5">
                 ₹{(Number(editModal.basic) + Number(editModal.allowance) - Number(editModal.deduction)).toLocaleString('en-IN')}
               </p>
@@ -413,7 +408,7 @@ export default function SalaryAdmin() {
                 Cancel
               </button>
               <button onClick={saveEdit} className="flex-1 py-2.5 bg-blue-700 text-white rounded-xl text-xs font-bold hover:bg-blue-800 shadow-md">
-                {lang === 'ta' ? 'நிர்ணயித்து சேமிக்க' : 'Save Salary'}
+                Save Salary
               </button>
             </div>
           </div>
@@ -427,7 +422,7 @@ export default function SalaryAdmin() {
             <div className="flex items-center justify-between mb-4">
               <div>
                 <h3 className="font-bold text-slate-800 text-base">
-                  {lang === 'ta' ? 'புதிய பணியாளர் சம்பள நிர்ணயம்' : 'Set New Worker Salary'}
+                  Set New Worker Salary
                 </h3>
                 <p className="text-xs text-slate-400">Add monthly payout for candidate or staff</p>
               </div>
@@ -436,7 +431,7 @@ export default function SalaryAdmin() {
 
             <div className="mb-3">
               <label className="text-xs font-bold text-slate-500 uppercase block mb-1.5">
-                {lang === 'ta' ? 'பணியாளர் தேர்வு செய்க' : 'Select Worker / Candidate'}
+                Select Worker / Candidate
               </label>
               <select
                 value={newSalaryData.userId}
@@ -473,7 +468,7 @@ export default function SalaryAdmin() {
             </div>
 
             <div className="bg-amber-50 border border-amber-200/70 rounded-2xl p-3.5 mb-5 text-center">
-              <p className="text-xs text-amber-700 font-semibold">{lang === 'ta' ? 'நிர்ணயிக்கப்படும் தொகை' : 'Net Payable'}</p>
+              <p className="text-xs text-amber-700 font-semibold">Net Payable</p>
               <p className="text-2xl font-black text-amber-900 mt-0.5">
                 ₹{(Number(newSalaryData.basic) + Number(newSalaryData.allowance) - Number(newSalaryData.deduction)).toLocaleString('en-IN')}
               </p>
@@ -484,7 +479,7 @@ export default function SalaryAdmin() {
                 Cancel
               </button>
               <button onClick={handleCreateNewSalary} className="flex-1 py-2.5 bg-blue-700 text-white rounded-xl text-xs font-bold hover:bg-blue-800 shadow-md">
-                {lang === 'ta' ? 'சம்பளம் சேமி' : 'Save & Allocate'}
+                Save & Allocate
               </button>
             </div>
           </div>

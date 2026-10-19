@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import DashboardLayout from '../../components/DashboardLayout';
 import { useAuth } from '../../context/AuthContext';
-import { useLanguage } from '../../context/LanguageContext';
 import { DUMMY_USERS } from '../../data/dummyData.jsx';
+import { printIndividualRecord } from '../../utils/printUtils.js';
 import { 
   Building2, 
   Clock, 
@@ -15,25 +15,76 @@ import {
   FileText, 
   ShieldCheck,                
   CreditCard, 
-  Smartphone,
+  Printer,
   ChevronRight,
-  Sparkles
+  Sparkles,
+  Users
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export default function ClientDashboard() {
   const { user } = useAuth();
-  const { lang, t } = useLanguage();
 
-  // Assigned Staff (Field Staff in charge)
-  const assignedStaff = DUMMY_USERS.find(u => u.staffId === user?.assignedStaffId);
-  const assignedManager = DUMMY_USERS.find(u => u.role === 'manager' && (u.name === user?.bunkManager || u.managerId === 'm001'));
+  // Find assigned supervising staff members (supports multi-staff)
+  const staffList = DUMMY_USERS.filter(u => u.role === 'staff');
+  const assignedStaffIds = user?.assignedStaffIds || (user?.assignedStaffId ? [user.assignedStaffId] : ['s001', 's002']);
+  const assignedStaffMembers = staffList.filter(s => assignedStaffIds.includes(s.staffId || s.id));
+  const primaryStaff = assignedStaffMembers[0] || { name: 'Anitha Devi', mobile: '9000000004', staffId: 's001' };
 
-  // Quick punch state for demo
-  const [punchedToday, setPunchedToday] = useState(false);
+  // Manager in charge
+  const assignedManager = DUMMY_USERS.find(u => u.role === 'manager' && (u.name === user?.bunkManager || u.managerId === 'm001')) || {
+    name: 'Priya Nair',
+    mobile: '9000000002',
+    managerId: 'm001'
+  };
+
+  // Selected date state (defaults to today)
+  const todayStr = new Date().toISOString().split('T')[0];
+  const [selectedDutyDate, setSelectedDutyDate] = useState(todayStr);
+
+  // Duty history
+  const dutyHistory = user?.dutyHistory && user.dutyHistory.length > 0 ? user.dutyHistory : [
+    { date: '2026-10-10', bunk: user?.assignedBunk || 'Indian Oil Petrol Bunk (IOCL) — Anna Salai', shift: user?.shift || 'Shift 1: Morning (06:00 AM - 02:00 PM)', approvedBy: `${primaryStaff.name} (Staff)`, approvedAt: '06:05 AM', status: 'approved' },
+    { date: '2026-10-09', bunk: user?.assignedBunk || 'Indian Oil Petrol Bunk (IOCL) — Anna Salai', shift: user?.shift || 'Shift 1: Morning (06:00 AM - 02:00 PM)', approvedBy: `${primaryStaff.name} (Staff)`, approvedAt: '06:00 AM', status: 'approved' },
+    { date: '2026-10-08', bunk: user?.assignedBunk || 'Indian Oil Petrol Bunk (IOCL) — Anna Salai', shift: user?.shift || 'Shift 1: Morning (06:00 AM - 02:00 PM)', approvedBy: `${primaryStaff.name} (Staff)`, approvedAt: '06:15 AM', status: 'late' },
+    { date: '2026-10-07', bunk: user?.assignedBunk || 'Indian Oil Petrol Bunk (IOCL) — Anna Salai', shift: user?.shift || 'Shift 1: Morning (06:00 AM - 02:00 PM)', approvedBy: `${primaryStaff.name} (Staff)`, approvedAt: '06:02 AM', status: 'approved' },
+    { date: '2026-10-06', bunk: user?.assignedBunk || 'Indian Oil Petrol Bunk (IOCL) — Anna Salai', shift: user?.shift || 'Shift 1: Morning (06:00 AM - 02:00 PM)', approvedBy: `${primaryStaff.name} (Staff)`, approvedAt: '05:58 AM', status: 'approved' },
+  ];
+
+  const currentDuty = dutyHistory.find(d => d.date === selectedDutyDate) || {
+    date: selectedDutyDate,
+    bunk: user?.assignedBunk || 'Indian Oil Petrol Bunk (IOCL) — Anna Salai',
+    shift: user?.shift || 'Shift 1: Morning (06:00 AM - 02:00 PM)',
+    approvedBy: user?.dutyStatus === 'approved' ? `${primaryStaff.name} (Staff)` : null,
+    approvedAt: user?.approvedAt || '06:05 AM',
+    status: user?.dutyStatus || 'approved'
+  };
+
+  const handlePrintAttendance = () => {
+    printIndividualRecord({
+      title: 'Candidate / Worker 3-Month Attendance Statement',
+      person: {
+        name: user?.name || 'Karthik Velu',
+        staffId: user?.clientId || 'C001',
+        mobile: user?.mobile || '9100000001',
+        role: 'Client Candidate',
+        roleAtBunk: user?.roleAtBunk || 'Fuel Dispenser Lead Attendant',
+        assignedBunk: user?.assignedBunk || 'Indian Oil Petrol Bunk (IOCL)',
+        shift: user?.shift || 'Shift 1: Morning (06:00 AM - 02:00 PM)',
+      },
+      type: 'attendance',
+      records: dutyHistory.map(d => ({
+        date: d.date,
+        punchIn: d.approvedAt || '06:00 AM',
+        punchOut: '02:00 PM',
+        location: d.bunk,
+        status: d.status === 'approved' ? 'present' : d.status,
+      }))
+    });
+  };
 
   return (
-    <DashboardLayout title={lang === 'ta' ? 'கிளைண்ட் பணியாளர் முகப்பு' : 'Candidate Portal'}>
+    <DashboardLayout title="Candidate Portal">
 
       {/* ── Candidate Personal Deployment Banner ── */}
       <div className="bg-gradient-to-r from-orange-600 via-amber-600 to-orange-700 rounded-3xl p-6 text-white mb-6 shadow-xl border border-white/10 relative overflow-hidden">
@@ -50,11 +101,11 @@ export default function ClientDashboard() {
               <div className="flex items-center gap-2 flex-wrap">
                 <h1 className="text-xl sm:text-2xl font-black text-white tracking-wide">{user?.name || 'Karthik Velu'}</h1>
                 <span className="text-[11px] bg-emerald-500/20 border border-emerald-300 text-emerald-100 font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1 shadow-sm">
-                  <ShieldCheck size={12} /> {lang === 'ta' ? 'பணியில் உள்ளார்' : 'Active Deployed'}
+                  <ShieldCheck size={12} /> Active Deployed
                 </span>
               </div>
               <p className="text-orange-100 text-xs sm:text-sm font-semibold mt-1">
-                {lang === 'ta' ? 'பதவி:' : 'Role:'} <span className="text-white font-bold">{user?.roleAtBunk || 'Fuel Dispenser Attendant'}</span>
+                Role: <span className="text-white font-bold">{user?.roleAtBunk || 'Fuel Dispenser Lead Attendant'}</span>
                 &nbsp;|&nbsp; ID: <span className="font-mono text-amber-200">{user?.clientId?.toUpperCase() || 'C001'}</span>
               </p>
               <p className="text-orange-200 text-xs mt-1 flex items-center gap-1">
@@ -65,10 +116,13 @@ export default function ClientDashboard() {
           </div>
 
           <div className="flex items-center gap-3">
-            <div className="bg-white/20 backdrop-blur-sm border border-white/30 text-white font-semibold text-xs sm:text-sm px-4 py-2.5 rounded-2xl flex items-center gap-2">
-              <ShieldCheck size={16} className="text-emerald-300" />
-              <span>{lang === 'ta' ? 'வருகை: ஸ்டாப் பதிவு செய்கிறார்' : 'Attendance: Marked by Staff'}</span>
-            </div>
+            <button
+              onClick={handlePrintAttendance}
+              className="bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30 text-white font-semibold text-xs sm:text-sm px-4 py-2.5 rounded-2xl flex items-center gap-2 transition"
+            >
+              <Printer size={15} />
+              <span>Print Attendance Statement</span>
+            </button>
           </div>
         </div>
 
@@ -80,10 +134,10 @@ export default function ClientDashboard() {
             </div>
             <div>
               <p className="text-amber-200 text-[10px] font-bold uppercase tracking-wider">
-                {lang === 'ta' ? 'ஒதுக்கப்பட்ட பெட்ரோல் பங்க்' : 'Assigned Petrol Bunk'}
+                Assigned Petrol Bunk Station
               </p>
               <p className="font-bold text-white text-xs sm:text-sm">{user?.assignedBunk || 'Indian Oil Petrol Bunk (IOCL)'}</p>
-              <p className="text-orange-200 text-[11px] mt-0.5">{user?.bunkLocation || 'Chennai, Tamil Nadu'}</p>
+              <p className="text-orange-200 text-[11px] mt-0.5">{user?.bunkLocation || 'Anna Salai, Chennai'}</p>
             </div>
           </div>
 
@@ -93,18 +147,18 @@ export default function ClientDashboard() {
             </div>
             <div>
               <p className="text-amber-200 text-[10px] font-bold uppercase tracking-wider">
-                {lang === 'ta' ? 'பணி ஷிப்ட் நேரம்' : 'Duty Shift Schedule'}
+                Duty Shift Schedule
               </p>
               <p className="font-bold text-white text-xs sm:text-sm">{user?.shift || 'Shift 1: Morning (06:00 AM - 02:00 PM)'}</p>
               <p className="text-orange-200 text-[11px] mt-0.5">
-                {lang === 'ta' ? 'மேலாளர்:' : 'Manager:'} {user?.bunkManager || 'Priya Nair'} (📞 {user?.bunkManagerPhone || '9000000002'})
+                Manager: {assignedManager.name} (📞 {assignedManager.mobile})
               </p>
             </div>
           </div>
         </div>
       </div>
 
-      {/* ── Key Overview Cards (Salary, Shift, Attendance, Staff) ── */}
+      {/* ── Key Overview Cards (Salary, Shift, Attendance, Supervising Staff) ── */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         
         {/* Monthly Salary Card */}
@@ -117,13 +171,11 @@ export default function ClientDashboard() {
               <p className="text-lg font-bold text-slate-800 leading-tight">
                 ₹{(user?.salary || 18500).toLocaleString('en-IN')}
               </p>
-              <p className="text-xs text-slate-500 font-medium">
-                {lang === 'ta' ? 'மாத சம்பளம்' : 'Monthly Salary'}
-              </p>
+              <p className="text-xs text-slate-500 font-medium">Monthly Salary</p>
             </div>
           </div>
           <div className="flex items-center justify-between text-[11px] text-green-700 font-semibold mt-2.5 pt-2 border-t border-slate-100">
-            <span>{lang === 'ta' ? 'அட்மின் நிர்ணயித்தது' : 'Set by Management'}</span>
+            <span>Fixed by Management</span>
             <span className="bg-green-50 px-2 py-0.5 rounded-full">GPay / Bank</span>
           </div>
         </div>
@@ -138,9 +190,7 @@ export default function ClientDashboard() {
               <p className="text-base font-bold text-slate-800 leading-tight">
                 {user?.shift?.split(':')[1]?.split('(')[0]?.trim() || 'Morning'}
               </p>
-              <p className="text-xs text-slate-500 font-medium">
-                {lang === 'ta' ? 'ஷிப்ட் முறை' : 'Current Shift'}
-              </p>
+              <p className="text-xs text-slate-500 font-medium">Assigned Shift</p>
             </div>
           </div>
           <p className="text-[11px] text-slate-500 mt-2.5 pt-2 border-t border-slate-100 font-mono">
@@ -148,197 +198,280 @@ export default function ClientDashboard() {
           </p>
         </div>
 
-        {/* Attendance Status */}
+        {/* Attendance Approval Status */}
         <div className="bg-white border border-slate-200/80 rounded-2xl p-4 shadow-sm hover:shadow-md transition">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-purple-600 rounded-xl flex items-center justify-center text-white shrink-0 shadow-sm">
+            <div className="w-10 h-10 bg-emerald-600 rounded-xl flex items-center justify-center text-white shrink-0 shadow-sm">
               <CheckCircle size={20} />
             </div>
             <div>
               <p className="text-lg font-bold text-slate-800 leading-tight">
-                {punchedToday ? 'Present' : '100%'}
+                {currentDuty.status === 'approved' ? 'Approved' : 'Pending'}
               </p>
-              <p className="text-xs text-slate-500 font-medium">
-                {lang === 'ta' ? 'மாத வருகை' : 'Month Attendance'}
-              </p>
+              <p className="text-xs text-slate-500 font-medium">Duty Status</p>
             </div>
           </div>
-          <p className="text-[11px] text-purple-700 font-semibold mt-2.5 pt-2 border-t border-slate-100">
-            {lang === 'ta' ? 'போட்டோ & GPS சரிபார்ப்பு' : 'Selfie & GPS Verified'}
+          <p className="text-[11px] text-emerald-700 font-semibold mt-2.5 pt-2 border-t border-slate-100">
+            ✓ Verified by Field Staff
           </p>
         </div>
 
-        {/* Incharge Staff */}
+        {/* Assigned Staff (Multi-Staff Display) */}
         <div className="bg-white border border-slate-200/80 rounded-2xl p-4 shadow-sm hover:shadow-md transition">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-orange-600 rounded-xl flex items-center justify-center text-white shrink-0 shadow-sm">
-              <User size={20} />
+              <Users size={20} />
             </div>
             <div>
               <p className="text-base font-bold text-slate-800 leading-tight truncate">
-                {assignedStaff?.name || 'Anitha Devi'}
+                {primaryStaff.name}
               </p>
               <p className="text-xs text-slate-500 font-medium">
-                {lang === 'ta' ? 'மேற்பார்வை ஸ்டாப்' : 'Assigned Staff'}
+                {assignedStaffMembers.length > 1 ? `+${assignedStaffMembers.length - 1} More Staff` : 'Incharge Staff'}
               </p>
             </div>
           </div>
           <p className="text-[11px] text-slate-500 mt-2.5 pt-2 border-t border-slate-100 font-mono">
-            📞 {assignedStaff?.mobile || '9000000004'}
+            📞 {primaryStaff.mobile}
           </p>
         </div>
       </div>
 
-      {/* ── Detailed Deployment & Work Information ── */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+      {/* ── DAILY DUTY BUNK ASSIGNMENT & STAFF APPROVAL (Core Feature) ── */}
+      <div className="bg-white border border-slate-200/80 rounded-3xl p-6 shadow-sm mb-6">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-5 pb-4 border-b border-slate-100">
+          <div>
+            <h2 className="text-lg font-bold text-slate-800 flex items-center gap-2">
+              <CheckCircle size={20} className="text-emerald-600" />
+              <span>Daily Bunk Duty Assignment & Verification</span>
+            </h2>
+            <p className="text-xs text-slate-500 mt-0.5">
+              Select date to check your duty station assignment and staff verification status
+            </p>
+          </div>
 
-        {/* Left Column: Work & Bunk Duties (2 cols) */}
-        <div className="lg:col-span-2 space-y-6">
+          {/* Date Picker */}
+          <div className="flex items-center gap-2 bg-slate-100 px-3 py-1.5 rounded-xl border border-slate-200 text-xs">
+            <Calendar size={14} className="text-slate-500" />
+            <span className="font-semibold text-slate-600">Select Date:</span>
+            <input
+              type="date"
+              value={selectedDutyDate}
+              onChange={e => setSelectedDutyDate(e.target.value)}
+              className="bg-transparent font-bold text-slate-800 focus:outline-none cursor-pointer"
+            />
+          </div>
+        </div>
 
-          {/* Today's Attendance Status Card (Marked by Staff - No Punch In/Out for Client) */}
-          <div className="bg-white border border-slate-200/80 rounded-3xl p-6 shadow-sm">
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <h2 className="text-base font-bold text-slate-800 flex items-center gap-2">
-                  <CheckCircle size={18} className="text-emerald-600" />
-                  {lang === 'ta' ? 'இன்றைய வருகை நிலை (ஸ்டாப் சரிபார்ப்பு)' : "Today's Attendance Status"}
-                </h2>
-                <p className="text-xs text-slate-500 mt-0.5">
-                  {lang === 'ta' ? 'கிளைண்ட் பஞ்ச் செய்ய தேவையில்லை — மேற்பார்வை ஸ்டாப் வருகையை பதிவு செய்கிறார்' : 'Marked directly by your assigned field staff'}
-                </p>
+        {/* Selected Date Duty Card */}
+        <div className="bg-gradient-to-br from-slate-50 to-emerald-50/40 border border-emerald-200/80 rounded-2xl p-5 mb-5">
+          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="text-xs font-mono font-bold bg-slate-200 text-slate-800 px-2.5 py-1 rounded-lg">
+                  📅 {currentDuty.date}
+                </span>
+                <span className={`text-xs font-bold px-3 py-1 rounded-full flex items-center gap-1.5 ${
+                  currentDuty.status === 'approved' ? 'bg-emerald-600 text-white shadow-sm' :
+                  currentDuty.status === 'late' ? 'bg-amber-500 text-white shadow-sm' : 'bg-slate-200 text-slate-700'
+                }`}>
+                  <ShieldCheck size={14} />
+                  {currentDuty.status === 'approved' ? '✓ Approved & Verified On Duty' :
+                   currentDuty.status === 'late' ? '⚠️ Verified Late on Duty' : '⏳ Awaiting Staff Verification'}
+                </span>
               </div>
-              <span className="px-3 py-1 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full text-xs font-bold flex items-center gap-1.5">
-                <ShieldCheck size={13} /> {lang === 'ta' ? 'நேரில் சரிபார்க்கப்பட்டது' : 'Verified by Staff'}
-              </span>
+
+              <div>
+                <p className="text-xs text-slate-400 uppercase font-bold tracking-wider">Assigned Duty Station</p>
+                <p className="text-base sm:text-lg font-black text-slate-800">{currentDuty.bunk}</p>
+                <p className="text-xs text-slate-500 mt-0.5">{user?.bunkLocation || 'Chennai, Tamil Nadu'}</p>
+              </div>
+
+              <div className="flex items-center gap-4 text-xs pt-1 flex-wrap">
+                <span className="text-slate-600">
+                  ⏰ <strong>Shift:</strong> {currentDuty.shift}
+                </span>
+                {currentDuty.approvedBy && (
+                  <span className="text-emerald-800 font-bold bg-emerald-100 px-2.5 py-0.5 rounded-lg">
+                    ✓ Verified by {currentDuty.approvedBy} at {currentDuty.approvedAt}
+                  </span>
+                )}
+              </div>
             </div>
 
-            <div className="bg-gradient-to-br from-emerald-50 to-teal-50 border border-emerald-200/60 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-bold text-lg shadow-sm">
-                  ✓
-                </div>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <p className="font-bold text-slate-800 text-sm">{user?.name || 'Karthik Velu'}</p>
-                    <span className="bg-emerald-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">
-                      Present
-                    </span>
-                  </div>
-                  <p className="text-xs text-slate-600 flex items-center gap-1 mt-0.5">
-                    <User size={12} className="text-emerald-600" />
-                    <span>{lang === 'ta' ? 'பதிவு செய்த ஸ்டாப்:' : 'Marked by Staff:'} <strong>{assignedStaff?.name || 'Anitha Devi'}</strong></span>
-                  </p>
-                  <p className="text-[11px] text-emerald-800 font-semibold mt-1">
-                    {user?.shift || 'Shift 1: Morning (06:00 AM - 02:00 PM)'}
-                  </p>
-                </div>
-              </div>
-
-              <div className="text-xs bg-white/80 border border-emerald-200 rounded-xl px-4 py-2.5 text-center sm:text-right">
-                <p className="text-slate-400 text-[10px] uppercase font-bold">{lang === 'ta' ? 'இன்றைய நிலை' : 'Today Status'}</p>
-                <p className="text-emerald-700 font-bold text-sm">🟢 On Duty (பணியில்)</p>
-                <p className="text-slate-400 text-[10px] mt-0.5">Time: 06:00 AM</p>
+            <div className="bg-white border border-emerald-200 rounded-2xl p-4 text-left md:text-right shrink-0 shadow-sm w-full md:w-auto">
+              <p className="text-[10px] text-slate-400 uppercase font-bold">Duty Verification Model</p>
+              <p className="text-xs text-slate-700 mt-1 font-medium max-w-xs">
+                Field staff verifies candidate presence directly at the petrol bunk station. Manual client punch in/out is disabled.
+              </p>
+              <div className="mt-3 flex items-center gap-2 md:justify-end">
+                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
+                <span className="text-xs font-bold text-emerald-700">Staff Incharge Verified</span>
               </div>
             </div>
           </div>
+        </div>
 
-          {/* Deployment Duties & Job Guidelines */}
+        {/* Recent Duty History Table */}
+        <div>
+          <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">
+            Recent Duty Assignment History
+          </h3>
+          <div className="overflow-x-auto border border-slate-100 rounded-2xl">
+            <table className="w-full text-xs">
+              <thead className="bg-slate-50 text-slate-400 font-semibold uppercase">
+                <tr>
+                  <th className="p-3 text-left">Date</th>
+                  <th className="p-3 text-left">Assigned Petrol Bunk</th>
+                  <th className="p-3 text-left">Shift Schedule</th>
+                  <th className="p-3 text-left">Verified By Staff</th>
+                  <th className="p-3 text-left">Status</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {dutyHistory.map((d, i) => (
+                  <tr
+                    key={i}
+                    onClick={() => setSelectedDutyDate(d.date)}
+                    className={`hover:bg-orange-50/50 cursor-pointer transition ${d.date === selectedDutyDate ? 'bg-orange-50/80 font-semibold' : ''}`}
+                  >
+                    <td className="p-3 font-mono text-slate-700">{d.date}</td>
+                    <td className="p-3 font-bold text-slate-800">{d.bunk}</td>
+                    <td className="p-3 text-slate-600">{d.shift}</td>
+                    <td className="p-3 text-slate-600">{d.approvedBy || 'Pending'} ({d.approvedAt || '—'})</td>
+                    <td className="p-3">
+                      <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold capitalize ${
+                        d.status === 'approved' ? 'bg-emerald-100 text-emerald-700' :
+                        d.status === 'late' ? 'bg-amber-100 text-amber-700' : 'bg-slate-100 text-slate-600'
+                      }`}>
+                        {d.status === 'approved' ? '✓ Approved' : d.status}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      {/* ── Assigned Supervising Staff Team & Job Guidelines ── */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+
+        {/* Left Column: Assigned Staff Team (1 col) */}
+        <div className="space-y-6">
+          <div className="bg-white border border-slate-200/80 rounded-3xl p-6 shadow-sm">
+            <h3 className="font-bold text-slate-800 text-sm mb-4 flex items-center gap-2">
+              <Users size={16} className="text-orange-600" />
+              <span>Assigned Supervising Staff Team</span>
+            </h3>
+
+            <p className="text-xs text-slate-500 mb-3">
+              Management has assigned the following field supervisors to oversee your station duties:
+            </p>
+
+            <div className="space-y-3">
+              {assignedStaffMembers.map(st => (
+                <div key={st.id} className="p-3.5 bg-slate-50 hover:bg-orange-50/50 rounded-2xl border border-slate-200/80 transition flex items-center gap-3">
+                  <img src={st.photo} alt={st.name} className="w-12 h-12 rounded-xl object-cover shrink-0" />
+                  <div>
+                    <p className="font-bold text-slate-800 text-sm">{st.name}</p>
+                    <p className="text-[11px] text-slate-500 font-mono">ID: {st.staffId} · Field Staff</p>
+                    <a href={`tel:${st.mobile}`} className="text-xs text-orange-600 font-semibold mt-0.5 inline-block hover:underline">
+                      📞 {st.mobile}
+                    </a>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-800">
+              ⚡ Contact your assigned staff supervisor for station shifts, relief handovers, or emergency leaves.
+            </div>
+          </div>
+        </div>
+
+        {/* Right Column: Job Responsibilities & Salary (2 cols) */}
+        <div className="lg:col-span-2 space-y-6">
+
+          {/* Job Responsibilities */}
           <div className="bg-white border border-slate-200/80 rounded-3xl p-6 shadow-sm">
             <h2 className="text-base font-bold text-slate-800 mb-4 flex items-center gap-2">
               <FileText size={18} className="text-orange-600" />
-              {lang === 'ta' ? 'உங்கள் பங்க் பணிகள் & விதிமுறைகள்' : 'My Bunk Job Responsibilities'}
+              <span>Station Job Responsibilities & Safety Standards</span>
             </h2>
 
             <div className="space-y-3 text-xs">
               {[
-                { title: 'Fuel Dispensing & Safety', desc: 'Maintain clean uniform, safety shoes, and follow no-smoking / safety protocols on nozzles.', taTitle: 'எரிபொருள் போடுதல் & பாதுகாப்பு', taDesc: 'சீரான உடை, பாதுகாப்பு காலணிகள் அணிந்து பாதுகாப்பு விதிகளை தவறாது பின்பற்றவும்.' },
-                { title: 'POS / Cash Reconciliation', desc: 'Collect cash and credit card payments accurately and deposit with the bunk cashier at shift end.', taTitle: 'பணம் & கார்டு வசூல்', taDesc: 'பணம் மற்றும் கார்டு வசூலை சரியாக கணக்கு வைத்து ஷிப்ட் முடிவில் கேஷியரிடம் ஒப்படைக்கவும்.' },
-                { title: 'Shift Handover & Log', desc: 'Ensure smooth meter reading handover to the next incoming shift attendant.', taTitle: 'ஷிப்ட் ஒப்படைப்பு', taDesc: 'அடுத்த ஷிப்ட் பணியாளரிடம் மீட்டர் அளவுகளை சரியாக சரிபார்த்து ஒப்படைக்கவும்.' },
-                { title: 'Emergency Management Contact', desc: `In case of machine issues or fuel stock shortages, notify Manager ${user?.bunkManager || 'Priya Nair'} immediately.`, taTitle: 'அவசர உதவிக்கு மேலாளர் தொடர்பு', taDesc: `இயந்திர கோளாறு அல்லது பிரச்சனை ஏற்பட்டால் உடனடியாக மேலாளரை அழைக்கவும்: ${user?.bunkManagerPhone || '9000000002'}` },
+                { title: 'Fuel Dispensing & Safety Protocol', desc: 'Maintain clean uniform, safety footwear, and strictly enforce no-smoking rules on fuel nozzles.' },
+                { title: 'Cash & POS Reconciliation', desc: 'Collect cash and credit card payments accurately and deposit reconciliation slips with the bunk cashier at shift end.' },
+                { title: 'Shift Handover & Meter Log', desc: 'Ensure smooth meter reading handover to the next incoming shift attendant.' },
+                { title: 'Emergency Management Escalation', desc: `In case of dispenser issues or fuel stock shortages, notify Manager ${assignedManager.name} immediately (📞 ${assignedManager.mobile}).` },
               ].map((item, i) => (
                 <div key={i} className="p-3.5 bg-slate-50 hover:bg-orange-50/50 rounded-2xl border border-slate-100 transition flex items-start gap-3">
                   <div className="w-6 h-6 rounded-lg bg-orange-100 text-orange-700 font-bold flex items-center justify-center shrink-0 mt-0.5">
                     {i + 1}
                   </div>
                   <div>
-                    <p className="font-bold text-slate-800">{lang === 'ta' ? item.taTitle : item.title}</p>
-                    <p className="text-slate-500 mt-0.5 leading-relaxed">{lang === 'ta' ? item.taDesc : item.desc}</p>
+                    <p className="font-bold text-slate-800">{item.title}</p>
+                    <p className="text-slate-500 mt-0.5 leading-relaxed">{item.desc}</p>
                   </div>
                 </div>
               ))}
             </div>
           </div>
 
-        </div>
-
-        {/* Right Column: Personal KYC & Salary Details */}
-        <div className="space-y-6">
-
-          {/* Salary Breakdown Box */}
-          <div className="bg-white border border-slate-200/80 rounded-3xl p-6 shadow-sm">
-            <h3 className="font-bold text-slate-800 text-sm mb-4 flex items-center gap-2">
-              <IndianRupee size={16} className="text-green-600" />
-              {lang === 'ta' ? 'சம்பள விபரம் (Management Fixed)' : 'Salary Structure'}
-            </h3>
-
-            <div className="bg-emerald-50 border border-emerald-200/70 rounded-2xl p-4 text-center mb-4">
-              <p className="text-xs text-emerald-700 font-semibold uppercase">{lang === 'ta' ? 'மாதாந்திர நிகர தொகை' : 'Monthly Net Payout'}</p>
-              <p className="text-2xl font-black text-emerald-800 mt-1">₹{(user?.salary || 18500).toLocaleString('en-IN')}</p>
-              <p className="text-[11px] text-emerald-600 mt-1">{lang === 'ta' ? 'ELAKIYAA நிர்வாகத்தால் நிர்ணயிக்கப்பட்டது' : 'Direct Management Payout'}</p>
-            </div>
-
-            <div className="space-y-2.5 text-xs">
-              <div className="flex justify-between py-2 border-b border-slate-100">
-                <span className="text-slate-500">{lang === 'ta' ? 'அடிப்படை சம்பளம்' : 'Basic Pay'}</span>
-                <span className="font-semibold text-slate-700">₹{((user?.salary || 18500) - 2500).toLocaleString('en-IN')}</span>
-              </div>
-              <div className="flex justify-between py-2 border-b border-slate-100">
-                <span className="text-slate-500">{lang === 'ta' ? 'ஷிப்ட் அலவன்ஸ்' : 'Shift Allowance'}</span>
-                <span className="font-semibold text-green-600">+₹2,500</span>
-              </div>
-              <div className="flex justify-between py-2 border-b border-slate-100">
-                <span className="text-slate-500">{lang === 'ta' ? 'பேமென்ட் முறை' : 'Payment Mode'}</span>
-                <span className="font-semibold text-blue-600">GPay / Bank Transfer</span>
-              </div>
-              <div className="flex justify-between py-2">
-                <span className="text-slate-500">{lang === 'ta' ? 'வங்கி கணக்கு' : 'Bank Account'}</span>
-                <span className="font-mono text-slate-700">{user?.bankAccount || 'SBI - 30894512903'}</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Candidate ID & Contacts Card */}
-          <div className="bg-white border border-slate-200/80 rounded-3xl p-6 shadow-sm">
-            <h3 className="font-bold text-slate-800 text-sm mb-4 flex items-center gap-2">
-              <User size={16} className="text-orange-600" />
-              {lang === 'ta' ? 'பணியாளர் விவரம் (Profile)' : 'Candidate Details'}
-            </h3>
-
-            <div className="space-y-3 text-xs">
-              <div className="p-3 bg-slate-50 rounded-xl">
-                <p className="text-[10px] text-slate-400 font-bold uppercase">{lang === 'ta' ? 'முழு பெயர்' : 'Full Name'}</p>
-                <p className="font-bold text-slate-800 text-sm mt-0.5">{user?.name}</p>
-              </div>
-              <div className="p-3 bg-slate-50 rounded-xl">
-                <p className="text-[10px] text-slate-400 font-bold uppercase">{lang === 'ta' ? 'மொபைல் & GPay' : 'Mobile / GPay'}</p>
-                <p className="font-bold font-mono text-slate-800 text-sm mt-0.5">📞 {user?.mobile}</p>
-              </div>
-              <div className="p-3 bg-slate-50 rounded-xl">
-                <p className="text-[10px] text-slate-400 font-bold uppercase">{lang === 'ta' ? 'ஆதார் எண்' : 'Aadhaar (KYC)'}</p>
-                <p className="font-bold font-mono text-slate-800 text-sm mt-0.5">{user?.aadhaar || 'XXXX-XXXX-4512'}</p>
-              </div>
-              <div className="p-3 bg-slate-50 rounded-xl">
-                <p className="text-[10px] text-slate-400 font-bold uppercase">{lang === 'ta' ? 'சேர்ந்த நாள்' : 'Date of Joining'}</p>
-                <p className="font-semibold text-slate-700 text-xs mt-0.5">{user?.joinDate || '2023-01-15'}</p>
+          {/* Salary Breakdown & KYC Details */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="bg-white border border-slate-200/80 rounded-3xl p-5 shadow-sm">
+              <h3 className="font-bold text-slate-800 text-sm mb-3 flex items-center gap-2">
+                <IndianRupee size={16} className="text-green-600" />
+                <span>Salary Structure</span>
+              </h3>
+              <div className="space-y-2 text-xs">
+                <div className="flex justify-between py-1.5 border-b border-slate-100">
+                  <span className="text-slate-500">Basic Pay</span>
+                  <span className="font-semibold text-slate-700">₹{((user?.salary || 18500) - 2500).toLocaleString('en-IN')}</span>
+                </div>
+                <div className="flex justify-between py-1.5 border-b border-slate-100">
+                  <span className="text-slate-500">Shift Allowance</span>
+                  <span className="font-semibold text-green-600">+₹2,500</span>
+                </div>
+                <div className="flex justify-between py-1.5 border-b border-slate-100">
+                  <span className="text-slate-500">Payment Mode</span>
+                  <span className="font-semibold text-blue-600">GPay / Bank Transfer</span>
+                </div>
+                <div className="flex justify-between pt-1 font-bold text-slate-800 text-sm">
+                  <span>Net Monthly Salary</span>
+                  <span className="text-green-700">₹{(user?.salary || 18500).toLocaleString('en-IN')}</span>
+                </div>
               </div>
             </div>
 
-            <Link
-              to="/client/profile"
-              className="mt-4 block text-center w-full py-2.5 bg-orange-50 hover:bg-orange-100 text-orange-700 font-bold rounded-xl text-xs transition"
-            >
-              {lang === 'ta' ? 'முழு சுயவிபரம் பார்க்க' : 'View Full Profile'}
-            </Link>
+            <div className="bg-white border border-slate-200/80 rounded-3xl p-5 shadow-sm">
+              <h3 className="font-bold text-slate-800 text-sm mb-3 flex items-center gap-2">
+                <User size={16} className="text-orange-600" />
+                <span>Candidate Profile & KYC</span>
+              </h3>
+              <div className="space-y-2 text-xs">
+                <div className="flex justify-between py-1.5 border-b border-slate-100">
+                  <span className="text-slate-500">Candidate ID</span>
+                  <span className="font-mono font-bold text-slate-700">{user?.clientId?.toUpperCase() || 'C001'}</span>
+                </div>
+                <div className="flex justify-between py-1.5 border-b border-slate-100">
+                  <span className="text-slate-500">Registered Mobile</span>
+                  <span className="font-mono font-bold text-slate-700">{user?.mobile}</span>
+                </div>
+                <div className="flex justify-between py-1.5 border-b border-slate-100">
+                  <span className="text-slate-500">Aadhaar KYC</span>
+                  <span className="font-mono text-slate-700">{user?.aadhaar || 'XXXX-XXXX-4512'}</span>
+                </div>
+                <div className="flex justify-between pt-1">
+                  <span className="text-slate-500">Joining Date</span>
+                  <span className="font-semibold text-slate-700">{user?.joinDate || '2023-01-15'}</span>
+                </div>
+              </div>
+            </div>
           </div>
 
         </div>

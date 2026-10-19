@@ -1,16 +1,23 @@
 import React from 'react';
 import DashboardLayout from '../../components/DashboardLayout';
 import { useAuth } from '../../context/AuthContext';
-import { useLanguage } from '../../context/LanguageContext';
 import { DUMMY_USERS } from '../../data/dummyData.jsx';
-import { User, Phone, MapPin, Building2, Briefcase, Calendar, Shield, UserCheck, IndianRupee, Clock, CreditCard } from 'lucide-react';
+import { User, Phone, MapPin, Building2, Briefcase, Calendar, Shield, UserCheck, IndianRupee, Clock, CreditCard, Users } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export default function ClientProfile() {
   const { user } = useAuth();
-  const { lang, t } = useLanguage();
-  const assignedStaff   = DUMMY_USERS.find(u => u.staffId === user?.assignedStaffId);
-  const assignedManager = DUMMY_USERS.find(u => u.name === user?.bunkManager || (u.role === 'manager' && u.managerId === 'm001'));
+  
+  const staffList = DUMMY_USERS.filter(u => u.role === 'staff');
+  const assignedStaffIds = user?.assignedStaffIds || (user?.assignedStaffId ? [user.assignedStaffId] : ['s001', 's002']);
+  const assignedStaffMembers = staffList.filter(s => assignedStaffIds.includes(s.staffId || s.id));
+  const primaryStaff = assignedStaffMembers[0] || { name: 'Anitha Devi', mobile: '9000000004', staffId: 's001' };
+
+  const assignedManager = DUMMY_USERS.find(u => u.name === user?.bunkManager || (u.role === 'manager' && u.managerId === 'm001')) || {
+    name: 'Priya Nair',
+    mobile: '9000000002',
+    managerId: 'm001'
+  };
 
   const InfoRow = ({ icon, label, value, highlight }) => (
     <div className={`flex items-start gap-3 py-3.5 border-b border-slate-50 last:border-0 ${highlight ? 'bg-orange-50/40 -mx-5 px-5 rounded-xl' : ''}`}>
@@ -23,7 +30,7 @@ export default function ClientProfile() {
   );
 
   return (
-    <DashboardLayout title={lang === 'ta' ? 'பணியாளர் சுயவிபரம் (Candidate Profile)' : 'My Profile'}>
+    <DashboardLayout title="My Profile">
 
       {/* Cover + Avatar */}
       <div className="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden mb-6">
@@ -42,7 +49,7 @@ export default function ClientProfile() {
               <div className="flex items-center gap-2 flex-wrap">
                 <h2 className="text-2xl font-black text-slate-800">{user?.name}</h2>
                 <span className="bg-emerald-100 text-emerald-800 text-xs font-bold px-3 py-1 rounded-full">
-                  {lang === 'ta' ? 'பணியில் உள்ளார்' : 'Active Deployed Candidate'}
+                  Active Deployed Candidate
                 </span>
               </div>
               <p className="text-slate-500 text-sm mt-1">
@@ -51,7 +58,7 @@ export default function ClientProfile() {
               </p>
             </div>
             <div className="text-left sm:text-right text-xs text-slate-500">
-              <p>{lang === 'ta' ? 'சேர்ந்த நாள் (Joining Date)' : 'Date of Joining'}</p>
+              <p>Date of Joining</p>
               <p className="font-bold text-slate-800 text-sm mt-0.5">{user?.joinDate || '2023-01-15'}</p>
             </div>
           </div>
@@ -63,75 +70,75 @@ export default function ClientProfile() {
         {/* Personal Details */}
         <div className="bg-white rounded-3xl shadow-sm border border-slate-100 p-6">
           <h3 className="font-bold text-slate-800 mb-4 flex items-center gap-2 text-sm uppercase tracking-wider text-slate-600">
-            <User size={16} className="text-orange-600" /> {lang === 'ta' ? 'தனிநபர் விவரங்கள்' : 'Personal Information'}
+            <User size={16} className="text-orange-600" /> Personal Information
           </h3>
-          <InfoRow icon={<User size={16} />} label={lang === 'ta' ? 'முழு பெயர்' : 'Full Name'} value={user?.name} />
-          <InfoRow icon={<Phone size={16} />} label={lang === 'ta' ? 'மொபைல் எண் (Mobile)' : 'Mobile Phone'} value={user?.mobile} />
-          <InfoRow icon={<MapPin size={16} />} label={lang === 'ta' ? 'முகவரி (Residential Address)' : 'Address'} value={user?.address} />
-          <InfoRow icon={<Shield size={16} />} label={lang === 'ta' ? 'ஆதார் KYC' : 'Aadhaar Number'} value={user?.aadhaar || 'XXXX-XXXX-4512'} />
+          <InfoRow icon={<User size={16} />} label="Full Name" value={user?.name} />
+          <InfoRow icon={<Phone size={16} />} label="Mobile Phone" value={user?.mobile} />
+          <InfoRow icon={<MapPin size={16} />} label="Address" value={user?.address} />
+          <InfoRow icon={<Shield size={16} />} label="Aadhaar KYC" value={user?.aadhaar || 'XXXX-XXXX-4512'} />
         </div>
 
         {/* Assigned Bunk & Deployment */}
         <div className="bg-white rounded-3xl shadow-sm border border-slate-100 p-6">
           <h3 className="font-bold text-slate-800 mb-4 flex items-center gap-2 text-sm uppercase tracking-wider text-slate-600">
-            <Building2 size={16} className="text-orange-600" /> {lang === 'ta' ? 'ஒதுக்கப்பட்ட பெட்ரோல் பங்க் பணி' : 'Assigned Petrol Bunk'}
+            <Building2 size={16} className="text-orange-600" /> Assigned Petrol Bunk Station
           </h3>
           <InfoRow 
             icon={<Building2 size={16} />} 
-            label={lang === 'ta' ? 'பெட்ரோல் பங்க் பெயர்' : 'Petrol Bunk'} 
+            label="Petrol Bunk Station" 
             value={user?.assignedBunk || 'Indian Oil Petrol Bunk (IOCL)'} 
             highlight 
           />
-          <InfoRow icon={<MapPin size={16} />} label={lang === 'ta' ? 'பங்க் இடம்' : 'Station Location'} value={user?.bunkLocation || 'Chennai, Tamil Nadu'} />
-          <InfoRow icon={<Clock size={16} />} label={lang === 'ta' ? 'ஷிப்ட் நேரம்' : 'Duty Shift'} value={user?.shift || 'Shift 1: Morning (06:00 AM - 02:00 PM)'} />
-          <InfoRow icon={<Briefcase size={16} />} label={lang === 'ta' ? 'பணி பதவி' : 'Role at Bunk'} value={user?.roleAtBunk || 'Fuel Dispenser Attendant'} />
+          <InfoRow icon={<MapPin size={16} />} label="Station Location" value={user?.bunkLocation || 'Chennai, Tamil Nadu'} />
+          <InfoRow icon={<Clock size={16} />} label="Duty Shift" value={user?.shift || 'Shift 1: Morning (06:00 AM - 02:00 PM)'} />
+          <InfoRow icon={<Briefcase size={16} />} label="Role at Bunk" value={user?.roleAtBunk || 'Fuel Dispenser Attendant'} />
         </div>
 
         {/* Salary & Bank Info (Set by Management) */}
         <div className="bg-white rounded-3xl shadow-sm border border-slate-100 p-6">
           <h3 className="font-bold text-slate-800 mb-4 flex items-center gap-2 text-sm uppercase tracking-wider text-slate-600">
-            <IndianRupee size={16} className="text-green-600" /> {lang === 'ta' ? 'சம்பளம் & வங்கி கணக்கு' : 'Salary & Bank Details'}
+            <IndianRupee size={16} className="text-green-600" /> Salary & Bank Details
           </h3>
           <InfoRow 
             icon={<IndianRupee size={16} />} 
-            label={lang === 'ta' ? 'மாத சம்பளம் (Fixed by Sir/Admin)' : 'Monthly Salary (Fixed)'} 
+            label="Monthly Salary (Fixed by Management)" 
             value={`₹${(user?.salary || 18500).toLocaleString('en-IN')}`} 
             highlight 
           />
-          <InfoRow icon={<CreditCard size={16} />} label={lang === 'ta' ? 'வங்கி கணக்கு' : 'Bank Account'} value={user?.bankAccount || 'SBI - 30894512903'} />
-          <InfoRow icon={<Phone size={16} />} label={lang === 'ta' ? 'GPay எண்' : 'GPay Mobile'} value={user?.gpayNumber || user?.mobile} />
+          <InfoRow icon={<CreditCard size={16} />} label="Bank Account" value={user?.bankAccount || 'SBI - 30894512903'} />
+          <InfoRow icon={<Phone size={16} />} label="GPay Mobile Number" value={user?.gpayNumber || user?.mobile} />
         </div>
 
         {/* Incharge Team Contacts */}
         <div className="bg-white rounded-3xl shadow-sm border border-slate-100 p-6">
           <h3 className="font-bold text-slate-800 mb-4 flex items-center gap-2 text-sm uppercase tracking-wider text-slate-600">
-            <UserCheck size={16} className="text-purple-600" /> {lang === 'ta' ? 'மேலாளர் & மேற்பார்வை ஸ்டாப்' : 'Management & Staff Contacts'}
+            <UserCheck size={16} className="text-purple-600" /> Management & Supervising Staff Contacts
           </h3>
           
           <div className="space-y-4">
             {/* Manager */}
             <div className="flex items-center gap-3 p-3 bg-purple-50 rounded-2xl border border-purple-100">
-              <div className="w-12 h-12 rounded-xl bg-purple-600 text-white flex items-center justify-center font-bold text-base">
+              <div className="w-12 h-12 rounded-xl bg-purple-600 text-white flex items-center justify-center font-bold text-base shrink-0">
                 M
               </div>
               <div>
-                <p className="text-[10px] text-purple-700 font-bold uppercase">{lang === 'ta' ? 'பங்க் பீல்டு மேலாளர்' : 'Field Manager'}</p>
+                <p className="text-[10px] text-purple-700 font-bold uppercase">Field Manager</p>
                 <p className="font-bold text-slate-800 text-sm">{user?.bunkManager || assignedManager?.name || 'Priya Nair'}</p>
                 <p className="text-xs text-slate-600 mt-0.5">📞 {user?.bunkManagerPhone || assignedManager?.mobile || '9000000002'}</p>
               </div>
             </div>
 
-            {/* Staff */}
-            <div className="flex items-center gap-3 p-3 bg-orange-50 rounded-2xl border border-orange-100">
-              <div className="w-12 h-12 rounded-xl bg-orange-600 text-white flex items-center justify-center font-bold text-base">
-                S
+            {/* Supervising Staff Members */}
+            {assignedStaffMembers.map(st => (
+              <div key={st.id} className="flex items-center gap-3 p-3 bg-orange-50 rounded-2xl border border-orange-100">
+                <img src={st.photo} alt={st.name} className="w-12 h-12 rounded-xl object-cover shrink-0" />
+                <div>
+                  <p className="text-[10px] text-orange-700 font-bold uppercase">Assigned Staff Supervisor</p>
+                  <p className="font-bold text-slate-800 text-sm">{st.name}</p>
+                  <p className="text-xs text-slate-600 mt-0.5">📞 {st.mobile}</p>
+                </div>
               </div>
-              <div>
-                <p className="text-[10px] text-orange-700 font-bold uppercase">{lang === 'ta' ? 'மேற்பார்வை ஸ்டாப்' : 'Assigned Field Staff'}</p>
-                <p className="font-bold text-slate-800 text-sm">{assignedStaff?.name || 'Anitha Devi'}</p>
-                <p className="text-xs text-slate-600 mt-0.5">📞 {assignedStaff?.mobile || '9000000004'}</p>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
 
