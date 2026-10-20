@@ -7,6 +7,14 @@ import { Building2, Phone, MapPin, Mail } from 'lucide-react';
 export default function StaffClients() {
   const { user } = useAuth();
   
+  const dutyConfirmations = (() => {
+    try {
+      return JSON.parse(localStorage.getItem('cms_duty_confirmations') || '{}');
+    } catch {
+      return {};
+    }
+  })();
+
   // Find all petrol bunks assigned to this staff member (handles multi-bunks)
   const myClients = DUMMY_USERS.filter(u => {
     if (u.role !== 'client') return false;
@@ -49,7 +57,9 @@ export default function StaffClients() {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-          {myClients.map(client => (
+          {myClients.map(client => {
+            const conf = dutyConfirmations[client.clientId];
+            return (
             <div key={client.id} className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden hover:shadow-md transition">
               {/* Card Header */}
               <div className="bg-gradient-to-r from-orange-500 to-amber-400 h-16 relative">
@@ -73,6 +83,14 @@ export default function StaffClients() {
                   </span>
                 </div>
 
+                {/* Duty Confirmation Status */}
+                {conf?.confirmed && (
+                  <div className="bg-emerald-50 border border-emerald-200 rounded-xl px-3 py-1.5 mb-3 flex items-center justify-between text-xs">
+                    <span className="font-bold text-emerald-800">✓ On Duty Confirmed</span>
+                    <span className="font-mono text-emerald-700 font-semibold">{conf.confirmedAt}</span>
+                  </div>
+                )}
+
                 {/* Service */}
                 <div className="bg-orange-50 rounded-xl px-3 py-2 mb-3">
                   <p className="text-xs text-orange-500 font-medium">Service</p>
@@ -92,7 +110,8 @@ export default function StaffClients() {
                 </div>
               </div>
             </div>
-          ))}
+          );
+        })}
         </div>
       )}
     </DashboardLayout>

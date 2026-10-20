@@ -45,6 +45,26 @@ export default function StaffDashboard() {
     { id: 4, msg: 'Admin announcement: Holiday on Oct 25', icon: '📢', unread: false },
   ];
 
+  // Load live duty confirmations and live notifications from localStorage
+  const dutyConfirmations = (() => {
+    try {
+      return JSON.parse(localStorage.getItem('cms_duty_confirmations') || '{}');
+    } catch {
+      return {};
+    }
+  })();
+
+  const liveNotifs = (() => {
+    try {
+      const all = JSON.parse(localStorage.getItem('cms_live_notifications') || '[]');
+      return all.filter(n => !n.targetStaffId || n.targetStaffId === user?.staffId);
+    } catch {
+      return [];
+    }
+  })();
+
+  const allNotifications = [...liveNotifs, ...NOTIFS];
+
   return (
     <DashboardLayout title="My Dashboard">
 
@@ -112,18 +132,29 @@ export default function StaffDashboard() {
             <Link to="/staff/clients" className="text-xs text-green-600 font-semibold hover:underline">View All →</Link>
           </div>
           <div className="divide-y divide-slate-50">
-            {myClients.map(c => (
-              <div key={c.id} className="px-5 py-3 flex items-center gap-3 hover:bg-slate-50 transition">
-                <img src={c.photo} alt="" className="w-9 h-9 rounded-xl object-cover shrink-0"/>
-                <div className="flex-1 min-w-0">
-                  <p className="font-bold text-slate-800 text-sm truncate">{c.name}</p>
-                  <p className="text-xs text-slate-500 truncate">
-                    {c.roleAtBunk || 'Worker'} &nbsp;·&nbsp; {c.assignedBunk || 'Petrol Bunk'}
-                  </p>
+            {myClients.map(c => {
+              const conf = dutyConfirmations[c.clientId];
+              return (
+                <div key={c.id} className="px-5 py-3 flex items-center gap-3 hover:bg-slate-50 transition">
+                  <img src={c.photo} alt="" className="w-9 h-9 rounded-xl object-cover shrink-0 border border-slate-200"/>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-bold text-slate-800 text-sm truncate">{c.name}</p>
+                    <p className="text-xs text-slate-500 truncate">
+                      {c.roleAtBunk || 'Worker'} &nbsp;·&nbsp; {c.assignedBunk || 'Petrol Bunk'}
+                    </p>
+                  </div>
+                  {conf?.confirmed ? (
+                    <span className="text-[10px] px-2.5 py-1 rounded-full font-bold bg-emerald-100 text-emerald-800 border border-emerald-300 shadow-sm flex items-center gap-1">
+                      ✓ Confirmed On Duty ({conf.confirmedAt})
+                    </span>
+                  ) : (
+                    <span className="text-[10px] px-2 py-0.5 rounded-full font-bold bg-amber-50 text-amber-700 border border-amber-200">
+                      ⏳ Pending Check-in
+                    </span>
+                  )}
                 </div>
-                <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${c.status==='active'?'bg-green-100 text-green-700':'bg-red-100 text-red-700'}`}>{c.status}</span>
-              </div>
-            ))}
+              );
+            })}
             {myClients.length === 0 && <p className="text-center py-6 text-slate-400 text-sm">No candidates assigned</p>}
           </div>
         </div>
@@ -148,7 +179,7 @@ export default function StaffDashboard() {
               <h3 className="font-bold text-slate-800 flex items-center gap-2"><Bell size={15} className="text-green-600"/>Notifications</h3>
               <Link to="/staff/notifications" className="text-xs text-green-600 font-semibold">View All →</Link>
             </div>
-            {NOTIFS.map(n => (
+            {allNotifications.slice(0, 5).map(n => (
               <div key={n.id} className={`px-5 py-3 flex items-center gap-3 border-b border-slate-50 last:border-0 ${n.unread?'bg-green-50/30 border-l-4 border-l-green-400':''}`}>
                 <span className="shrink-0">{n.icon}</span>
                 <p className={`text-xs flex-1 ${n.unread?'font-semibold text-slate-800':'text-slate-600'}`}>{n.msg}</p>

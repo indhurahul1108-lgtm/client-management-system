@@ -28,7 +28,16 @@ function groupByDate(notifs) {
 }
 
 export default function ManagerNotifications() {
-  const [notifs, setNotifs] = useState(NOTIFS);
+  const { user } = useAuth();
+  const [notifs, setNotifs] = useState(() => {
+    try {
+      const live = JSON.parse(localStorage.getItem('cms_live_notifications') || '[]');
+      const filtered = live.filter(n => !n.targetManagerId || n.targetManagerId === (user?.managerId || 'm001'));
+      return [...filtered, ...NOTIFS];
+    } catch {
+      return NOTIFS;
+    }
+  });
   const [filter, setFilter] = useState('all');
 
   const markRead = (id) => setNotifs(prev=>prev.map(n=>n.id===id?{...n,unread:false}:n));

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import DashboardLayout from '../../components/DashboardLayout';
+import { useAuth } from '../../context/AuthContext';
 
 const NOTIFS = [
   { id:1, title:'New Bunk Shift Assigned', msg:'Morning Shift at IOCL Anna Salai has been assigned to you.',  icon:'⛽', unread:true,  time:'2026-10-08T09:00:00' },
@@ -21,7 +22,16 @@ function groupByDate(notifs) {
 }
 
 export default function StaffNotifications() {
-  const [notifs, setNotifs] = useState(NOTIFS);
+  const { user } = useAuth();
+  const [notifs, setNotifs] = useState(() => {
+    try {
+      const live = JSON.parse(localStorage.getItem('cms_live_notifications') || '[]');
+      const filtered = live.filter(n => !n.targetStaffId || n.targetStaffId === user?.staffId);
+      return [...filtered, ...NOTIFS];
+    } catch {
+      return NOTIFS;
+    }
+  });
   const [filter, setFilter] = useState('all');
 
   const shown = filter==='all' ? notifs : notifs.filter(n=>n.unread);

@@ -46,20 +46,33 @@ export default function ClientDashboard() {
   const [selectedDutyDate, setSelectedDutyDate] = useState(todayStr);
   const [callingContact, setCallingContact] = useState(null);
 
-  // Client duty approval state (Client confirms presence & assigned station)
-  const [clientApprovedDuties, setClientApprovedDuties] = useState({
-    [todayStr]: {
-      approved: false,
-      approvedAt: null,
-    },
-    '2026-10-10': {
-      approved: true,
-      approvedAt: '06:08 AM',
-    },
-    '2026-10-09': {
-      approved: true,
-      approvedAt: '06:05 AM',
-    },
+  // Client duty approval state (Client confirms presence & assigned station with localStorage sync)
+  const [clientApprovedDuties, setClientApprovedDuties] = useState(() => {
+    try {
+      const clientId = user?.clientId || user?.id || 'c001';
+      const stored = JSON.parse(localStorage.getItem('cms_duty_confirmations') || '{}');
+      const userConf = stored[clientId];
+      return {
+        [todayStr]: {
+          approved: userConf?.confirmed || false,
+          approvedAt: userConf?.confirmedAt || null,
+        },
+        '2026-10-10': {
+          approved: true,
+          approvedAt: '06:08 AM',
+        },
+        '2026-10-09': {
+          approved: true,
+          approvedAt: '06:05 AM',
+        },
+      };
+    } catch {
+      return {
+        [todayStr]: { approved: false, approvedAt: null },
+        '2026-10-10': { approved: true, approvedAt: '06:08 AM' },
+        '2026-10-09': { approved: true, approvedAt: '06:05 AM' },
+      };
+    }
   });
 
   const [approvalToast, setApprovalToast] = useState('');
@@ -79,8 +92,47 @@ export default function ClientDashboard() {
         approvedAt: now,
       }
     }));
-    setApprovalToast(`✅ Station Duty Confirmed at ${now}! Supervisor and Manager updated.`);
-    setTimeout(() => setApprovalToast(''), 4000);
+
+    // Sync across portals via localStorage
+    const clientId = user?.clientId || user?.id || 'c001';
+    const candidateName = user?.name || 'Karthik Velu';
+    const bunkName = currentDuty.bunk || user?.assignedBunk || 'Indian Oil Petrol Bunk (IOCL)';
+    const staffId = primaryStaff.staffId || 's001';
+    const managerId = assignedManager.managerId || 'm001';
+
+    try {
+      // 1. Save duty confirmation status for staff view
+      const existingConf = JSON.parse(localStorage.getItem('cms_duty_confirmations') || '{}');
+      existingConf[clientId] = {
+        confirmed: true,
+        confirmedAt: now,
+        date: selectedDutyDate,
+        bunk: bunkName,
+        candidateName,
+        staffId,
+        managerId,
+      };
+      localStorage.setItem('cms_duty_confirmations', JSON.stringify(existingConf));
+
+      // 2. Add real-time notification specifically for the Assigned Staff & Reporting Manager
+      const existingNotifs = JSON.parse(localStorage.getItem('cms_live_notifications') || '[]');
+      const newNotif = {
+        id: 'notif_' + Date.now(),
+        targetStaffId: staffId,
+        targetManagerId: managerId,
+        title: `Candidate Arrived & On Duty: ${candidateName}`,
+        msg: `${candidateName} confirmed arrival at ${bunkName} for Shift duty at ${now}.`,
+        time: new Date().toISOString(),
+        icon: '⛽',
+        unread: true,
+      };
+      localStorage.setItem('cms_live_notifications', JSON.stringify([newNotif, ...existingNotifs]));
+    } catch (err) {
+      console.warn('Failed to sync duty confirmation', err);
+    }
+
+    setApprovalToast(`✅ Duty Confirmed at ${now}! Sent to Supervisor ${primaryStaff.name} & Manager ${assignedManager.name}.`);
+    setTimeout(() => setApprovalToast(''), 4500);
   };
 
   // Duty history

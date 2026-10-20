@@ -46,6 +46,17 @@ export default function ManagerDashboard() {
     { id:4, msg:'Client sent a request', icon:'🏢', unread:false },
   ];
 
+  const liveNotifs = (() => {
+    try {
+      const all = JSON.parse(localStorage.getItem('cms_live_notifications') || '[]');
+      return all.filter(n => !n.targetManagerId || n.targetManagerId === (user?.managerId || 'm001'));
+    } catch {
+      return [];
+    }
+  })();
+
+  const allManagerNotifs = [...liveNotifs, ...NOTIFS];
+
   const COLOR_MAP = {
     purple: { bg: 'bg-purple-50', border: 'border-purple-200', text: 'text-purple-800', iconBg: 'bg-purple-600' },
     blue:   { bg: 'bg-blue-50',   border: 'border-blue-200',   text: 'text-blue-800',   iconBg: 'bg-blue-600' },
@@ -187,7 +198,7 @@ export default function ManagerDashboard() {
             <Link to="/manager/notifications" className="text-xs text-purple-600 font-semibold">View All →</Link>
           </div>
           <div className="divide-y divide-slate-50">
-            {NOTIFS.map(n => (
+            {allManagerNotifs.slice(0, 5).map(n => (
               <div key={n.id} className={`px-5 py-3 flex items-center gap-3 hover:bg-slate-50 ${n.unread?'bg-purple-50/30 border-l-4 border-purple-400':''}`}>
                 <span className="text-lg shrink-0">{n.icon}</span>
                 <p className={`text-sm flex-1 ${n.unread?'font-semibold text-slate-800':'text-slate-600'}`}>{n.msg}</p>
