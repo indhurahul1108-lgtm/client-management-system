@@ -51,32 +51,22 @@ export default function ClientDashboard() {
     [todayStr]: {
       approved: false,
       approvedAt: null,
-      meterReading: '',
-      notes: '',
     },
     '2026-10-10': {
       approved: true,
       approvedAt: '06:08 AM',
-      meterReading: 'Dispenser 1: 52140 L, Dispenser 2: 41230 L',
-      notes: 'Shift handover received from previous attendant.',
     },
     '2026-10-09': {
       approved: true,
       approvedAt: '06:05 AM',
-      meterReading: 'Dispenser 1: 51200 L, Dispenser 2: 40500 L',
-      notes: 'Normal shift start.',
     },
   });
 
-  const [meterReadingInput, setMeterReadingInput] = useState('');
-  const [clientNoteInput, setClientNoteInput] = useState('');
   const [approvalToast, setApprovalToast] = useState('');
 
   const currentApproval = clientApprovedDuties[selectedDutyDate] || {
     approved: false,
     approvedAt: null,
-    meterReading: '',
-    notes: '',
   };
 
   const handleClientApproveDuty = (e) => {
@@ -87,11 +77,9 @@ export default function ClientDashboard() {
       [selectedDutyDate]: {
         approved: true,
         approvedAt: now,
-        meterReading: meterReadingInput.trim() || 'Dispenser reading verified & recorded',
-        notes: clientNoteInput.trim() || 'Duty arrival confirmed by candidate',
       }
     }));
-    setApprovalToast(`✅ Station Duty Approved & Confirmed by you at ${now}! Supervisor and Manager updated.`);
+    setApprovalToast(`✅ Station Duty Confirmed at ${now}! Supervisor and Manager updated.`);
     setTimeout(() => setApprovalToast(''), 4000);
   };
 
@@ -370,7 +358,7 @@ export default function ClientDashboard() {
             </div>
           </div>
 
-          {/* ── Candidate Action: Duty Station Approval & Submission ── */}
+          {/* ── Candidate Action: Duty Station Confirmation ── */}
           {currentApproval.approved ? (
             <div className="mt-4 p-4 bg-emerald-50 border border-emerald-200 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 animate-in fade-in">
               <div className="flex items-center gap-3">
@@ -379,16 +367,16 @@ export default function ClientDashboard() {
                 </div>
                 <div>
                   <p className="text-xs font-bold text-emerald-900">
-                    ✓ Station Duty Approved & Confirmed by Candidate at {currentApproval.approvedAt}
+                    ✓ Station Duty Acknowledged & Confirmed at {currentApproval.approvedAt}
                   </p>
                   <p className="text-[11px] text-emerald-700 mt-0.5">
-                    {currentApproval.meterReading} {currentApproval.notes ? `· "${currentApproval.notes}"` : ''}
+                    Presence verified at {currentDuty.bunk}. Shift active.
                   </p>
                 </div>
               </div>
               <div className="flex items-center gap-2 shrink-0">
                 <span className="text-[11px] font-bold text-emerald-800 bg-emerald-100 border border-emerald-300 px-3 py-1 rounded-full">
-                  ✓ Confirmed & Submitted
+                  ✓ Confirmed & On Duty
                 </span>
               </div>
             </div>
@@ -398,48 +386,21 @@ export default function ClientDashboard() {
                 <div>
                   <p className="text-xs font-bold text-orange-950 flex items-center gap-1.5 uppercase tracking-wide">
                     <ShieldCheck size={16} className="text-orange-600" />
-                    <span>Candidate Action: Approve Assigned Duty & Station Arrival</span>
+                    <span>Candidate Action: Confirm Assigned Duty Station</span>
                   </p>
                   <p className="text-xs text-orange-800 mt-1 max-w-xl leading-relaxed">
-                    Supervisor <strong>{primaryStaff.name}</strong> & Manager <strong>{assignedManager.name}</strong> have posted you to <strong>{currentDuty.bunk}</strong>. Please review your shift station and submit your confirmation below.
+                    Supervisor <strong>{primaryStaff.name}</strong> & Manager <strong>{assignedManager.name}</strong> have assigned you to <strong>{currentDuty.bunk}</strong>. Click confirm to acknowledge your duty.
                   </p>
                 </div>
 
                 <button
                   type="button"
                   onClick={handleClientApproveDuty}
-                  className="bg-orange-600 hover:bg-orange-700 text-white font-bold text-xs px-5 py-3 rounded-xl shadow-md transition flex items-center gap-2 shrink-0 animate-pulse hover:animate-none"
+                  className="bg-orange-600 hover:bg-orange-700 text-white font-bold text-xs px-5 py-3 rounded-xl shadow-md transition flex items-center gap-2 shrink-0"
                 >
                   <CheckSquare size={16} />
-                  <span>Approve & Submit Station Duty</span>
+                  <span>Confirm Duty Station</span>
                 </button>
-              </div>
-
-              <div className="mt-4 pt-3 border-t border-orange-200/80 grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-                <div>
-                  <label className="text-[10px] font-bold uppercase text-orange-900 block mb-1">
-                    Dispenser / Meter Log (Optional)
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="E.g. Nozzle 1: 52140 L, Nozzle 2: 41230 L"
-                    value={meterReadingInput}
-                    onChange={e => setMeterReadingInput(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl border border-orange-200 bg-white text-xs outline-none focus:ring-2 focus:ring-orange-400 font-mono"
-                  />
-                </div>
-                <div>
-                  <label className="text-[10px] font-bold uppercase text-orange-900 block mb-1">
-                    Shift Handover Note (Optional)
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="E.g. Handover received, cash float verified"
-                    value={clientNoteInput}
-                    onChange={e => setClientNoteInput(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl border border-orange-200 bg-white text-xs outline-none focus:ring-2 focus:ring-orange-400"
-                  />
-                </div>
               </div>
             </div>
           )}
