@@ -134,20 +134,20 @@ export default function ClientDashboard() {
       )}
 
       {/* ── Candidate Personal Deployment Banner ── */}
-      <div className="bg-gradient-to-r from-orange-600 via-amber-600 to-orange-700 rounded-3xl p-6 text-white mb-6 shadow-xl border border-white/10 relative overflow-hidden">
+      <div className="bg-gradient-to-r from-orange-600 via-amber-600 to-orange-700 rounded-3xl p-4 sm:p-6 text-white mb-5 sm:mb-6 shadow-xl border border-white/10 relative overflow-hidden">
         <div className="absolute right-0 top-0 translate-x-8 -translate-y-8 w-60 h-60 bg-white/10 rounded-full blur-2xl pointer-events-none" />
 
-        <div className="flex flex-wrap items-center justify-between gap-5 relative z-10">
-          <div className="flex items-center gap-4">
+        <div className="flex flex-wrap items-center justify-between gap-4 relative z-10">
+          <div className="flex items-center gap-3 sm:gap-4">
             <img
               src={user?.photo || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150'}
               alt={user?.name}
-              className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl object-cover border-4 border-white/40 shadow-xl shrink-0"
+              className="w-14 h-14 sm:w-20 sm:h-20 rounded-2xl object-cover border-2 sm:border-4 border-white/40 shadow-xl shrink-0"
             />
             <div>
               <div className="flex items-center gap-2 flex-wrap">
-                <h1 className="text-xl sm:text-2xl font-black text-white tracking-wide">{user?.name || 'Karthik Velu'}</h1>
-                <span className="text-[11px] bg-emerald-500/20 border border-emerald-300 text-emerald-100 font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1 shadow-sm">
+                <h1 className="text-lg sm:text-2xl font-black text-white tracking-wide">{user?.name || 'Karthik Velu'}</h1>
+                <span className="text-[10px] sm:text-[11px] bg-emerald-500/20 border border-emerald-300 text-emerald-100 font-bold px-2 py-0.5 rounded-full flex items-center gap-1 shadow-sm">
                   <ShieldCheck size={12} /> Active Deployed
                 </span>
               </div>
@@ -155,49 +155,49 @@ export default function ClientDashboard() {
                 Role: <span className="text-white font-bold">{user?.roleAtBunk || 'Fuel Dispenser Lead Attendant'}</span>
                 &nbsp;|&nbsp; ID: <span className="font-mono text-amber-200">{user?.clientId?.toUpperCase() || 'C001'}</span>
               </p>
-              <p className="text-orange-200 text-xs mt-1 flex items-center gap-1">
+              <p className="text-orange-200 text-xs mt-0.5 flex items-center gap-1">
                 <MapPin size={13} className="shrink-0" />
                 <span>{user?.address || 'Chennai, Tamil Nadu'}</span>
               </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
             <button
               onClick={handlePrintAttendance}
-              className="bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30 text-white font-semibold text-xs sm:text-sm px-4 py-2.5 rounded-2xl flex items-center gap-2 transition"
+              className="bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30 text-white font-semibold text-xs sm:text-sm px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-xl sm:rounded-2xl flex items-center gap-2 transition"
             >
               <Printer size={15} />
-              <span>Print Attendance Statement</span>
+              <span>Print Statement</span>
             </button>
           </div>
         </div>
 
         {/* Deployment Location Banner */}
-        <div className="mt-6 pt-4 border-t border-white/20 grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs relative z-10">
-          <div className="bg-black/20 rounded-2xl p-3.5 flex items-center gap-3 border border-white/10 backdrop-blur-sm">
-            <div className="p-2.5 bg-white/20 rounded-xl text-white shrink-0">
-              <Building2 size={20} />
+        <div className="mt-5 pt-4 border-t border-white/20 grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3 text-xs relative z-10">
+          <div className="bg-black/20 rounded-2xl p-3 sm:p-3.5 flex items-center gap-3 border border-white/10 backdrop-blur-sm">
+            <div className="p-2 sm:p-2.5 bg-white/20 rounded-xl text-white shrink-0">
+              <Building2 size={18} />
             </div>
             <div>
               <p className="text-amber-200 text-[10px] font-bold uppercase tracking-wider">
                 Assigned Petrol Bunk Station
               </p>
               <p className="font-bold text-white text-xs sm:text-sm">{user?.assignedBunk || 'Indian Oil Petrol Bunk (IOCL)'}</p>
-              <p className="text-orange-200 text-[11px] mt-0.5">{user?.bunkLocation || 'Anna Salai, Chennai'}</p>
+              <p className="text-orange-200 text-[10px] sm:text-[11px] mt-0.5">{user?.bunkLocation || 'Anna Salai, Chennai'}</p>
             </div>
           </div>
 
-          <div className="bg-black/20 rounded-2xl p-3.5 flex items-center gap-3 border border-white/10 backdrop-blur-sm">
-            <div className="p-2.5 bg-white/20 rounded-xl text-white shrink-0">
-              <Clock size={20} />
+          <div className="bg-black/20 rounded-2xl p-3 sm:p-3.5 flex items-center gap-3 border border-white/10 backdrop-blur-sm">
+            <div className="p-2 sm:p-2.5 bg-white/20 rounded-xl text-white shrink-0">
+              <Clock size={18} />
             </div>
             <div>
               <p className="text-amber-200 text-[10px] font-bold uppercase tracking-wider">
                 Duty Shift Schedule
               </p>
               <p className="font-bold text-white text-xs sm:text-sm">{user?.shift || 'Shift 1: Morning (06:00 AM - 02:00 PM)'}</p>
-              <p className="text-orange-200 text-[11px] mt-0.5">
+              <p className="text-orange-200 text-[10px] sm:text-[11px] mt-0.5">
                 Manager: {assignedManager.name} (📞 {assignedManager.mobile})
               </p>
             </div>
@@ -206,86 +206,86 @@ export default function ClientDashboard() {
       </div>
 
       {/* ── Key Overview Cards (Salary, Shift, Attendance, Supervising Staff) ── */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-5 sm:mb-6">
         
         {/* Monthly Salary Card */}
-        <div className="bg-white border border-slate-200/80 rounded-2xl p-4 shadow-sm hover:shadow-md transition">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-green-600 rounded-xl flex items-center justify-center text-white shrink-0 shadow-sm">
-              <IndianRupee size={20} />
+        <div className="bg-white border border-slate-200/80 rounded-2xl p-3.5 sm:p-4 shadow-sm hover:shadow-md transition">
+          <div className="flex items-center gap-2.5 sm:gap-3">
+            <div className="w-9 h-9 sm:w-10 sm:h-10 bg-green-600 rounded-xl flex items-center justify-center text-white shrink-0 shadow-sm">
+              <IndianRupee size={18} />
             </div>
-            <div>
-              <p className="text-lg font-bold text-slate-800 leading-tight">
+            <div className="min-w-0">
+              <p className="text-base sm:text-lg font-bold text-slate-800 leading-tight">
                 ₹{(user?.salary || 18500).toLocaleString('en-IN')}
               </p>
-              <p className="text-xs text-slate-500 font-medium">Monthly Salary</p>
+              <p className="text-[11px] sm:text-xs text-slate-500 font-medium">Monthly Salary</p>
             </div>
           </div>
-          <div className="flex items-center justify-between text-[11px] text-green-700 font-semibold mt-2.5 pt-2 border-t border-slate-100">
-            <span>Fixed by Management</span>
+          <div className="flex items-center justify-between text-[10px] sm:text-[11px] text-green-700 font-semibold mt-2.5 pt-2 border-t border-slate-100">
+            <span>Fixed</span>
             <span className="bg-green-50 px-2 py-0.5 rounded-full">GPay / Bank</span>
           </div>
         </div>
 
         {/* Current Shift */}
-        <div className="bg-white border border-slate-200/80 rounded-2xl p-4 shadow-sm hover:shadow-md transition">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shrink-0 shadow-sm">
-              <Clock size={20} />
+        <div className="bg-white border border-slate-200/80 rounded-2xl p-3.5 sm:p-4 shadow-sm hover:shadow-md transition">
+          <div className="flex items-center gap-2.5 sm:gap-3">
+            <div className="w-9 h-9 sm:w-10 sm:h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shrink-0 shadow-sm">
+              <Clock size={18} />
             </div>
-            <div>
-              <p className="text-base font-bold text-slate-800 leading-tight">
+            <div className="min-w-0">
+              <p className="text-base font-bold text-slate-800 leading-tight truncate">
                 {user?.shift?.split(':')[1]?.split('(')[0]?.trim() || 'Morning'}
               </p>
-              <p className="text-xs text-slate-500 font-medium">Assigned Shift</p>
+              <p className="text-[11px] sm:text-xs text-slate-500 font-medium">Assigned Shift</p>
             </div>
           </div>
-          <p className="text-[11px] text-slate-500 mt-2.5 pt-2 border-t border-slate-100 font-mono">
+          <p className="text-[10px] sm:text-[11px] text-slate-500 mt-2.5 pt-2 border-t border-slate-100 font-mono truncate">
             {user?.shift?.split('(')[1]?.replace(')', '') || '06:00 AM - 02:00 PM'}
           </p>
         </div>
 
         {/* Attendance Approval Status */}
-        <div className="bg-white border border-slate-200/80 rounded-2xl p-4 shadow-sm hover:shadow-md transition">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-emerald-600 rounded-xl flex items-center justify-center text-white shrink-0 shadow-sm">
-              <CheckCircle size={20} />
+        <div className="bg-white border border-slate-200/80 rounded-2xl p-3.5 sm:p-4 shadow-sm hover:shadow-md transition">
+          <div className="flex items-center gap-2.5 sm:gap-3">
+            <div className="w-9 h-9 sm:w-10 sm:h-10 bg-emerald-600 rounded-xl flex items-center justify-center text-white shrink-0 shadow-sm">
+              <CheckCircle size={18} />
             </div>
-            <div>
-              <p className="text-lg font-bold text-slate-800 leading-tight">
+            <div className="min-w-0">
+              <p className="text-base sm:text-lg font-bold text-slate-800 leading-tight">
                 {currentDuty.status === 'approved' ? 'Approved' : 'Pending'}
               </p>
-              <p className="text-xs text-slate-500 font-medium">Duty Status</p>
+              <p className="text-[11px] sm:text-xs text-slate-500 font-medium">Duty Status</p>
             </div>
           </div>
-          <p className="text-[11px] text-emerald-700 font-semibold mt-2.5 pt-2 border-t border-slate-100">
-            ✓ Verified by Field Staff
+          <p className="text-[10px] sm:text-[11px] text-emerald-700 font-semibold mt-2.5 pt-2 border-t border-slate-100 truncate">
+            ✓ Field Staff Verified
           </p>
         </div>
 
         {/* Assigned Staff (Multi-Staff Display) */}
-        <div className="bg-white border border-slate-200/80 rounded-2xl p-4 shadow-sm hover:shadow-md transition">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-orange-600 rounded-xl flex items-center justify-center text-white shrink-0 shadow-sm">
-              <Users size={20} />
+        <div className="bg-white border border-slate-200/80 rounded-2xl p-3.5 sm:p-4 shadow-sm hover:shadow-md transition">
+          <div className="flex items-center gap-2.5 sm:gap-3">
+            <div className="w-9 h-9 sm:w-10 sm:h-10 bg-orange-600 rounded-xl flex items-center justify-center text-white shrink-0 shadow-sm">
+              <Users size={18} />
             </div>
-            <div>
-              <p className="text-base font-bold text-slate-800 leading-tight truncate">
+            <div className="min-w-0">
+              <p className="text-sm sm:text-base font-bold text-slate-800 leading-tight truncate">
                 {primaryStaff.name}
               </p>
-              <p className="text-xs text-slate-500 font-medium">
-                {assignedStaffMembers.length > 1 ? `+${assignedStaffMembers.length - 1} More Staff` : 'Incharge Staff'}
+              <p className="text-[11px] sm:text-xs text-slate-500 font-medium truncate">
+                {assignedStaffMembers.length > 1 ? `+${assignedStaffMembers.length - 1} Staff` : 'Incharge Staff'}
               </p>
             </div>
           </div>
-          <p className="text-[11px] text-slate-500 mt-2.5 pt-2 border-t border-slate-100 font-mono">
+          <p className="text-[10px] sm:text-[11px] text-slate-500 mt-2.5 pt-2 border-t border-slate-100 font-mono truncate">
             📞 {primaryStaff.mobile}
           </p>
         </div>
       </div>
 
       {/* ── DAILY DUTY BUNK ASSIGNMENT & STAFF APPROVAL (Core Feature) ── */}
-      <div className="bg-white border border-slate-200/80 rounded-3xl p-6 shadow-sm mb-6">
+      <div className="bg-white border border-slate-200/80 rounded-3xl p-4 sm:p-6 shadow-sm mb-6">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-5 pb-4 border-b border-slate-100">
           <div>
             <h2 className="text-lg font-bold text-slate-800 flex items-center gap-2">

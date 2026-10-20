@@ -85,13 +85,19 @@ export default function StaffDashboard() {
       </div>
 
       {/* ─ Work Summary ─ */}
-      <div className="grid grid-cols-3 gap-4 mb-5">
-        {[['Active',activeW,'blue','/staff/work'],['Pending',pendingW,'yellow','/staff/work'],['Completed',completedW,'green','/staff/work']].map(([l,v,c,to])=>(
-          <Link key={l} to={to} className={`bg-${c}-50 border border-${c}-100 rounded-2xl p-4 hover:shadow-md transition text-center`}>
-            <p className={`text-2xl font-bold text-${c}-800`}>{v}</p>
-            <p className="text-xs text-slate-500 font-medium">{l} Work</p>
-          </Link>
-        ))}
+      <div className="grid grid-cols-3 gap-3 sm:gap-4 mb-5">
+        <Link to="/staff/work" className="bg-blue-50 border border-blue-200 rounded-2xl p-3 sm:p-4 hover:shadow-md transition text-center">
+          <p className="text-xl sm:text-2xl font-black text-blue-800 leading-tight">{activeW}</p>
+          <p className="text-[11px] sm:text-xs text-slate-500 font-medium mt-0.5">Active Work</p>
+        </Link>
+        <Link to="/staff/work" className="bg-amber-50 border border-amber-200 rounded-2xl p-3 sm:p-4 hover:shadow-md transition text-center">
+          <p className="text-xl sm:text-2xl font-black text-amber-800 leading-tight">{pendingW}</p>
+          <p className="text-[11px] sm:text-xs text-slate-500 font-medium mt-0.5">Pending Work</p>
+        </Link>
+        <Link to="/staff/work" className="bg-emerald-50 border border-emerald-200 rounded-2xl p-3 sm:p-4 hover:shadow-md transition text-center">
+          <p className="text-xl sm:text-2xl font-black text-emerald-800 leading-tight">{completedW}</p>
+          <p className="text-[11px] sm:text-xs text-slate-500 font-medium mt-0.5">Completed Work</p>
+        </Link>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">

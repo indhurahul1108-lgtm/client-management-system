@@ -127,11 +127,11 @@ export function printIndividualRecord({ title, person, type, records = [], summa
       </head>
       <body>
         <div class="header">
-          <div style="display:flex; align-items:center; gap:12px;">
-            <img src="/logo.png" style="height:44px; width:auto; object-fit:contain;" alt="ELAKIYAA Logo" />
-            <div>
-              <div class="company-title">ELAKIYAA - JOBS MADE SIMPLE</div>
-              <div class="company-sub">Official Manpower & Staff Management Records</div>
+          <div style="display:flex; align-items:center; gap:14px;">
+            <img src="/logo.png" style="height:48px; width:auto; object-fit:contain;" alt="ELAKIYAA Logo" />
+            <div style="border-left:2px solid #cbd5e1; padding-left:12px;">
+              <div class="company-title">Client Management System</div>
+              <div class="company-sub">Official Manpower & Staff Records</div>
             </div>
           </div>
           <div style="text-align:right; font-size:11px; color:#64748b;">
@@ -188,7 +188,7 @@ export function printIndividualRecord({ title, person, type, records = [], summa
           </div>
           <div style="text-align:right;">
             <p>Authorized Signatory</p>
-            <p style="font-weight:bold; color:#0f172a; margin-top:4px;">ELAKIYAA - JOBS MADE SIMPLE</p>
+            <p style="font-weight:bold; color:#0f172a; margin-top:4px;">Operations & Administration</p>
             <div style="margin-top:25px; border-bottom:1px solid #94a3b8; width:180px; margin-left:auto;"></div>
           </div>
         </div>
@@ -275,11 +275,11 @@ export function printBulkRecords({ title, subtitle = '', columns = [], rows = []
       </head>
       <body>
         <div class="header">
-          <div style="display:flex; align-items:center; gap:12px;">
-            <img src="/logo.png" style="height:44px; width:auto; object-fit:contain;" alt="ELAKIYAA Logo" />
-            <div>
-              <div class="company-title">ELAKIYAA - JOBS MADE SIMPLE</div>
-              <div class="company-sub">Official Manpower & Staff Management Records</div>
+          <div style="display:flex; align-items:center; gap:14px;">
+            <img src="/logo.png" style="height:48px; width:auto; object-fit:contain;" alt="ELAKIYAA Logo" />
+            <div style="border-left:2px solid #cbd5e1; padding-left:12px;">
+              <div class="company-title">Client Management System</div>
+              <div class="company-sub">Official Manpower & Staff Records</div>
             </div>
           </div>
           <div style="text-align:right; font-size:11px; color:#64748b;">
@@ -310,7 +310,7 @@ export function printBulkRecords({ title, subtitle = '', columns = [], rows = []
           </div>
           <div style="text-align:right;">
             <p>Authorized Signatory</p>
-            <p style="font-weight:bold; color:#0f172a; margin-top:4px;">ELAKIYAA - JOBS MADE SIMPLE</p>
+            <p style="font-weight:bold; color:#0f172a; margin-top:4px;">Operations & Administration</p>
             <div style="margin-top:25px; border-bottom:1px solid #94a3b8; width:180px; margin-left:auto;"></div>
           </div>
         </div>

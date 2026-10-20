@@ -46,14 +46,28 @@ export default function ManagerDashboard() {
     { id:4, msg:'Client sent a request', icon:'🏢', unread:false },
   ];
 
+  const COLOR_MAP = {
+    purple: { bg: 'bg-purple-50', border: 'border-purple-200', text: 'text-purple-800', iconBg: 'bg-purple-600' },
+    blue:   { bg: 'bg-blue-50',   border: 'border-blue-200',   text: 'text-blue-800',   iconBg: 'bg-blue-600' },
+    indigo: { bg: 'bg-indigo-50', border: 'border-indigo-200', text: 'text-indigo-800', iconBg: 'bg-indigo-600' },
+    green:  { bg: 'bg-emerald-50',border: 'border-emerald-200',text: 'text-emerald-800',iconBg: 'bg-emerald-600' },
+    red:    { bg: 'bg-rose-50',   border: 'border-rose-200',   text: 'text-rose-800',   iconBg: 'bg-rose-600' },
+    yellow: { bg: 'bg-amber-50',  border: 'border-amber-200',  text: 'text-amber-800',  iconBg: 'bg-amber-600' },
+    orange: { bg: 'bg-orange-50', border: 'border-orange-200', text: 'text-orange-800', iconBg: 'bg-orange-600' },
+  };
+
   const StatCard = ({ label, value, color, icon, to }) => {
+    const c = COLOR_MAP[color] || COLOR_MAP.purple;
     const content = (
-      <div className={`bg-${color}-50 border border-${color}-100 rounded-2xl p-4 flex items-center gap-3 hover:shadow-md transition`}>
-        <div className={`w-10 h-10 bg-${color}-600 rounded-xl flex items-center justify-center shrink-0`}>{icon}</div>
-        <div><p className={`text-xl font-bold text-${color}-800`}>{value}</p><p className="text-xs text-slate-500">{label}</p></div>
+      <div className={`${c.bg} ${c.border} border rounded-2xl p-3.5 sm:p-4 flex items-center gap-2.5 sm:gap-3 hover:shadow-md transition`}>
+        <div className={`w-9 h-9 sm:w-10 sm:h-10 ${c.iconBg} rounded-xl flex items-center justify-center shrink-0 shadow-sm`}>{icon}</div>
+        <div className="min-w-0">
+          <p className={`text-xl sm:text-2xl font-black ${c.text} leading-tight`}>{value}</p>
+          <p className="text-[11px] sm:text-xs text-slate-500 font-medium truncate">{label}</p>
+        </div>
       </div>
     );
-    return to ? <Link to={to}>{content}</Link> : content;
+    return to ? <Link to={to} className="block">{content}</Link> : content;
   };
 
   return (

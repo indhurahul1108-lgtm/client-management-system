@@ -12,14 +12,14 @@ export default function DashboardLayout({ title, children }) {
         <div className="no-print">
           <Navbar title={title} />
         </div>
-        <main className="flex-1 p-6 overflow-auto">
+        <main className="flex-1 p-3 sm:p-6 overflow-auto">
           {/* Official Letterhead Header for Print */}
           <div className="hidden print:flex items-center justify-between pb-4 mb-5 border-b-2 border-slate-900">
             <div className="flex items-center gap-3">
-              <img src="/logo.png" alt="ELAKIYAA" className="h-10 w-auto object-contain" />
-              <div>
-                <h1 className="text-xl font-black text-slate-900">ELAKIYAA - JOBS MADE SIMPLE</h1>
-                <p className="text-xs text-slate-600 font-semibold">{title} · Official Management Records</p>
+              <img src="/logo.png" alt="ELAKIYAA" className="h-12 w-auto object-contain" />
+              <div className="border-l-2 border-slate-300 pl-3">
+                <h1 className="text-lg font-black text-slate-900">{title}</h1>
+                <p className="text-xs text-slate-600 font-semibold">Official Management Records</p>
               </div>
             </div>
             <div className="text-right text-xs text-slate-700 font-medium">

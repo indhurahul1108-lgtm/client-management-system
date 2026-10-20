@@ -56,23 +56,25 @@ export default function Login() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-blue-700 flex items-center justify-center p-4">
-      {/* Background decoration */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-white/5 rounded-full" />
-        <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-white/5 rounded-full" />
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900 flex items-center justify-center p-4 relative overflow-hidden">
+      {/* Background ELAKIYAA Branding & Ambient Light */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none flex items-center justify-center select-none">
+        <span className="text-white/[0.04] text-[90px] sm:text-[170px] font-black tracking-widest uppercase rotate-[-12deg]">
+          ELAKIYAA
+        </span>
+        <div className="absolute -top-32 -right-32 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl" />
+        <div className="absolute -bottom-32 -left-32 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl" />
       </div>
 
-      <div className="relative w-full max-w-md">
+      <div className="relative w-full max-w-md z-10">
         {/* Card */}
-        <div className="bg-white rounded-3xl shadow-2xl overflow-hidden">
-          {/* Top banner with ELAKIYAA Logo */}
-          <div className="bg-gradient-to-r from-blue-700 to-blue-900 px-8 pt-8 pb-6 text-white text-center">
-            <div className="bg-white p-2.5 rounded-2xl mx-auto mb-3 inline-block shadow-lg">
-              <img src="/logo.png" alt="ELAKIYAA" className="h-12 w-auto object-contain" />
+        <div className="bg-white rounded-3xl shadow-2xl overflow-hidden border border-slate-100">
+          {/* Top banner with Large ELAKIYAA Logo */}
+          <div className="bg-gradient-to-r from-blue-700 via-indigo-700 to-blue-900 px-6 sm:px-8 pt-8 pb-6 text-white text-center">
+            <div className="bg-white p-3.5 rounded-2xl mx-auto mb-3.5 inline-block shadow-xl max-w-[280px]">
+              <img src="/logo.png" alt="ELAKIYAA" className="h-16 sm:h-20 w-auto object-contain mx-auto" />
             </div>
-            <h1 className="text-lg font-bold">Petrol Bunk Staffing Portal</h1>
-            <p className="text-blue-200 text-xs mt-0.5">Workforce Allocation & Shift Management</p>
+            <h1 className="text-xl sm:text-2xl font-black tracking-tight text-white">Client Management System</h1>
           </div>
 
           <div className="p-8">

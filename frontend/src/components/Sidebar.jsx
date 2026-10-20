@@ -81,33 +81,34 @@ export default function Sidebar() {
 
   const SidebarContent = () => (
     <div className={`flex flex-col h-full bg-gradient-to-b ${gradient} text-white`}>
-      {/* Header with ELAKIYAA Logo */}
-      <div className="flex items-center justify-between p-3.5 border-b border-white/20">
-        {!collapsed && (
-          <Link to="/" className="flex items-center gap-2">
+      {/* Header with Large ELAKIYAA Logo */}
+      <div className="flex items-center justify-between p-3 border-b border-white/20 gap-2">
+        {!collapsed ? (
+          <Link to="/" className="flex-1 bg-white p-2 rounded-2xl shadow-md flex items-center justify-center">
             <img
               src="/logo.png"
-              alt="ELAKIYAA Jobs Made Simple"
-              className="h-10 w-auto bg-white px-2 py-1 rounded-xl object-contain shadow"
+              alt="ELAKIYAA"
+              className="h-12 w-auto max-w-full object-contain"
             />
           </Link>
-        )}
-        {collapsed && (
-          <img
-            src="/logo.png"
-            alt="E"
-            className="w-8 h-8 bg-white p-1 rounded-lg object-contain mx-auto"
-          />
+        ) : (
+          <div className="w-10 h-10 bg-white p-1 rounded-xl shadow mx-auto flex items-center justify-center">
+            <img
+              src="/logo.png"
+              alt="E"
+              className="h-8 w-auto object-contain"
+            />
+          </div>
         )}
         <button
           onClick={() => setCollapsed(!collapsed)}
-          className="hidden lg:flex w-8 h-8 rounded-lg bg-white/10 hover:bg-white/20 items-center justify-center transition"
+          className="hidden lg:flex w-8 h-8 rounded-lg bg-white/10 hover:bg-white/20 items-center justify-center transition shrink-0"
         >
           {collapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
         </button>
         <button
           onClick={() => setMobileOpen(false)}
-          className="lg:hidden w-8 h-8 rounded-lg bg-white/10 hover:bg-white/20 flex items-center justify-center"
+          className="lg:hidden w-8 h-8 rounded-lg bg-white/10 hover:bg-white/20 flex items-center justify-center shrink-0"
         >
           <X size={16} />
         </button>

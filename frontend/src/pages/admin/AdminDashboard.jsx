@@ -42,17 +42,30 @@ const NOTIFICATIONS = [
   { id:4, msg:'Vijay S reported 15 mins late for Morning Shift at HPCL Bunk', type:'attend', icon:'🕐', unread:true },
 ];
 
+const COLOR_MAP = {
+  purple: { bg: 'bg-purple-50', border: 'border-purple-200', text: 'text-purple-800', iconBg: 'bg-purple-600' },
+  blue:   { bg: 'bg-blue-50',   border: 'border-blue-200',   text: 'text-blue-800',   iconBg: 'bg-blue-600' },
+  orange: { bg: 'bg-orange-50', border: 'border-orange-200', text: 'text-orange-800', iconBg: 'bg-orange-600' },
+  slate:  { bg: 'bg-slate-50',  border: 'border-slate-200',  text: 'text-slate-800',  iconBg: 'bg-slate-700' },
+  green:  { bg: 'bg-emerald-50',border: 'border-emerald-200',text: 'text-emerald-800',iconBg: 'bg-emerald-600' },
+  red:    { bg: 'bg-rose-50',   border: 'border-rose-200',   text: 'text-rose-800',   iconBg: 'bg-rose-600' },
+  yellow: { bg: 'bg-amber-50',  border: 'border-amber-200',  text: 'text-amber-800',  iconBg: 'bg-amber-600' },
+};
+
 function StatCard({ label, value, color, icon, to }) {
+  const c = COLOR_MAP[color] || COLOR_MAP.blue;
   const card = (
-    <div className={`bg-${color}-50 border border-${color}-100 rounded-2xl p-5 flex items-center gap-3 hover:shadow-md transition`}>
-      <div className={`w-11 h-11 bg-${color}-600 rounded-xl flex items-center justify-center shrink-0`}>{icon}</div>
-      <div>
-        <p className={`text-2xl font-bold text-${color}-800`}>{value}</p>
-        <p className="text-xs text-slate-500 font-medium">{label}</p>
+    <div className={`${c.bg} ${c.border} border rounded-2xl p-3.5 sm:p-4 flex items-center gap-2.5 sm:gap-3 hover:shadow-md transition`}>
+      <div className={`w-9 h-9 sm:w-11 sm:h-11 ${c.iconBg} rounded-xl flex items-center justify-center shrink-0 text-white shadow-sm`}>
+        {icon}
+      </div>
+      <div className="min-w-0">
+        <p className={`text-xl sm:text-2xl font-black ${c.text} leading-tight`}>{value}</p>
+        <p className="text-[11px] sm:text-xs text-slate-500 font-medium truncate">{label}</p>
       </div>
     </div>
   );
-  return to ? <Link to={to}>{card}</Link> : card;
+  return to ? <Link to={to} className="block">{card}</Link> : card;
 }
 
 export default function AdminDashboard() {
