@@ -3,6 +3,7 @@ import DashboardLayout from '../../components/DashboardLayout';
 import { useAuth } from '../../context/AuthContext';
 import { DUMMY_USERS } from '../../data/dummyData.jsx';
 import { printIndividualRecord } from '../../utils/printUtils.js';
+import PhoneCallModal from '../../components/PhoneCallModal';
 import { 
   Building2, 
   Clock, 
@@ -18,7 +19,9 @@ import {
   Printer,
   ChevronRight,
   Sparkles,
-  Users
+  Users,
+  Check,
+  CheckSquare
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
@@ -41,6 +44,56 @@ export default function ClientDashboard() {
   // Selected date state (defaults to today)
   const todayStr = new Date().toISOString().split('T')[0];
   const [selectedDutyDate, setSelectedDutyDate] = useState(todayStr);
+  const [callingContact, setCallingContact] = useState(null);
+
+  // Client duty approval state (Client confirms presence & assigned station)
+  const [clientApprovedDuties, setClientApprovedDuties] = useState({
+    [todayStr]: {
+      approved: false,
+      approvedAt: null,
+      meterReading: '',
+      notes: '',
+    },
+    '2026-10-10': {
+      approved: true,
+      approvedAt: '06:08 AM',
+      meterReading: 'Dispenser 1: 52140 L, Dispenser 2: 41230 L',
+      notes: 'Shift handover received from previous attendant.',
+    },
+    '2026-10-09': {
+      approved: true,
+      approvedAt: '06:05 AM',
+      meterReading: 'Dispenser 1: 51200 L, Dispenser 2: 40500 L',
+      notes: 'Normal shift start.',
+    },
+  });
+
+  const [meterReadingInput, setMeterReadingInput] = useState('');
+  const [clientNoteInput, setClientNoteInput] = useState('');
+  const [approvalToast, setApprovalToast] = useState('');
+
+  const currentApproval = clientApprovedDuties[selectedDutyDate] || {
+    approved: false,
+    approvedAt: null,
+    meterReading: '',
+    notes: '',
+  };
+
+  const handleClientApproveDuty = (e) => {
+    e.preventDefault();
+    const now = new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true });
+    setClientApprovedDuties(prev => ({
+      ...prev,
+      [selectedDutyDate]: {
+        approved: true,
+        approvedAt: now,
+        meterReading: meterReadingInput.trim() || 'Dispenser reading verified & recorded',
+        notes: clientNoteInput.trim() || 'Duty arrival confirmed by candidate',
+      }
+    }));
+    setApprovalToast(`✅ Station Duty Approved & Confirmed by you at ${now}! Supervisor and Manager updated.`);
+    setTimeout(() => setApprovalToast(''), 4000);
+  };
 
   // Duty history
   const dutyHistory = user?.dutyHistory && user.dutyHistory.length > 0 ? user.dutyHistory : [
@@ -85,6 +138,12 @@ export default function ClientDashboard() {
 
   return (
     <DashboardLayout title="Candidate Portal">
+      {/* Toast */}
+      {approvalToast && (
+        <div className="fixed top-4 right-4 z-50 bg-emerald-600 text-white px-5 py-3 rounded-2xl shadow-xl font-medium text-xs sm:text-sm flex items-center gap-2 animate-bounce">
+          {approvalToast}
+        </div>
+      )}
 
       {/* ── Candidate Personal Deployment Banner ── */}
       <div className="bg-gradient-to-r from-orange-600 via-amber-600 to-orange-700 rounded-3xl p-6 text-white mb-6 shadow-xl border border-white/10 relative overflow-hidden">
@@ -310,6 +369,80 @@ export default function ClientDashboard() {
               </div>
             </div>
           </div>
+
+          {/* ── Candidate Action: Duty Station Approval & Submission ── */}
+          {currentApproval.approved ? (
+            <div className="mt-4 p-4 bg-emerald-50 border border-emerald-200 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 animate-in fade-in">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-sm">
+                  <Check size={18} />
+                </div>
+                <div>
+                  <p className="text-xs font-bold text-emerald-900">
+                    ✓ Station Duty Approved & Confirmed by Candidate at {currentApproval.approvedAt}
+                  </p>
+                  <p className="text-[11px] text-emerald-700 mt-0.5">
+                    {currentApproval.meterReading} {currentApproval.notes ? `· "${currentApproval.notes}"` : ''}
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2 shrink-0">
+                <span className="text-[11px] font-bold text-emerald-800 bg-emerald-100 border border-emerald-300 px-3 py-1 rounded-full">
+                  ✓ Confirmed & Submitted
+                </span>
+              </div>
+            </div>
+          ) : (
+            <div className="mt-4 p-5 bg-gradient-to-r from-orange-50 via-amber-50 to-orange-50 border border-orange-200/90 rounded-2xl shadow-sm">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div>
+                  <p className="text-xs font-bold text-orange-950 flex items-center gap-1.5 uppercase tracking-wide">
+                    <ShieldCheck size={16} className="text-orange-600" />
+                    <span>Candidate Action: Approve Assigned Duty & Station Arrival</span>
+                  </p>
+                  <p className="text-xs text-orange-800 mt-1 max-w-xl leading-relaxed">
+                    Supervisor <strong>{primaryStaff.name}</strong> & Manager <strong>{assignedManager.name}</strong> have posted you to <strong>{currentDuty.bunk}</strong>. Please review your shift station and submit your confirmation below.
+                  </p>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={handleClientApproveDuty}
+                  className="bg-orange-600 hover:bg-orange-700 text-white font-bold text-xs px-5 py-3 rounded-xl shadow-md transition flex items-center gap-2 shrink-0 animate-pulse hover:animate-none"
+                >
+                  <CheckSquare size={16} />
+                  <span>Approve & Submit Station Duty</span>
+                </button>
+              </div>
+
+              <div className="mt-4 pt-3 border-t border-orange-200/80 grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                <div>
+                  <label className="text-[10px] font-bold uppercase text-orange-900 block mb-1">
+                    Dispenser / Meter Log (Optional)
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="E.g. Nozzle 1: 52140 L, Nozzle 2: 41230 L"
+                    value={meterReadingInput}
+                    onChange={e => setMeterReadingInput(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl border border-orange-200 bg-white text-xs outline-none focus:ring-2 focus:ring-orange-400 font-mono"
+                  />
+                </div>
+                <div>
+                  <label className="text-[10px] font-bold uppercase text-orange-900 block mb-1">
+                    Shift Handover Note (Optional)
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="E.g. Handover received, cash float verified"
+                    value={clientNoteInput}
+                    onChange={e => setClientNoteInput(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl border border-orange-200 bg-white text-xs outline-none focus:ring-2 focus:ring-orange-400"
+                  />
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Recent Duty History Table */}
@@ -377,9 +510,18 @@ export default function ClientDashboard() {
                   <div>
                     <p className="font-bold text-slate-800 text-sm">{st.name}</p>
                     <p className="text-[11px] text-slate-500 font-mono">ID: {st.staffId} · Field Staff</p>
-                    <a href={`tel:${st.mobile}`} className="text-xs text-orange-600 font-semibold mt-0.5 inline-block hover:underline">
-                      📞 {st.mobile}
-                    </a>
+                    <button
+                      onClick={() => setCallingContact({
+                        name: st.name,
+                        role: 'Field Supervising Staff',
+                        mobile: st.mobile,
+                        photo: st.photo,
+                        bunk: user?.assignedBunk || 'Indian Oil Petrol Bunk (IOCL)'
+                      })}
+                      className="text-xs text-orange-600 font-bold mt-1 inline-flex items-center gap-1 hover:underline"
+                    >
+                      📞 Call {st.mobile}
+                    </button>
                   </div>
                 </div>
               ))}
@@ -477,6 +619,12 @@ export default function ClientDashboard() {
         </div>
       </div>
 
+      {/* ── Phone Call Modal ── */}
+      <PhoneCallModal
+        isOpen={!!callingContact}
+        onClose={() => setCallingContact(null)}
+        contact={callingContact}
+      />
     </DashboardLayout>
   );
 }

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import DashboardLayout from '../../components/DashboardLayout';
 import { DUMMY_ATTENDANCE, DUMMY_LEAVES, DUMMY_SALARIES, DUMMY_USERS } from '../../data/dummyData.jsx';
 import { BarChart2, CalendarCheck, FileText, DollarSign, Printer, Download, Users, UserCheck, Building2 } from 'lucide-react';
-import { printIndividualRecord } from '../../utils/printUtils.js';
+import { printIndividualRecord, printBulkRecords } from '../../utils/printUtils.js';
 
 const TABS = [
   { id: 'attendance', label: 'Attendance', icon: CalendarCheck },
@@ -112,7 +112,66 @@ export default function ReportsAdmin() {
   const filteredSalaries = fullSalaries.filter(s => roleFilter === 'all' || s.role === roleFilter);
 
   const handlePrint = () => {
-    window.print();
+    if (tab === 'attendance') {
+      printBulkRecords({
+        title: `Official Attendance Register — ${roleFilter.toUpperCase()}`,
+        subtitle: `Date: ${new Date().toLocaleDateString('en-IN')}`,
+        summaryCards: [
+          { label: 'Total Records', value: filteredAttendance.length },
+          { label: 'Present', value: filteredAttendance.filter(a => a.status === 'present').length },
+          { label: 'Late', value: filteredAttendance.filter(a => a.status === 'late').length },
+          { label: 'Absent', value: filteredAttendance.filter(a => a.status === 'absent').length },
+        ],
+        columns: [
+          { header: 'Person Name', key: 'staffName' },
+          { header: 'Role / Category', key: 'category' },
+          { header: 'Date', key: 'date' },
+          { header: 'Punch In', render: a => a.punchIn || '—' },
+          { header: 'Punch Out', render: a => a.punchOut || '—' },
+          { header: 'Location & Station', render: a => a.location || 'Chennai Area' },
+          { header: 'Status', render: a => a.status.toUpperCase(), style: 'font-weight:bold;' },
+        ],
+        rows: filteredAttendance,
+      });
+    } else if (tab === 'leave') {
+      printBulkRecords({
+        title: `Official Leave Register — ${roleFilter.toUpperCase()}`,
+        subtitle: `Total Applications: ${filteredLeaves.length}`,
+        summaryCards: [
+          { label: 'Pending', value: filteredLeaves.filter(l => l.status === 'pending').length },
+          { label: 'Approved', value: filteredLeaves.filter(l => l.status === 'approved').length },
+          { label: 'Rejected', value: filteredLeaves.filter(l => l.status === 'rejected').length },
+        ],
+        columns: [
+          { header: 'Person Name', key: 'staffName' },
+          { header: 'Role / Category', key: 'category' },
+          { header: 'Leave Type', key: 'leaveType' },
+          { header: 'From Date', key: 'fromDate' },
+          { header: 'To Date', key: 'toDate' },
+          { header: 'Status', render: l => l.status.toUpperCase(), style: 'font-weight:bold;' },
+        ],
+        rows: filteredLeaves,
+      });
+    } else if (tab === 'salary') {
+      const totalPayable = filteredSalaries.reduce((a, s) => a + (s.net || 0), 0);
+      printBulkRecords({
+        title: `Official Salary Payroll Register — ${roleFilter.toUpperCase()}`,
+        subtitle: `Month: October 2026`,
+        summaryCards: [
+          { label: 'Total Payable', value: `₹${totalPayable.toLocaleString('en-IN')}` },
+          { label: 'Paid Count', value: filteredSalaries.filter(s => s.status === 'paid').length },
+          { label: 'Pending Count', value: filteredSalaries.filter(s => s.status === 'pending').length },
+        ],
+        columns: [
+          { header: 'Person Name', key: 'staffName' },
+          { header: 'Role / Category', key: 'category' },
+          { header: 'Salary Month', key: 'month' },
+          { header: 'Net Amount', render: s => `₹${(s.net || 0).toLocaleString('en-IN')}`, align: 'right', style: 'font-weight:bold;' },
+          { header: 'Disbursal Status', render: s => s.status.toUpperCase(), style: 'font-weight:bold;' },
+        ],
+        rows: filteredSalaries,
+      });
+    }
   };
 
   return (

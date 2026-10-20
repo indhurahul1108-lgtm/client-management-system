@@ -3,6 +3,7 @@ import DashboardLayout from '../../components/DashboardLayout';
 import { useAuth } from '../../context/AuthContext';
 import { DUMMY_USERS } from '../../data/dummyData.jsx';
 import { printIndividualRecord } from '../../utils/printUtils.js';
+import PhoneCallModal from '../../components/PhoneCallModal';
 import { IndianRupee, Printer, ShieldCheck, CheckCircle, Clock, Building2, Phone, User, Users, Smartphone, CreditCard } from 'lucide-react';
 
 const PAYSLIP_HISTORY = [
@@ -46,6 +47,7 @@ const PAYSLIP_HISTORY = [
 
 export default function ClientSalary() {
   const { user } = useAuth();
+  const [callingContact, setCallingContact] = useState(null);
 
   // Assigned Staff & Manager
   const staffList = DUMMY_USERS.filter(u => u.role === 'staff');
@@ -266,16 +268,29 @@ export default function ClientSalary() {
               <p className="font-bold text-slate-800 text-sm">{primaryStaff.name}</p>
               <p className="text-[11px] text-slate-500">Field Supervising Staff</p>
             </div>
-            <a
-              href={`tel:${primaryStaff.mobile}`}
+            <button
+              onClick={() => setCallingContact({
+                name: primaryStaff.name,
+                role: 'Field Supervising Staff',
+                mobile: primaryStaff.mobile,
+                photo: primaryStaff.photo,
+                bunk: user?.assignedBunk || 'Indian Oil Petrol Bunk (IOCL)'
+              })}
               className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-4 py-2 rounded-xl flex items-center gap-1.5 shadow transition"
             >
               <Phone size={13} />
               <span>Call Supervisor</span>
-            </a>
+            </button>
           </div>
         </div>
       </div>
+
+      {/* ── Phone Call Modal ── */}
+      <PhoneCallModal
+        isOpen={!!callingContact}
+        onClose={() => setCallingContact(null)}
+        contact={callingContact}
+      />
     </DashboardLayout>
   );
 }

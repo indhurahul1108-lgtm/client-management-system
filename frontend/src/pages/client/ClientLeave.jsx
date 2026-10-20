@@ -3,6 +3,7 @@ import DashboardLayout from '../../components/DashboardLayout';
 import { useAuth } from '../../context/AuthContext';
 import { DUMMY_USERS } from '../../data/dummyData.jsx';
 import { printIndividualRecord } from '../../utils/printUtils.js';
+import PhoneCallModal from '../../components/PhoneCallModal';
 import { FileText, Calendar, Plus, Clock, CheckCircle, XCircle, AlertCircle, Phone, User, Printer, ShieldCheck } from 'lucide-react';
 
 const INITIAL_CLIENT_LEAVES = [
@@ -42,6 +43,7 @@ export default function ClientLeave() {
   const { user } = useAuth();
   const [leaves, setLeaves] = useState(INITIAL_CLIENT_LEAVES);
   const [showApplyModal, setShowApplyModal] = useState(false);
+  const [callingContact, setCallingContact] = useState(null);
   const [leaveForm, setLeaveForm] = useState({
     leaveType: 'Casual Leave',
     fromDate: '',
@@ -248,14 +250,27 @@ export default function ClientLeave() {
             In case of sudden illness or urgent personal emergencies, call your supervising staff immediately so that another candidate from the standby crew can be deployed to your fuel dispenser station.
           </p>
         </div>
-        <a
-          href={`tel:${primaryStaff.mobile}`}
+        <button
+          onClick={() => setCallingContact({
+            name: primaryStaff.name,
+            role: 'Field Supervising Staff',
+            mobile: primaryStaff.mobile,
+            photo: primaryStaff.photo,
+            bunk: user?.assignedBunk || 'Indian Oil Petrol Bunk (IOCL)'
+          })}
           className="bg-amber-700 hover:bg-amber-800 text-white font-bold text-xs px-5 py-2.5 rounded-xl flex items-center gap-1.5 shadow transition shrink-0"
         >
           <Phone size={14} />
           <span>Call Staff ({primaryStaff.name})</span>
-        </a>
+        </button>
       </div>
+
+      {/* ── Phone Call Modal ── */}
+      <PhoneCallModal
+        isOpen={!!callingContact}
+        onClose={() => setCallingContact(null)}
+        contact={callingContact}
+      />
 
       {/* ── Apply Modal ── */}
       {showApplyModal && (

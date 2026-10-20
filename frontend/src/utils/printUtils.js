@@ -108,6 +108,7 @@ export function printIndividualRecord({ title, person, type, records = [], summa
       <head>
         <title>${person.name || 'Person'} - ${title}</title>
         <style>
+          @page { size: auto; margin: 10mm 15mm; }
           * { margin:0; padding:0; box-sizing:border-box; font-family: 'Segoe UI', Arial, sans-serif; }
           body { padding: 24px; color: #1e293b; background: #ffffff; }
           .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #0f172a; padding-bottom: 12px; margin-bottom: 16px; }
@@ -259,6 +260,7 @@ export function printBulkRecords({ title, subtitle = '', columns = [], rows = []
       <head>
         <title>ELAKIYAA - ${title}</title>
         <style>
+          @page { size: auto; margin: 10mm 15mm; }
           * { margin:0; padding:0; box-sizing:border-box; font-family: 'Segoe UI', Arial, sans-serif; }
           body { padding: 24px; color: #1e293b; background: #ffffff; }
           .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #0f172a; padding-bottom: 12px; margin-bottom: 16px; }
