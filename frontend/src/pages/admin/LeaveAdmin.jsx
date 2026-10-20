@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import DashboardLayout from '../../components/DashboardLayout';
 import { DUMMY_LEAVES, DUMMY_USERS } from '../../data/dummyData.jsx';
-import { Check, X, MessageSquare, CheckCircle, Users, UserCheck, Building2, Calendar } from 'lucide-react';
+import { Check, X, MessageSquare, CheckCircle, Users, UserCheck, Building2, Calendar, Printer } from 'lucide-react';
+import { printIndividualRecord, printBulkRecords } from '../../utils/printUtils.js';
 
 function Badge({ status }) {
   const map = {
@@ -87,6 +88,48 @@ export default function LeaveAdmin() {
     return matchRole && matchStatus;
   });
 
+  const handlePrintTotal = () => {
+    printBulkRecords({
+      title: `Official Leave Register — ${roleTab.toUpperCase()} (${filter.toUpperCase()})`,
+      subtitle: `Total Applications: ${filtered.length}`,
+      summaryCards: [
+        { label: 'Pending', value: filtered.filter(l => l.status === 'pending').length },
+        { label: 'Approved', value: filtered.filter(l => l.status === 'approved').length },
+        { label: 'Rejected', value: filtered.filter(l => l.status === 'rejected').length },
+        { label: 'Total', value: filtered.length },
+      ],
+      columns: [
+        { header: 'Person Name', key: 'staffName' },
+        { header: 'Role / Category', render: l => l.role === 'manager' ? 'Manager' : l.role === 'staff' ? 'Staff' : 'Candidate (Client)' },
+        { header: 'Leave Type', key: 'leaveType' },
+        { header: 'From Date', key: 'fromDate' },
+        { header: 'To Date', key: 'toDate' },
+        { header: 'Reason & Notes', render: l => `"${l.reason}" ${l.approvalMessage ? `(Note: ${l.approvalMessage})` : ''}` },
+        { header: 'Applied On', render: l => l.appliedOn || '—' },
+        { header: 'Status', render: l => l.status.toUpperCase(), style: 'font-weight:bold;' },
+      ],
+      rows: filtered,
+    });
+  };
+
+  const handlePrintIndividual = (leave) => {
+    const userObj = DUMMY_USERS.find(u => u.name === leave.staffName || u.id === leave.staffId) || {};
+    printIndividualRecord({
+      title: `${leave.staffName} — Official Leave Record`,
+      person: {
+        name: leave.staffName,
+        staffId: userObj.staffId || userObj.clientId || userObj.managerId || leave.staffId,
+        mobile: userObj.mobile || '9876543210',
+        role: leave.role === 'manager' ? 'Manager' : leave.role === 'staff' ? 'Staff' : 'Candidate (Client)',
+        roleAtBunk: userObj.roleAtBunk || (leave.role === 'client' ? 'Fuel Dispenser Attendant' : leave.role.toUpperCase()),
+        assignedBunk: userObj.assignedBunk || leave.assignedBunk || 'Petrol Bunk Station',
+        shift: userObj.shift || 'Morning Shift',
+      },
+      type: 'leaves',
+      records: [leave],
+    });
+  };
+
   return (
     <DashboardLayout title="Leave Management">
       {toast && <Toast msg={toast.msg} color={toast.color} />}
@@ -135,15 +178,25 @@ export default function LeaveAdmin() {
       </div>
 
       <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-        {/* Filter status tabs */}
-        <div className="px-5 py-4 border-b border-slate-100 flex gap-2 flex-wrap">
-          {['all', 'pending', 'approved', 'rejected'].map(f => (
-            <button key={f} onClick={() => setFilter(f)}
-              className={`px-4 py-2 rounded-xl text-xs font-semibold capitalize transition
-                ${filter === f ? 'bg-blue-700 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}>
-              {f} ({f === 'all' ? filtered.length : filtered.filter(l => l.status === f).length})
-            </button>
-          ))}
+        {/* Filter status tabs & Total Print */}
+        <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between gap-3 flex-wrap">
+          <div className="flex gap-2 flex-wrap">
+            {['all', 'pending', 'approved', 'rejected'].map(f => (
+              <button key={f} onClick={() => setFilter(f)}
+                className={`px-4 py-2 rounded-xl text-xs font-semibold capitalize transition
+                  ${filter === f ? 'bg-blue-700 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}>
+                {f} ({f === 'all' ? filtered.length : filtered.filter(l => l.status === f).length})
+              </button>
+            ))}
+          </div>
+
+          <button
+            onClick={handlePrintTotal}
+            className="flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-xl text-xs font-bold transition shadow-sm ml-auto"
+          >
+            <Printer size={14} />
+            <span>Print All Leaves (Total Print)</span>
+          </button>
         </div>
 
         <div className="overflow-x-auto">
@@ -200,24 +253,33 @@ export default function LeaveAdmin() {
                     <Badge status={l.status} />
                   </td>
                   <td className="px-4 py-3.5 whitespace-nowrap">
-                    {l.status === 'pending' ? (
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => openApprove(l)}
-                          className="flex items-center gap-1 bg-green-600 text-white px-3 py-1.5 rounded-xl text-xs font-bold hover:bg-green-700 shadow-sm"
-                        >
-                          <Check size={12} /> Approve
-                        </button>
-                        <button
-                          onClick={() => openReject(l)}
-                          className="flex items-center gap-1 bg-red-100 text-red-700 px-3 py-1.5 rounded-xl text-xs font-bold hover:bg-red-200"
-                        >
-                          <X size={12} /> Reject
-                        </button>
-                      </div>
-                    ) : (
-                      <span className="text-xs text-slate-400 italic">Completed</span>
-                    )}
+                    <div className="flex items-center gap-2">
+                      {l.status === 'pending' ? (
+                        <>
+                          <button
+                            onClick={() => openApprove(l)}
+                            className="flex items-center gap-1 bg-green-600 text-white px-3 py-1.5 rounded-xl text-xs font-bold hover:bg-green-700 shadow-sm"
+                          >
+                            <Check size={12} /> Approve
+                          </button>
+                          <button
+                            onClick={() => openReject(l)}
+                            className="flex items-center gap-1 bg-red-100 text-red-700 px-3 py-1.5 rounded-xl text-xs font-bold hover:bg-red-200"
+                          >
+                            <X size={12} /> Reject
+                          </button>
+                        </>
+                      ) : (
+                        <span className="text-xs text-slate-400 italic">Completed</span>
+                      )}
+                      <button
+                        onClick={() => handlePrintIndividual(l)}
+                        className="p-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 rounded-lg transition"
+                        title="Print Leave Statement"
+                      >
+                        <Printer size={13} />
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}

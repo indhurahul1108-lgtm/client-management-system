@@ -48,10 +48,12 @@ const MENUS = {
     { label: 'Profile',      icon: User,            path: '/staff/profile' },
   ],
   client: [
-    { label: 'Candidate Portal', icon: LayoutDashboard, path: '/client' },
-    { label: 'My Attendance',    icon: CalendarCheck,   path: '/client/attendance' },
-    { label: 'My Documents',     icon: Briefcase,       path: '/client/documents' },
-    { label: 'Profile',          icon: User,            path: '/client/profile' },
+    { label: "Today's Duty",      icon: LayoutDashboard, path: '/client' },
+    { label: 'My Attendance',     icon: CalendarCheck,   path: '/client/attendance' },
+    { label: 'Salary & Payslips', icon: DollarSign,      path: '/client/salary' },
+    { label: 'Request Leave',     icon: FileText,        path: '/client/leave' },
+    { label: 'ID Card & Docs',    icon: Briefcase,       path: '/client/documents' },
+    { label: 'My Profile',        icon: User,            path: '/client/profile' },
   ],
 };
 

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import DashboardLayout from '../../components/DashboardLayout';
 import { DUMMY_ATTENDANCE, DUMMY_LEAVES, DUMMY_SALARIES, DUMMY_USERS } from '../../data/dummyData.jsx';
 import { BarChart2, CalendarCheck, FileText, DollarSign, Printer, Download, Users, UserCheck, Building2 } from 'lucide-react';
+import { printIndividualRecord } from '../../utils/printUtils.js';
 
 const TABS = [
   { id: 'attendance', label: 'Attendance', icon: CalendarCheck },
@@ -203,6 +204,7 @@ export default function ReportsAdmin() {
                       <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase">Punch Out</th>
                       <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase">Location</th>
                       <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase">Status</th>
+                      <th className="text-center px-4 py-3 text-xs font-semibold text-slate-500 uppercase no-print">Print Slip</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100">
@@ -215,6 +217,32 @@ export default function ReportsAdmin() {
                         <td className="px-4 py-3 text-slate-700 text-xs font-mono">{a.punchOut || '—'}</td>
                         <td className="px-4 py-3 text-slate-500 text-xs">{a.location || 'Chennai Area'}</td>
                         <td className="px-4 py-3"><Badge status={a.status} /></td>
+                        <td className="px-4 py-3 text-center no-print">
+                          <button
+                            onClick={() => {
+                              const u = DUMMY_USERS.find(user => user.name === a.staffName) || {};
+                              printIndividualRecord({
+                                title: `${a.staffName} — Attendance Record`,
+                                person: {
+                                  name: a.staffName,
+                                  staffId: u.staffId || u.clientId || u.managerId || a.id,
+                                  mobile: u.mobile || '9876543210',
+                                  role: a.role,
+                                  roleAtBunk: u.roleAtBunk || a.category,
+                                  assignedBunk: u.assignedBunk || a.location || 'IOCL Petrol Bunk',
+                                  shift: u.shift || 'Morning Shift',
+                                },
+                                type: 'attendance',
+                                records: [a],
+                              });
+                            }}
+                            className="inline-flex items-center gap-1 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 px-2.5 py-1 rounded-lg text-xs font-bold transition shadow-sm"
+                            title="Print Person Statement"
+                          >
+                            <Printer size={12} />
+                            <span>Print</span>
+                          </button>
+                        </td>
                       </tr>
                     ))}
                   </tbody>
@@ -249,6 +277,7 @@ export default function ReportsAdmin() {
                       <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase">From Date</th>
                       <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase">To Date</th>
                       <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase">Status</th>
+                      <th className="text-center px-4 py-3 text-xs font-semibold text-slate-500 uppercase no-print">Print Slip</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100">
@@ -260,6 +289,32 @@ export default function ReportsAdmin() {
                         <td className="px-4 py-3 text-slate-500 text-xs font-mono">{l.fromDate}</td>
                         <td className="px-4 py-3 text-slate-500 text-xs font-mono">{l.toDate}</td>
                         <td className="px-4 py-3"><Badge status={l.status} /></td>
+                        <td className="px-4 py-3 text-center no-print">
+                          <button
+                            onClick={() => {
+                              const u = DUMMY_USERS.find(user => user.name === l.staffName) || {};
+                              printIndividualRecord({
+                                title: `${l.staffName} — Leave Statement`,
+                                person: {
+                                  name: l.staffName,
+                                  staffId: u.staffId || u.clientId || u.managerId || l.id,
+                                  mobile: u.mobile || '9876543210',
+                                  role: l.role,
+                                  roleAtBunk: u.roleAtBunk || l.category,
+                                  assignedBunk: u.assignedBunk || 'Petrol Bunk Station',
+                                  shift: u.shift || 'Morning Shift',
+                                },
+                                type: 'leaves',
+                                records: [l],
+                              });
+                            }}
+                            className="inline-flex items-center gap-1 bg-green-50 hover:bg-green-100 text-green-700 border border-green-200 px-2.5 py-1 rounded-lg text-xs font-bold transition shadow-sm"
+                            title="Print Leave Statement"
+                          >
+                            <Printer size={12} />
+                            <span>Print</span>
+                          </button>
+                        </td>
                       </tr>
                     ))}
                   </tbody>
@@ -294,6 +349,7 @@ export default function ReportsAdmin() {
                       <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase">Month</th>
                       <th className="text-right px-4 py-3 text-xs font-semibold text-slate-500 uppercase">Net Salary</th>
                       <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase">Status</th>
+                      <th className="text-center px-4 py-3 text-xs font-semibold text-slate-500 uppercase no-print">Print Slip</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100">
@@ -306,6 +362,39 @@ export default function ReportsAdmin() {
                           ₹{s.net?.toLocaleString('en-IN')}
                         </td>
                         <td className="px-4 py-3"><Badge status={s.status} /></td>
+                        <td className="px-4 py-3 text-center no-print">
+                          <button
+                            onClick={() => {
+                              const u = DUMMY_USERS.find(user => user.name === s.staffName) || {};
+                              printIndividualRecord({
+                                title: `${s.staffName} — Payslip (${s.month})`,
+                                person: {
+                                  name: s.staffName,
+                                  staffId: u.staffId || u.clientId || u.managerId || s.id,
+                                  mobile: u.mobile || '9876543210',
+                                  role: s.role,
+                                  roleAtBunk: u.roleAtBunk || s.category,
+                                  assignedBunk: u.assignedBunk || 'Petrol Bunk Station',
+                                  shift: u.shift || 'Morning Shift',
+                                },
+                                type: 'salary',
+                                records: [{
+                                  month: s.month,
+                                  basic: (s.net || 18500) - 2500,
+                                  allowance: 2500,
+                                  deduction: 0,
+                                  netSalary: s.net || 18500,
+                                  status: s.status,
+                                }],
+                              });
+                            }}
+                            className="inline-flex items-center gap-1 bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-200 px-2.5 py-1 rounded-lg text-xs font-bold transition shadow-sm"
+                            title="Print Payslip"
+                          >
+                            <Printer size={12} />
+                            <span>Print</span>
+                          </button>
+                        </td>
                       </tr>
                     ))}
                   </tbody>

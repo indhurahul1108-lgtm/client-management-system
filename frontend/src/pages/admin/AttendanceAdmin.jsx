@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import DashboardLayout from '../../components/DashboardLayout';
 import { DUMMY_ATTENDANCE, DUMMY_USERS } from '../../data/dummyData.jsx';
 import { calcLateMinutes, formatLate, SHIFT_CONFIG } from '../../utils/attendanceUtils.js';
-import { Users, Clock, X, AlertTriangle, Settings, UserCheck, Building2, Eye } from 'lucide-react';
+import { Users, Clock, X, AlertTriangle, Settings, UserCheck, Building2, Eye, Printer, FileText } from 'lucide-react';
+import { printIndividualRecord, printBulkRecords } from '../../utils/printUtils.js';
 
 const STATUS_FILTERS = ['all', 'present', 'late', 'absent'];
 
@@ -59,6 +60,49 @@ export default function AttendanceAdmin() {
   const [shiftStart, setShiftStart] = useState(SHIFT_CONFIG.shiftStart);
   const [graceMins, setGraceMins] = useState(SHIFT_CONFIG.graceMins);
   const [showSettings, setShowSettings] = useState(false);
+  const [historyModal, setHistoryModal] = useState(null);
+
+  const getPerson3MonthAttendance = (person) => {
+    const bunk = person.location || (person.role === 'client' ? 'IOCL Petrol Bunk, Anna Salai' : 'Chennai Area');
+    return [
+      // October 2026
+      { date: '2026-10-10', punchIn: person.punchIn || '06:00 AM', punchOut: person.punchOut || '02:00 PM', location: bunk, status: person.status || 'present' },
+      { date: '2026-10-09', punchIn: '05:58 AM', punchOut: '02:00 PM', location: bunk, status: 'present' },
+      { date: '2026-10-08', punchIn: '06:12 AM', punchOut: '02:00 PM', location: bunk, status: 'late', lateMinutes: 12 },
+      { date: '2026-10-07', punchIn: '06:00 AM', punchOut: '02:00 PM', location: bunk, status: 'present' },
+      { date: '2026-10-06', punchIn: '05:55 AM', punchOut: '02:00 PM', location: bunk, status: 'present' },
+      // September 2026
+      { date: '2026-09-30', punchIn: '05:55 AM', punchOut: '02:00 PM', location: bunk, status: 'present' },
+      { date: '2026-09-29', punchIn: '06:00 AM', punchOut: '02:00 PM', location: bunk, status: 'present' },
+      { date: '2026-09-28', punchIn: '06:15 AM', punchOut: '02:00 PM', location: bunk, status: 'late', lateMinutes: 15 },
+      { date: '2026-09-27', punchIn: '05:58 AM', punchOut: '02:00 PM', location: bunk, status: 'present' },
+      { date: '2026-09-26', punchIn: '05:52 AM', punchOut: '02:05 PM', location: bunk, status: 'present' },
+      // August 2026
+      { date: '2026-08-31', punchIn: '05:58 AM', punchOut: '02:00 PM', location: bunk, status: 'present' },
+      { date: '2026-08-30', punchIn: '06:00 AM', punchOut: '02:00 PM', location: bunk, status: 'present' },
+      { date: '2026-08-29', punchIn: '05:55 AM', punchOut: '02:00 PM', location: bunk, status: 'present' },
+      { date: '2026-08-28', punchIn: '06:05 AM', punchOut: '02:00 PM', location: bunk, status: 'present' },
+      { date: '2026-08-27', punchIn: '05:57 AM', punchOut: '02:00 PM', location: bunk, status: 'present' },
+    ];
+  };
+
+  const handlePrintIndividual = (record) => {
+    const userObj = DUMMY_USERS.find(u => u.name === record.staffName || u.id === record.userId) || {};
+    printIndividualRecord({
+      title: `${record.staffName} — 3-Month Attendance Statement`,
+      person: {
+        name: record.staffName,
+        staffId: userObj.staffId || userObj.clientId || userObj.managerId || record.userId,
+        mobile: userObj.mobile || '9876543210',
+        role: record.role === 'manager' ? 'Manager' : record.role === 'staff' ? 'Staff' : 'Candidate (Client)',
+        roleAtBunk: userObj.roleAtBunk || (record.role === 'client' ? 'Fuel Dispenser Attendant' : record.role.toUpperCase()),
+        assignedBunk: userObj.assignedBunk || record.location || 'IOCL Petrol Bunk',
+        shift: userObj.shift || 'Shift 1: Morning (06:00 AM - 02:00 PM)',
+      },
+      type: 'attendance',
+      records: getPerson3MonthAttendance(record),
+    });
+  };
 
   const attendanceWithLate = INITIAL_ATTENDANCE.map(a => ({
     ...a,
@@ -74,6 +118,30 @@ export default function AttendanceAdmin() {
   const present = filtered.filter(a => a.status === 'present').length;
   const absent  = filtered.filter(a => a.status === 'absent').length;
   const late    = filtered.filter(a => a.status === 'late').length;
+
+  const handlePrintTotal = () => {
+    printBulkRecords({
+      title: `Official Attendance Register — ${roleTab.toUpperCase()} (${filter.toUpperCase()})`,
+      subtitle: `Date: ${today} | Shift Start: ${shiftStart} | Grace Period: ${graceMins} mins`,
+      summaryCards: [
+        { label: 'Total Records', value: filtered.length },
+        { label: 'Present', value: present },
+        { label: 'Late', value: late },
+        { label: 'Absent', value: absent },
+      ],
+      columns: [
+        { header: 'Person Name', key: 'staffName' },
+        { header: 'Role / Category', render: r => r.role === 'manager' ? 'Manager' : r.role === 'staff' ? 'Staff' : 'Candidate (Client)' },
+        { header: 'Date', key: 'date' },
+        { header: 'Punch In', render: r => r.punchIn || '—' },
+        { header: 'Late Status', render: r => r.computedLate > 0 ? `+${r.computedLate} mins late` : 'On Time' },
+        { header: 'Punch Out', render: r => r.punchOut || '—' },
+        { header: 'Location & Station', render: r => r.location || '—' },
+        { header: 'Status', render: r => r.status.toUpperCase(), style: 'font-weight:bold;' },
+      ],
+      rows: filtered,
+    });
+  };
 
   return (
     <DashboardLayout title="Attendance Management">
@@ -140,16 +208,28 @@ export default function AttendanceAdmin() {
 
       {/* Main Table */}
       <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-        {/* Status Filters */}
-        <div className="px-6 py-4 border-b border-slate-100 flex flex-wrap items-center gap-2">
-          {STATUS_FILTERS.map(f => (
-            <button key={f} onClick={() => setFilter(f)}
-              className={`px-4 py-2 rounded-xl text-xs font-semibold capitalize transition
-                ${filter === f ? 'bg-blue-700 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}>
-              {f === 'all' ? `All (${filtered.length})` : `${f}`}
+        {/* Status Filters & Total Print Button */}
+        <div className="px-6 py-4 border-b border-slate-100 flex flex-wrap items-center justify-between gap-3">
+          <div className="flex flex-wrap items-center gap-2">
+            {STATUS_FILTERS.map(f => (
+              <button key={f} onClick={() => setFilter(f)}
+                className={`px-4 py-2 rounded-xl text-xs font-semibold capitalize transition
+                  ${filter === f ? 'bg-blue-700 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}>
+                {f === 'all' ? `All (${filtered.length})` : `${f}`}
+              </button>
+            ))}
+          </div>
+
+          <div className="flex items-center gap-3">
+            <span className="text-xs text-blue-600 font-medium hidden sm:inline">🔒 Selfie & GPS Camera Logs</span>
+            <button
+              onClick={handlePrintTotal}
+              className="flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-xl text-xs font-bold transition shadow-sm"
+            >
+              <Printer size={14} />
+              <span>Print All (Total Print)</span>
             </button>
-          ))}
-          <span className="ml-auto text-xs text-blue-600 font-medium">🔒 Selfie & GPS Camera Logs</span>
+          </div>
         </div>
 
         {/* Table */}
@@ -166,6 +246,7 @@ export default function AttendanceAdmin() {
                 <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase">Location & GPS</th>
                 <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase">Selfie Photo</th>
                 <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase">Status</th>
+                <th className="text-center px-4 py-3 text-xs font-semibold text-slate-500 uppercase">Actions / Print</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
@@ -219,6 +300,25 @@ export default function AttendanceAdmin() {
                     ) : <span className="text-slate-300 text-xs">No photo</span>}
                   </td>
                   <td className="px-4 py-3.5"><Badge status={a.status} /></td>
+                  <td className="px-4 py-3.5 text-center whitespace-nowrap">
+                    <div className="flex items-center justify-center gap-1.5">
+                      <button
+                        onClick={() => setHistoryModal({ person: a, records: getPerson3MonthAttendance(a) })}
+                        className="p-1.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-lg transition"
+                        title="View 3-Month Attendance"
+                      >
+                        <Eye size={14} />
+                      </button>
+                      <button
+                        onClick={() => handlePrintIndividual(a)}
+                        className="flex items-center gap-1 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 px-2.5 py-1.5 rounded-lg text-xs font-bold transition shadow-sm"
+                        title="Print 3-Month Statement"
+                      >
+                        <Printer size={13} />
+                        <span>Print</span>
+                      </button>
+                    </div>
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -250,6 +350,90 @@ export default function AttendanceAdmin() {
             <div className="flex gap-3 mt-5">
               <button onClick={() => setShowSettings(false)} className="flex-1 py-2.5 border border-slate-200 rounded-xl text-slate-600 text-sm font-medium">Cancel</button>
               <button onClick={() => setShowSettings(false)} className="flex-1 py-2.5 bg-blue-700 text-white rounded-xl text-sm font-bold">Apply</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 3-Month Individual History Modal */}
+      {historyModal && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl w-full max-w-2xl max-h-[85vh] flex flex-col shadow-2xl overflow-hidden">
+            {/* Modal Header */}
+            <div className="p-5 bg-gradient-to-r from-blue-900 to-indigo-900 text-white flex items-center justify-between">
+              <div>
+                <h3 className="font-bold text-base flex items-center gap-2">
+                  <Printer size={18} className="text-amber-400" />
+                  <span>3-Month Verified Attendance Statement</span>
+                </h3>
+                <p className="text-xs text-blue-200 mt-0.5">
+                  {historyModal.person.staffName} &nbsp;|&nbsp; Category: {historyModal.person.role.toUpperCase()}
+                </p>
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => handlePrintIndividual(historyModal.person)}
+                  className="flex items-center gap-1.5 bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold text-xs px-3.5 py-2 rounded-xl shadow transition"
+                >
+                  <Printer size={14} />
+                  <span>Print Statement</span>
+                </button>
+                <button
+                  onClick={() => setHistoryModal(null)}
+                  className="p-2 bg-white/10 hover:bg-white/20 rounded-xl transition text-white"
+                >
+                  <X size={18} />
+                </button>
+              </div>
+            </div>
+
+            {/* Modal Content */}
+            <div className="p-6 overflow-y-auto">
+              <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-100">
+                <div>
+                  <p className="text-xs text-slate-400 font-bold uppercase tracking-wider">Total Recorded Shifts</p>
+                  <p className="text-lg font-black text-slate-800">{historyModal.records.length} Duty Days</p>
+                </div>
+                <div className="flex gap-2">
+                  <span className="text-xs font-bold bg-green-50 text-green-700 px-3 py-1 rounded-full border border-green-200">
+                    ✓ {historyModal.records.filter(r => r.status === 'present').length} Present
+                  </span>
+                  <span className="text-xs font-bold bg-amber-50 text-amber-700 px-3 py-1 rounded-full border border-amber-200">
+                    ⚠️ {historyModal.records.filter(r => r.status === 'late').length} Late
+                  </span>
+                </div>
+              </div>
+
+              <div className="overflow-x-auto border border-slate-200 rounded-2xl">
+                <table className="w-full text-xs">
+                  <thead className="bg-slate-50 text-slate-500 font-bold uppercase">
+                    <tr>
+                      <th className="p-3 text-left">Date</th>
+                      <th className="p-3 text-left">Punch In</th>
+                      <th className="p-3 text-left">Punch Out</th>
+                      <th className="p-3 text-left">Station / Location</th>
+                      <th className="p-3 text-center">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100">
+                    {historyModal.records.map((r, idx) => (
+                      <tr key={idx} className="hover:bg-slate-50 transition">
+                        <td className="p-3 font-mono text-slate-700">{r.date}</td>
+                        <td className="p-3 font-mono font-bold text-slate-800">{r.punchIn}</td>
+                        <td className="p-3 font-mono text-slate-600">{r.punchOut}</td>
+                        <td className="p-3 text-slate-700">{r.location}</td>
+                        <td className="p-3 text-center">
+                          <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase ${
+                            r.status === 'present' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'
+                          }`}>
+                            {r.status} {r.lateMinutes ? `(+${r.lateMinutes}m)` : ''}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
         </div>

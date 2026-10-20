@@ -62,6 +62,8 @@ import ClientHistory      from './pages/client/ClientHistory';
 import ClientMessages     from './pages/client/ClientMessages';
 import ClientProfile      from './pages/client/ClientProfile';
 import ClientAttendance   from './pages/client/ClientAttendance';
+import ClientSalary       from './pages/client/ClientSalary';
+import ClientLeave        from './pages/client/ClientLeave';
 
 const AR = (roles, Component) => (
   <ProtectedRoute roles={roles}><Component /></ProtectedRoute>
@@ -123,6 +125,9 @@ export default function App() {
 
             {/* ── CLIENT ── */}
             <Route path="/client"               element={AR(['client'], ClientDashboard)} />
+            <Route path="/client/attendance"    element={AR(['client'], ClientAttendance)} />
+            <Route path="/client/salary"        element={AR(['client'], ClientSalary)} />
+            <Route path="/client/leave"         element={AR(['client'], ClientLeave)} />
             <Route path="/client/work"          element={AR(['client'], ClientWork)} />
             <Route path="/client/overdue"       element={AR(['client'], ClientOverdue)} />
             <Route path="/client/requests"      element={AR(['client'], ClientRequests)} />

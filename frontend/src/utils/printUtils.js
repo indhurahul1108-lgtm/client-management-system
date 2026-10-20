@@ -206,3 +206,125 @@ export function printIndividualRecord({ title, person, type, records = [], summa
     printWindow.close();
   }, 400);
 }
+
+// Official ELAKIYAA Printing Utility for Bulk / Total Statements (All Records)
+export function printBulkRecords({ title, subtitle = '', columns = [], rows = [], summaryCards = [] }) {
+  const printWindow = window.open('', '_blank');
+  if (!printWindow) {
+    alert('Please allow popups to print records');
+    return;
+  }
+
+  const dateStr = new Date().toLocaleDateString('en-IN', {
+    day: '2-digit',
+    month: 'long',
+    year: 'numeric',
+  });
+  const timeStr = new Date().toLocaleTimeString('en-IN', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: true,
+  });
+
+  const headerHtml = columns.map(c => `
+    <th style="padding:8px 10px; text-align:${c.align || 'left'}; border:1px solid #cbd5e1; background:#f8fafc; font-size:11px; font-weight:bold; color:#334155;">
+      ${c.header}
+    </th>
+  `).join('');
+
+  const rowsHtml = rows.map((r, idx) => `
+    <tr style="${idx % 2 === 1 ? 'background:#fafbfc;' : ''}">
+      ${columns.map(c => `
+        <td style="padding:7px 10px; border:1px solid #e2e8f0; font-size:11px; text-align:${c.align || 'left'}; ${c.style || ''}">
+          ${c.render ? c.render(r) : (r[c.key] !== undefined && r[c.key] !== null ? r[c.key] : '—')}
+        </td>
+      `).join('')}
+    </tr>
+  `).join('');
+
+  const summaryHtml = summaryCards.length > 0 ? `
+    <div style="display:flex; gap:12px; margin-bottom:16px;">
+      ${summaryCards.map(s => `
+        <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:10px 14px; min-width:140px;">
+          <div style="font-size:10px; font-weight:bold; color:#64748b; text-transform:uppercase;">${s.label}</div>
+          <div style="font-size:16px; font-weight:bold; color:#0f172a; margin-top:2px;">${s.value}</div>
+        </div>
+      `).join('')}
+    </div>
+  ` : '';
+
+  printWindow.document.write(`
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <title>ELAKIYAA - ${title}</title>
+        <style>
+          * { margin:0; padding:0; box-sizing:border-box; font-family: 'Segoe UI', Arial, sans-serif; }
+          body { padding: 24px; color: #1e293b; background: #ffffff; }
+          .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #0f172a; padding-bottom: 12px; margin-bottom: 16px; }
+          .company-title { font-size: 20px; font-weight: 900; color: #0f172a; letter-spacing: -0.5px; }
+          .company-sub { font-size: 11px; color: #64748b; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+          .report-title-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+          .report-heading { font-size: 15px; font-weight: bold; text-transform: uppercase; color: #1e40af; border-left: 3px solid #1e40af; padding-left: 8px; }
+          table { width: 100%; border-collapse: collapse; margin-top: 6px; margin-bottom: 24px; }
+          .sign-area { display: flex; justify-content: space-between; margin-top: 40px; padding-top: 20px; border-top: 1px dashed #cbd5e1; font-size: 11px; color: #475569; }
+          .footer { text-align: center; font-size: 10px; color: #94a3b8; margin-top: 25px; border-top: 1px solid #f1f5f9; padding-top: 8px; }
+        </style>
+      </head>
+      <body>
+        <div class="header">
+          <div style="display:flex; align-items:center; gap:12px;">
+            <img src="/logo.png" style="height:44px; width:auto; object-fit:contain;" alt="ELAKIYAA Logo" />
+            <div>
+              <div class="company-title">ELAKIYAA - JOBS MADE SIMPLE</div>
+              <div class="company-sub">Official Manpower & Staff Management Records</div>
+            </div>
+          </div>
+          <div style="text-align:right; font-size:11px; color:#64748b;">
+            <div>Statement Date: <strong>${dateStr}</strong></div>
+            <div>Time: ${timeStr}</div>
+          </div>
+        </div>
+
+        <div class="report-title-bar">
+          <div>
+            <div class="report-heading">${title}</div>
+            ${subtitle ? `<div style="font-size:11px; color:#64748b; margin-top:3px; padding-left:11px;">${subtitle}</div>` : ''}
+          </div>
+          <div style="font-size:11px; color:#64748b; font-weight:600;">Total Records: ${rows.length}</div>
+        </div>
+
+        ${summaryHtml}
+
+        <table>
+          <thead><tr>${headerHtml}</tr></thead>
+          <tbody>${rowsHtml}</tbody>
+        </table>
+
+        <div class="sign-area">
+          <div>
+            <p>Verified By (Operations In-Charge)</p>
+            <div style="margin-top:35px; border-bottom:1px solid #94a3b8; width:180px;"></div>
+          </div>
+          <div style="text-align:right;">
+            <p>Authorized Signatory</p>
+            <p style="font-weight:bold; color:#0f172a; margin-top:4px;">ELAKIYAA - JOBS MADE SIMPLE</p>
+            <div style="margin-top:25px; border-bottom:1px solid #94a3b8; width:180px; margin-left:auto;"></div>
+          </div>
+        </div>
+
+        <div class="footer">
+          This is an official bulk report from ELAKIYAA Jobs Made Simple Management System. Valid without stamp unless specified.
+        </div>
+      </body>
+    </html>
+  `);
+
+  printWindow.document.close();
+  printWindow.focus();
+  setTimeout(() => {
+    printWindow.print();
+    printWindow.close();
+  }, 400);
+}
+

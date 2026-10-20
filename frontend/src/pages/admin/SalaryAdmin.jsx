@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import DashboardLayout from '../../components/DashboardLayout';
 import { DUMMY_USERS, DUMMY_SALARIES } from '../../data/dummyData.jsx';
 import { IndianRupee, CreditCard, Smartphone, Check, Edit2, X, Plus, User, Building2, Search, Printer } from 'lucide-react';
-import { printIndividualRecord } from '../../utils/printUtils.js';
+import { printIndividualRecord, printBulkRecords } from '../../utils/printUtils.js';
 
 const PAYMENT_METHODS = [
   { id: 'gpay',   label: 'GPay',          icon: '📲', color: 'bg-blue-50 border-blue-200 text-blue-700' },
@@ -130,6 +130,32 @@ export default function SalaryAdmin() {
   const totalPending = salaries.filter(s => s.status === 'pending').reduce((sum, s) => sum + (s.netSalary || 0), 0);
   const clientSalaryTotal = salaries.filter(s => s.userRole === 'client').reduce((sum, s) => sum + (s.netSalary || 0), 0);
 
+  const handlePrintTotal = () => {
+    printBulkRecords({
+      title: `Official Salary Payroll Register — ${filterRole.toUpperCase()} (${filterStatus.toUpperCase()})`,
+      subtitle: `Disbursement Statement | Month: October 2026`,
+      summaryCards: [
+        { label: 'Total Paid', value: `₹${totalPaid.toLocaleString('en-IN')}` },
+        { label: 'Pending Payout', value: `₹${totalPending.toLocaleString('en-IN')}` },
+        { label: 'Crew Salaries', value: `₹${clientSalaryTotal.toLocaleString('en-IN')}` },
+        { label: 'Total Records', value: filtered.length },
+      ],
+      columns: [
+        { header: 'Worker / Staff Name', key: 'staffName' },
+        { header: 'Role & Category', key: 'roleTag' },
+        { header: 'Assigned Bunk', render: s => s.assignedBunk || '—' },
+        { header: 'Month', key: 'month' },
+        { header: 'Basic Pay', render: s => `₹${(s.basic || 0).toLocaleString('en-IN')}`, align: 'right' },
+        { header: 'Allowance', render: s => `+₹${(s.allowance || 0).toLocaleString('en-IN')}`, align: 'right' },
+        { header: 'Deductions', render: s => `-₹${(s.deduction || 0).toLocaleString('en-IN')}`, align: 'right' },
+        { header: 'Net Salary', render: s => `₹${(s.netSalary || 0).toLocaleString('en-IN')}`, align: 'right', style: 'font-weight:bold;' },
+        { header: 'Payment Mode', render: s => s.paymentMethod === 'gpay' ? 'GPay' : 'Bank Transfer' },
+        { header: 'Status', render: s => s.status.toUpperCase(), style: 'font-weight:bold;' },
+      ],
+      rows: filtered,
+    });
+  };
+
   return (
     <DashboardLayout title="Salary Management">
       {toast && <Toast msg={toast} onClose={() => setToast('')} />}
@@ -145,12 +171,20 @@ export default function SalaryAdmin() {
             Management sets individual salary amounts for deployed manpower & staff with instant payment modes (GPay / Bank Transfer).
           </p>
         </div>
-        <button
-          onClick={() => setSetNewSalaryModal(true)}
-          className="flex items-center gap-2 bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold text-xs px-4 py-2.5 rounded-xl shadow-lg transition shrink-0"
-        >
-          <Plus size={16} /> Set Worker Salary
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={handlePrintTotal}
+            className="flex items-center gap-1.5 bg-white/20 hover:bg-white/30 border border-white/20 text-white font-bold text-xs px-4 py-2.5 rounded-xl shadow transition shrink-0"
+          >
+            <Printer size={15} /> Print All Payroll (Total Print)
+          </button>
+          <button
+            onClick={() => setSetNewSalaryModal(true)}
+            className="flex items-center gap-2 bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold text-xs px-4 py-2.5 rounded-xl shadow-lg transition shrink-0"
+          >
+            <Plus size={16} /> Set Worker Salary
+          </button>
+        </div>
       </div>
 
       {/* Summary Cards */}
