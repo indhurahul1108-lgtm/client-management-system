@@ -297,16 +297,10 @@ export default function ClientDashboard() {
             </p>
           </div>
 
-          {/* Date Picker */}
-          <div className="flex items-center gap-2 bg-slate-100 px-3 py-1.5 rounded-xl border border-slate-200 text-xs">
-            <Calendar size={14} className="text-slate-500" />
-            <span className="font-semibold text-slate-600">Select Date:</span>
-            <input
-              type="date"
-              value={selectedDutyDate}
-              onChange={e => setSelectedDutyDate(e.target.value)}
-              className="bg-transparent font-bold text-slate-800 focus:outline-none cursor-pointer"
-            />
+          {/* Active Date Indicator */}
+          <div className="flex items-center gap-2 bg-emerald-50 border border-emerald-200 text-emerald-800 px-3.5 py-1.5 rounded-xl text-xs font-bold shadow-sm">
+            <Calendar size={14} className="text-emerald-600" />
+            <span>Today's Active Duty: {new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
           </div>
         </div>
 
