@@ -34,4 +34,4 @@ frontend/src/
 └── utils/               # Attendance & shift calculation utilities
 ```
 
-For comprehensive project documentation, architecture diagrams, and credential listings, please refer to the root [README.md](../README.md) and [DOCUMENTATION.md](../DOCUMENTATION.md).
+For comprehensive project documentation, architecture diagrams, and credential listings, please refer to the root [README.md](../README.md).
