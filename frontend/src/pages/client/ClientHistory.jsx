@@ -1,25 +1,23 @@
 import React, { useState } from 'react';
 import DashboardLayout from '../../components/DashboardLayout';
 import { useAuth } from '../../context/AuthContext';
-import { getClientData, calcOverdueDays } from '../../data/clientData.js';
+import { getClientData } from '../../data/clientData.js';
 import { DUMMY_USERS } from '../../data/dummyData.jsx';
 
 const STATUS_COLOR = {
   in_progress: 'bg-blue-100 text-blue-700',
   pending: 'bg-yellow-100 text-yellow-700',
   completed: 'bg-green-100 text-green-700',
-  overdue: 'bg-red-100 text-red-700',
   on_hold: 'bg-slate-100 text-slate-600',
 };
 const STATUS_LABEL = {
   in_progress: 'In Progress',
   pending: 'Pending',
   completed: 'Completed',
-  overdue: 'Overdue',
   on_hold: 'On Hold',
 };
 
-const FILTERS = ['All', 'Completed', 'Overdue', 'Pending'];
+const FILTERS = ['All', 'Completed', 'In Progress', 'Pending'];
 
 export default function ClientHistory() {
   const { user } = useAuth();
@@ -32,18 +30,18 @@ export default function ClientHistory() {
 
   const filtered = works.filter((w) => {
     if (activeFilter === 'All') return true;
+    if (activeFilter === 'In Progress') return w.status === 'in_progress';
     return w.status === activeFilter.toLowerCase();
   });
 
   const stats = [
     { label: 'Total', value: works.length, color: 'bg-orange-50 border-orange-200 text-orange-700' },
+    { label: 'In Progress', value: works.filter((w) => w.status === 'in_progress').length, color: 'bg-blue-50 border-blue-200 text-blue-700' },
     { label: 'Completed', value: works.filter((w) => w.status === 'completed').length, color: 'bg-green-50 border-green-200 text-green-700' },
-    { label: 'Overdue', value: works.filter((w) => w.status === 'overdue').length, color: 'bg-red-50 border-red-200 text-red-700' },
   ];
 
   const getRowBg = (status) => {
     if (status === 'completed') return 'bg-green-50';
-    if (status === 'overdue') return 'bg-red-50';
     return 'bg-white';
   };
 
@@ -108,7 +106,6 @@ export default function ClientHistory() {
               <tbody className="divide-y divide-slate-100">
                 {filtered.map((work) => {
                   const staff = getStaff(work.staffId);
-                  const overdue = work.status !== 'completed' && calcOverdueDays(work.dueDate) > 0;
                   return (
                     <tr key={work.id} className={`hover:brightness-95 transition-all ${getRowBg(work.status)}`}>
                       <td className="px-4 py-3">
@@ -123,7 +120,7 @@ export default function ClientHistory() {
                         </span>
                       </td>
                       <td className="px-4 py-3 text-slate-600 whitespace-nowrap">{work.startDate}</td>
-                      <td className={`px-4 py-3 whitespace-nowrap font-medium ${overdue ? 'text-red-600' : 'text-slate-600'}`}>
+                      <td className="px-4 py-3 whitespace-nowrap font-medium text-slate-600">
                         {work.dueDate}
                       </td>
                       <td className="px-4 py-3">
@@ -138,7 +135,7 @@ export default function ClientHistory() {
                         <div className="flex items-center gap-2">
                           <div className="flex-1 bg-slate-100 rounded-full h-2">
                             <div
-                              className={`h-2 rounded-full ${work.status === 'completed' ? 'bg-green-500' : work.status === 'overdue' ? 'bg-red-400' : 'bg-orange-500'}`}
+                              className={`h-2 rounded-full ${work.status === 'completed' ? 'bg-green-500' : 'bg-orange-500'}`}
                               style={{ width: `${work.progress}%` }}
                             />
                           </div>

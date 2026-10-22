@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import DashboardLayout from '../../components/DashboardLayout';
-import { DUMMY_USERS, DUMMY_ATTENDANCE, DUMMY_LEAVES, DUMMY_SALARIES, DUMMY_OVERDUE } from '../../data/dummyData.jsx';
-import { CLIENT_WORKS, calcOverdueDays } from '../../data/clientData.js';
+import { DUMMY_USERS, DUMMY_ATTENDANCE, DUMMY_LEAVES, DUMMY_SALARIES } from '../../data/dummyData.jsx';
+import { CLIENT_WORKS } from '../../data/clientData.js';
 import {
   Users, UserCheck, Building2, CalendarCheck, Clock, AlertTriangle,
   Briefcase, CheckCircle, TrendingUp, Bell, Activity, LogOut, ChevronRight
@@ -25,7 +25,6 @@ const allWorks    = CLIENT_WORKS;
 const activeWork  = allWorks.filter(w => w.status === 'in_progress').length;
 const completedW  = allWorks.filter(w => w.status === 'completed').length;
 const pendingW    = allWorks.filter(w => w.status === 'pending').length;
-const overdueW    = allWorks.filter(w => w.status === 'overdue' || (calcOverdueDays(w.dueDate) > 0 && w.status !== 'completed')).length;
 
 const RECENT_ACTIVITY = [
   { id:1, user:'Anitha Devi',  action:'Punched In On Duty', time:'10:05 AM', icon:'🟢', module:'Attendance' },
@@ -37,7 +36,7 @@ const RECENT_ACTIVITY = [
 
 const NOTIFICATIONS = [
   { id:1, msg:'Murugan P applied for Sick Leave — pending approval', type:'leave', icon:'📋', unread:true },
-  { id:2, msg:'IOCL Anna Salai requests 2 additional fuel operators for evening shift', type:'overdue', icon:'⚠️', unread:true },
+  { id:2, msg:'IOCL Anna Salai requests 2 additional fuel operators for evening shift', type:'task', icon:'⚠️', unread:true },
   { id:3, msg:'BPCL Guindy submitted monthly manpower verification report', type:'client', icon:'🏢', unread:false },
   { id:4, msg:'Vijay S reported 15 mins late for Morning Shift at HPCL Bunk', type:'attend', icon:'🕐', unread:true },
 ];

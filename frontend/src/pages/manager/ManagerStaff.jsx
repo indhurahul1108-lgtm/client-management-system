@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import DashboardLayout from '../../components/DashboardLayout';
 import { useAuth } from '../../context/AuthContext';
 import { DUMMY_USERS, DUMMY_ATTENDANCE, DUMMY_LEAVES } from '../../data/dummyData.jsx';
-import { CLIENT_WORKS, calcOverdueDays } from '../../data/clientData.js';
+import { CLIENT_WORKS } from '../../data/clientData.js';
 import { Search, X, Phone, MapPin, CalendarCheck, Clock, AlertTriangle, Briefcase } from 'lucide-react';
 
 const today = new Date().toISOString().split('T')[0];
@@ -54,7 +54,7 @@ export default function ManagerStaff() {
         {filtered.map(s => {
           const att = getAtt(s.id);
           const works = getWork(s.staffId);
-          const overdue = works.filter(w=>w.status==='overdue'||(calcOverdueDays(w.dueDate)>0&&w.status!=='completed')).length;
+          const completed = works.filter(w=>w.status==='completed').length;
           return (
             <div key={s.id} onClick={()=>setSelected(s)}
               className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 cursor-pointer hover:shadow-md transition hover:border-purple-200">
@@ -75,9 +75,9 @@ export default function ManagerStaff() {
                   <p className="text-xs text-slate-400">Works</p>
                   <p className="font-bold text-slate-700 text-sm">{works.length}</p>
                 </div>
-                <div className={`rounded-xl p-2 ${overdue>0?'bg-red-50':'bg-slate-50'}`}>
-                  <p className="text-xs text-slate-400">Overdue</p>
-                  <p className={`font-bold text-sm ${overdue>0?'text-red-600':'text-slate-700'}`}>{overdue}</p>
+                <div className="bg-slate-50 rounded-xl p-2">
+                  <p className="text-xs text-slate-400">Completed</p>
+                  <p className="font-bold text-sm text-emerald-600">{completed}</p>
                 </div>
               </div>
               <div className="flex items-center gap-1.5 mt-3 text-xs text-slate-400">
@@ -150,7 +150,7 @@ export default function ManagerStaff() {
                     <div key={w.id} className="bg-slate-50 rounded-xl px-3 py-2.5">
                       <div className="flex justify-between items-center mb-1">
                         <span className="text-sm font-medium text-slate-700 truncate">{w.title}</span>
-                        <span className={`text-xs px-2 py-0.5 rounded-full font-semibold ml-2 shrink-0 ${w.status==='completed'?'bg-green-100 text-green-700':w.status==='overdue'?'bg-red-100 text-red-700':'bg-blue-100 text-blue-700'}`}>{w.status}</span>
+                        <span className={`text-xs px-2 py-0.5 rounded-full font-semibold ml-2 shrink-0 ${w.status==='completed'?'bg-green-100 text-green-700':'bg-blue-100 text-blue-700'}`}>{w.status}</span>
                       </div>
                       <div className="w-full bg-slate-200 rounded-full h-1.5">
                         <div className="bg-purple-500 h-1.5 rounded-full" style={{width:`${w.progress}%`}}/>

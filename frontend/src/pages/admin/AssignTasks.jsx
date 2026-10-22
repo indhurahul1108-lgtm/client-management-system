@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import DashboardLayout from '../../components/DashboardLayout';
-import { DUMMY_USERS, DUMMY_OVERDUE } from '../../data/dummyData.jsx';
+import { DUMMY_USERS, DUMMY_TASKS } from '../../data/dummyData.jsx';
 import { Plus, X, Save, ClipboardList, AlertTriangle, Clock, CheckCircle, User, Users, Building2, Check, CheckSquare, Square } from 'lucide-react';
 
 const staffList = DUMMY_USERS.filter(u => u.role === 'staff');
 const clientList = DUMMY_USERS.filter(u => u.role === 'client');
 
 // Initialize tasks supporting multiple staff and multiple clients
-const initialTasks = DUMMY_OVERDUE.map((t, idx) => ({
+const initialTasks = DUMMY_TASKS.map((t, idx) => ({
   ...t,
   staffIds: [t.staffId || 's001', ...(idx % 2 === 0 ? ['s002'] : [])],
   clientIds: [t.clientId || 'c001', ...(idx % 3 === 0 ? ['c002'] : [])],
@@ -24,11 +24,12 @@ const emptyForm = {
 
 function Badge({ status }) {
   const map = {
-    overdue: 'bg-red-100 text-red-700',
+    in_progress: 'bg-blue-100 text-blue-700',
     pending: 'bg-yellow-100 text-yellow-700',
     completed: 'bg-green-100 text-green-700'
   };
-  return <span className={`text-xs px-2.5 py-1 rounded-full font-semibold capitalize ${map[status] || 'bg-slate-100 text-slate-600'}`}>{status}</span>;
+  const label = status === 'in_progress' ? 'In Progress' : status;
+  return <span className={`text-xs px-2.5 py-1 rounded-full font-semibold capitalize ${map[status] || 'bg-slate-100 text-slate-600'}`}>{label}</span>;
 }
 
 function PriorityBadge({ priority }) {
@@ -118,7 +119,6 @@ export default function AssignTasks() {
         : 'All Deployed Bunks',
       dueDate: form.dueDate,
       status: 'pending',
-      overdueDays: diffDays > 0 ? diffDays : 0,
       remarks: form.remarks,
       priority: form.priority,
       assignedOn: today,
@@ -131,7 +131,7 @@ export default function AssignTasks() {
   };
 
   const markComplete = (id) => {
-    setTasks(prev => prev.map(t => t.id === id ? { ...t, status: 'completed', overdueDays: 0 } : t));
+    setTasks(prev => prev.map(t => t.id === id ? { ...t, status: 'completed' } : t));
     showToast('✅ Task marked as completed!');
   };
 
@@ -140,7 +140,7 @@ export default function AssignTasks() {
   const counts = {
     all: tasks.length,
     pending: tasks.filter(t => t.status === 'pending').length,
-    overdue: tasks.filter(t => t.status === 'overdue').length,
+    in_progress: tasks.filter(t => t.status === 'in_progress').length,
     completed: tasks.filter(t => t.status === 'completed').length,
   };
 
@@ -157,7 +157,7 @@ export default function AssignTasks() {
         {[
           { label: 'Total Tasks', value: counts.all, color: 'blue', icon: <ClipboardList size={20} className="text-white" /> },
           { label: 'Pending', value: counts.pending, color: 'yellow', icon: <Clock size={20} className="text-white" /> },
-          { label: 'Overdue', value: counts.overdue, color: 'red', icon: <AlertTriangle size={20} className="text-white" /> },
+          { label: 'In Progress', value: counts.in_progress, color: 'indigo', icon: <AlertTriangle size={20} className="text-white" /> },
           { label: 'Completed', value: counts.completed, color: 'green', icon: <CheckCircle size={20} className="text-white" /> },
         ].map(({ label, value, color, icon }) => (
           <div key={label} className={`bg-${color}-50 border border-${color}-100 rounded-2xl p-4 flex items-center gap-4 shadow-sm`}>
@@ -174,7 +174,7 @@ export default function AssignTasks() {
         {/* Toolbar */}
         <div className="px-6 py-4 border-b border-slate-100 flex flex-wrap items-center justify-between gap-3">
           <div className="flex gap-2 flex-wrap">
-            {['all', 'pending', 'overdue', 'completed'].map(tab => (
+            {['all', 'pending', 'in_progress', 'completed'].map(tab => (
               <button
                 key={tab}
                 onClick={() => setFilterTab(tab)}
@@ -182,7 +182,7 @@ export default function AssignTasks() {
                   filterTab === tab ? 'bg-blue-700 text-white shadow-sm' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                 }`}
               >
-                {tab} ({counts[tab]})
+                {tab === 'in_progress' ? 'In Progress' : tab} ({counts[tab]})
               </button>
             ))}
           </div>
@@ -215,7 +215,7 @@ export default function AssignTasks() {
                 const assignedClientsList = clientList.filter(c => (t.clientIds || [t.clientId]).includes(c.clientId || c.id));
 
                 return (
-                  <tr key={t.id} className={`hover:bg-slate-50 transition ${t.status === 'overdue' ? 'bg-red-50/20' : ''}`}>
+                  <tr key={t.id} className="hover:bg-slate-50 transition">
                     <td className="px-5 py-3.5 font-medium text-slate-800 max-w-[220px]">
                       <p className="font-bold text-xs">{t.task}</p>
                       {t.remarks && <p className="text-[11px] text-slate-400 mt-0.5 truncate">{t.remarks}</p>}

@@ -2,13 +2,13 @@ import React, { useState } from 'react';
 import DashboardLayout from '../../components/DashboardLayout';
 import { useAuth } from '../../context/AuthContext';
 import { DUMMY_USERS } from '../../data/dummyData.jsx';
-import { CLIENT_WORKS, calcOverdueDays } from '../../data/clientData.js';
+import { CLIENT_WORKS } from '../../data/clientData.js';
 import { Plus, X, AlertTriangle, ChevronDown } from 'lucide-react';
 
-const STATUS_COLORS = { in_progress:'bg-blue-100 text-blue-700', pending:'bg-yellow-100 text-yellow-700', completed:'bg-green-100 text-green-700', overdue:'bg-red-100 text-red-700', on_hold:'bg-slate-100 text-slate-600', cancelled:'bg-gray-100 text-gray-600' };
+const STATUS_COLORS = { in_progress:'bg-blue-100 text-blue-700', pending:'bg-yellow-100 text-yellow-700', completed:'bg-green-100 text-green-700', on_hold:'bg-slate-100 text-slate-600', cancelled:'bg-gray-100 text-gray-600' };
 const PRIORITY_COLORS = { high:'bg-red-100 text-red-700', medium:'bg-yellow-100 text-yellow-700', low:'bg-green-100 text-green-700' };
-const STATUS_LABELS = { in_progress:'In Progress', pending:'Pending', completed:'Completed', overdue:'Overdue', on_hold:'On Hold', cancelled:'Cancelled' };
-const TABS = ['all','pending','in_progress','completed','overdue'];
+const STATUS_LABELS = { in_progress:'In Progress', pending:'Pending', completed:'Completed', on_hold:'On Hold', cancelled:'Cancelled' };
+const TABS = ['all','pending','in_progress','completed'];
 
 function Toast({msg,onClose}){return(<div className="fixed top-4 right-4 z-50 bg-green-600 text-white px-5 py-3 rounded-2xl shadow-xl flex items-center gap-3 text-sm font-semibold"><span>{msg}</span><button onClick={onClose}><X size={14}/></button></div>);}
 
@@ -28,10 +28,7 @@ export default function ManagerWork() {
 
   const showToast = msg => { setToastMsg(msg); setTimeout(()=>setToastMsg(''),3000); };
 
-  const filtered = tab==='all' ? works : works.filter(w => {
-    if (tab==='overdue') return w.status==='overdue' || (calcOverdueDays(w.dueDate)>0 && w.status!=='completed');
-    return w.status===tab;
-  });
+  const filtered = tab==='all' ? works : works.filter(w => w.status===tab);
 
   const addWork = () => {
     if (!form.clientId || !form.title || !form.staffId || !form.dueDate) { showToast('⚠️ Fill all required fields'); return; }
@@ -45,9 +42,9 @@ export default function ManagerWork() {
   };
 
   const totalW     = works.length;
+  const pendingW   = works.filter(w=>w.status==='pending').length;
   const activeW    = works.filter(w=>w.status==='in_progress').length;
   const completedW = works.filter(w=>w.status==='completed').length;
-  const overdueW   = works.filter(w=>w.status==='overdue'||(calcOverdueDays(w.dueDate)>0&&w.status!=='completed')).length;
 
   return (
     <DashboardLayout title="Work / Tasks">
@@ -55,7 +52,7 @@ export default function ManagerWork() {
 
       {/* Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-5">
-        {[['Total',totalW,'blue'],['Active',activeW,'green'],['Completed',completedW,'purple'],['Overdue',overdueW,'red']].map(([l,v,c])=>(
+        {[['Total',totalW,'blue'],['Pending',pendingW,'yellow'],['Active',activeW,'green'],['Completed',completedW,'purple']].map(([l,v,c])=>(
           <div key={l} className={`bg-${c}-50 border border-${c}-100 rounded-2xl p-4`}>
             <p className={`text-2xl font-bold text-${c}-800`}>{v}</p>
             <p className="text-xs text-slate-500">{l}</p>
@@ -79,10 +76,9 @@ export default function ManagerWork() {
       {/* Work Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {filtered.map(w=>{
-          const isOD = w.status==='overdue'||(calcOverdueDays(w.dueDate)>0&&w.status!=='completed');
           return (
             <div key={w.id} onClick={()=>setSelected(w)}
-              className={`bg-white rounded-2xl border shadow-sm p-5 cursor-pointer hover:shadow-md transition ${isOD?'border-red-200 bg-red-50/20':'border-slate-100 hover:border-purple-200'}`}>
+              className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 cursor-pointer hover:shadow-md hover:border-purple-200 transition">
               <div className="flex items-start justify-between mb-3">
                 <div>
                   <span className="text-xs text-slate-400 font-mono">{w.workId}</span>
@@ -95,11 +91,11 @@ export default function ManagerWork() {
                 </div>
               </div>
               <div className="w-full bg-slate-100 rounded-full h-2 mb-2">
-                <div className={`h-2 rounded-full ${isOD?'bg-red-500':w.progress>=80?'bg-green-500':'bg-purple-500'}`} style={{width:`${w.progress}%`}}/>
+                <div className={`h-2 rounded-full ${w.progress>=80?'bg-green-500':'bg-purple-500'}`} style={{width:`${w.progress}%`}}/>
               </div>
               <div className="flex items-center justify-between text-xs text-slate-400">
                 <span>{w.progress}% complete</span>
-                <span className={isOD?'text-red-600 font-bold':''}>Due: {w.dueDate} {isOD?`(+${calcOverdueDays(w.dueDate)}d)`:''}</span>
+                <span>Due: {w.dueDate}</span>
               </div>
             </div>
           );

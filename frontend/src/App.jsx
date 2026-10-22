@@ -17,7 +17,6 @@ import ManageClients     from './pages/admin/ManageClients';
 import AttendanceAdmin   from './pages/admin/AttendanceAdmin';
 import LeaveAdmin        from './pages/admin/LeaveAdmin';
 import SalaryAdmin       from './pages/admin/SalaryAdmin';
-import OverdueAdmin      from './pages/admin/OverdueAdmin';
 import ReportsAdmin      from './pages/admin/ReportsAdmin';
 import AssignTasks       from './pages/admin/AssignTasks';
 import SystemSettings    from './pages/admin/SystemSettings';
@@ -32,7 +31,6 @@ import ManagerClients     from './pages/manager/ManagerClients';
 import ManagerAttendance  from './pages/manager/ManagerAttendance';
 import ManagerLeave       from './pages/manager/ManagerLeave';
 import ManagerWork        from './pages/manager/ManagerWork';
-import ManagerOverdue     from './pages/manager/ManagerOverdue';
 import ManagerNotifications from './pages/manager/ManagerNotifications';
 import ManagerReports     from './pages/manager/ManagerReports';
 import ManagerProfile     from './pages/manager/ManagerProfile';
@@ -46,7 +44,6 @@ import StaffLeave         from './pages/staff/StaffLeave';
 import StaffSalary        from './pages/staff/StaffSalary';
 import StaffProfile       from './pages/staff/StaffProfile';
 import StaffClients       from './pages/staff/StaffClients';
-import StaffOverdue       from './pages/staff/StaffOverdue';
 import StaffNotifications from './pages/staff/StaffNotifications';
 import StaffDocuments     from './pages/staff/StaffDocuments';
 import StaffReports       from './pages/staff/StaffReports';
@@ -54,7 +51,6 @@ import StaffReports       from './pages/staff/StaffReports';
 // ── CLIENT pages ──────────────────────────────────────────────
 import ClientDashboard    from './pages/client/ClientDashboard';
 import ClientWork         from './pages/client/ClientWork';
-import ClientOverdue      from './pages/client/ClientOverdue';
 import ClientRequests     from './pages/client/ClientRequests';
 import ClientNotifications from './pages/client/ClientNotifications';
 import ClientDocuments    from './pages/client/ClientDocuments';
@@ -92,7 +88,7 @@ export default function App() {
             <Route path="/admin/leave"         element={AR(['admin'], LeaveAdmin)} />
             <Route path="/admin/salary"        element={AR(['admin'], SalaryAdmin)} />
             <Route path="/admin/assign-tasks"  element={AR(['admin'], AssignTasks)} />
-            <Route path="/admin/overdue"       element={AR(['admin'], OverdueAdmin)} />
+            <Route path="/admin/overdue"       element={<Navigate to="/admin/assign-tasks" replace />} />
             <Route path="/admin/reports"       element={AR(['admin'], ReportsAdmin)} />
             <Route path="/admin/notifications" element={AR(['admin'], AdminNotifications)} />
             <Route path="/admin/audit-log"     element={AR(['admin'], AuditLog)} />
@@ -105,7 +101,7 @@ export default function App() {
             <Route path="/manager/attendance"    element={AR(['manager'], ManagerAttendance)} />
             <Route path="/manager/leave"         element={AR(['manager'], ManagerLeave)} />
             <Route path="/manager/work"          element={AR(['manager'], ManagerWork)} />
-            <Route path="/manager/overdue"       element={AR(['manager'], ManagerOverdue)} />
+            <Route path="/manager/overdue"       element={<Navigate to="/manager/work" replace />} />
             <Route path="/manager/notifications" element={AR(['manager'], ManagerNotifications)} />
             <Route path="/manager/reports"       element={AR(['manager'], ManagerReports)} />
             <Route path="/manager/profile"       element={AR(['manager'], ManagerProfile)} />
@@ -115,7 +111,7 @@ export default function App() {
             <Route path="/staff/attendance"    element={AR(['staff'], Attendance)} />
             <Route path="/staff/work"          element={AR(['staff'], StaffWork)} />
             <Route path="/staff/clients"       element={AR(['staff'], StaffClients)} />
-            <Route path="/staff/overdue"       element={AR(['staff'], StaffOverdue)} />
+            <Route path="/staff/overdue"       element={<Navigate to="/staff/work" replace />} />
             <Route path="/staff/leave"         element={AR(['staff'], StaffLeave)} />
             <Route path="/staff/salary"        element={AR(['staff'], StaffSalary)} />
             <Route path="/staff/notifications" element={AR(['staff'], StaffNotifications)} />
@@ -129,7 +125,7 @@ export default function App() {
             <Route path="/client/salary"        element={AR(['client'], ClientSalary)} />
             <Route path="/client/leave"         element={AR(['client'], ClientLeave)} />
             <Route path="/client/work"          element={AR(['client'], ClientWork)} />
-            <Route path="/client/overdue"       element={AR(['client'], ClientOverdue)} />
+            <Route path="/client/overdue"       element={<Navigate to="/client/work" replace />} />
             <Route path="/client/requests"      element={AR(['client'], ClientRequests)} />
             <Route path="/client/notifications" element={AR(['client'], ClientNotifications)} />
             <Route path="/client/documents"     element={AR(['client'], ClientDocuments)} />

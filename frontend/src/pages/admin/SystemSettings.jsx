@@ -30,7 +30,7 @@ export default function SystemSettings() {
     leaveRequests:   true,
     attendanceAlert: true,
     salaryReminder:  true,
-    overdueAlert:    true,
+    taskAlert:       true,
     newClient:       false,
     dailyReport:     false,
   });
@@ -163,7 +163,7 @@ export default function SystemSettings() {
                 <Toggle label="Leave Requests"      desc="Alert when staff applies for leave"       value={notifications.leaveRequests}   onChange={v => setNotifications(n => ({ ...n, leaveRequests:   v }))} />
                 <Toggle label="Attendance Alerts"   desc="Alert when staff is late or absent"       value={notifications.attendanceAlert} onChange={v => setNotifications(n => ({ ...n, attendanceAlert: v }))} />
                 <Toggle label="Salary Reminders"    desc="Monthly salary payment reminders"         value={notifications.salaryReminder}  onChange={v => setNotifications(n => ({ ...n, salaryReminder:  v }))} />
-                <Toggle label="Overdue Alerts"      desc="Alert when tasks are overdue"             value={notifications.overdueAlert}    onChange={v => setNotifications(n => ({ ...n, overdueAlert:    v }))} />
+                <Toggle label="Task Alerts"        desc="Alert when tasks are assigned or updated"  value={notifications.taskAlert}      onChange={v => setNotifications(n => ({ ...n, taskAlert:       v }))} />
                 <Toggle label="New Client Added"    desc="Notify when a new client is registered"  value={notifications.newClient}       onChange={v => setNotifications(n => ({ ...n, newClient:       v }))} />
                 <Toggle label="Daily Report"        desc="Receive daily summary report"             value={notifications.dailyReport}     onChange={v => setNotifications(n => ({ ...n, dailyReport:     v }))} />
               </div>

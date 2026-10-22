@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import DashboardLayout from '../../components/DashboardLayout';
 import { useAuth } from '../../context/AuthContext';
-import { CLIENT_WORKS, calcOverdueDays } from '../../data/clientData.js';
+import { CLIENT_WORKS } from '../../data/clientData.js';
 import { X, AlertTriangle, ChevronRight } from 'lucide-react';
 
-const STATUS_COLOR = { in_progress:'bg-blue-100 text-blue-700', pending:'bg-yellow-100 text-yellow-700', completed:'bg-green-100 text-green-700', overdue:'bg-red-100 text-red-700', on_hold:'bg-slate-100 text-slate-600' };
-const STATUS_LABEL = { in_progress:'In Progress', pending:'Pending', completed:'Completed', overdue:'Overdue', on_hold:'On Hold' };
+const STATUS_COLOR = { in_progress:'bg-blue-100 text-blue-700', pending:'bg-yellow-100 text-yellow-700', completed:'bg-green-100 text-green-700', on_hold:'bg-slate-100 text-slate-600' };
+const STATUS_LABEL = { in_progress:'In Progress', pending:'Pending', completed:'Completed', on_hold:'On Hold' };
 const PRIORITY_COLOR = { high:'bg-red-100 text-red-700', medium:'bg-yellow-100 text-yellow-700', low:'bg-green-100 text-green-700' };
 
 function Toast({ msg, onClose }) {
@@ -22,10 +22,7 @@ export default function StaffWork() {
 
   const showToast = msg => { setToastMsg(msg); setTimeout(() => setToastMsg(''), 3000); };
 
-  const filtered = tab === 'all' ? works : works.filter(w => {
-    if (tab === 'overdue') return w.status === 'overdue' || (calcOverdueDays(w.dueDate) > 0 && w.status !== 'completed');
-    return w.status === tab;
-  });
+  const filtered = tab === 'all' ? works : works.filter(w => w.status === tab);
 
   const openDetail = (w) => {
     setSelected(w);
@@ -44,9 +41,9 @@ export default function StaffWork() {
   };
 
   const total    = works.length;
+  const pending  = works.filter(w => w.status === 'pending').length;
   const active   = works.filter(w => w.status === 'in_progress').length;
   const done     = works.filter(w => w.status === 'completed').length;
-  const overdue  = works.filter(w => w.status === 'overdue' || (calcOverdueDays(w.dueDate) > 0 && w.status !== 'completed')).length;
 
   return (
     <DashboardLayout title="My Work">
@@ -54,7 +51,7 @@ export default function StaffWork() {
 
       {/* Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-5">
-        {[['Total',total,'blue'],['Active',active,'green'],['Completed',done,'purple'],['Overdue',overdue,'red']].map(([l,v,c])=>(
+        {[['Total',total,'blue'],['Pending',pending,'yellow'],['Active',active,'green'],['Completed',done,'purple']].map(([l,v,c])=>(
           <div key={l} className={`bg-${c}-50 border border-${c}-100 rounded-2xl p-4`}>
             <p className={`text-2xl font-bold text-${c}-800`}>{v}</p>
             <p className="text-xs text-slate-500">{l}</p>
@@ -64,7 +61,7 @@ export default function StaffWork() {
 
       {/* Tabs */}
       <div className="flex gap-2 flex-wrap mb-5">
-        {['all','in_progress','pending','completed','overdue'].map(t => (
+        {['all','in_progress','pending','completed'].map(t => (
           <button key={t} onClick={() => setTab(t)}
             className={`px-4 py-2 rounded-xl text-xs font-semibold capitalize transition ${tab===t?'bg-green-700 text-white':'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'}`}>
             {t.replace('_',' ')}
@@ -75,10 +72,9 @@ export default function StaffWork() {
       {/* Work Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {filtered.map(w => {
-          const isOD = w.status === 'overdue' || (calcOverdueDays(w.dueDate) > 0 && w.status !== 'completed');
           return (
             <div key={w.id} onClick={() => openDetail(w)}
-              className={`bg-white rounded-2xl border shadow-sm p-5 cursor-pointer hover:shadow-md transition ${isOD?'border-red-200 bg-red-50/20':'border-slate-100 hover:border-green-200'}`}>
+              className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 cursor-pointer hover:shadow-md hover:border-green-200 transition">
               <div className="flex items-start justify-between mb-3">
                 <div className="flex-1 min-w-0">
                   <span className="text-xs text-slate-400 font-mono">{w.workId}</span>
@@ -91,11 +87,11 @@ export default function StaffWork() {
                 </div>
               </div>
               <div className="w-full bg-slate-100 rounded-full h-2 mb-2">
-                <div className={`h-2 rounded-full ${isOD?'bg-red-500':w.progress>=80?'bg-green-500':'bg-green-600'}`} style={{width:`${w.progress}%`}}/>
+                <div className={`h-2 rounded-full ${w.progress>=80?'bg-green-500':'bg-green-600'}`} style={{width:`${w.progress}%`}}/>
               </div>
               <div className="flex items-center justify-between text-xs text-slate-400">
                 <span>{w.progress}% complete</span>
-                <span className={isOD?'text-red-600 font-bold':''}>Due: {w.dueDate}{isOD?` (+${calcOverdueDays(w.dueDate)}d)`:''}</span>
+                <span>Due: {w.dueDate}</span>
               </div>
             </div>
           );

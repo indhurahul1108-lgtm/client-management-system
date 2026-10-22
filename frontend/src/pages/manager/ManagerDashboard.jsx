@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import DashboardLayout from '../../components/DashboardLayout';
 import { useAuth } from '../../context/AuthContext';
 import { DUMMY_USERS, DUMMY_ATTENDANCE, DUMMY_LEAVES } from '../../data/dummyData.jsx';
-import { CLIENT_WORKS, calcOverdueDays } from '../../data/clientData.js';
+import { CLIENT_WORKS } from '../../data/clientData.js';
 import { Users, Building2, CalendarCheck, AlertTriangle, Clock, FileText, CheckCircle, TrendingUp, Bell, ChevronRight, Briefcase } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
@@ -32,7 +32,6 @@ export default function ManagerDashboard() {
   // Work
   const myWorks    = CLIENT_WORKS.filter(w => myStaffIds.includes(w.staffId));
   const activeWork = myWorks.filter(w => w.status === 'in_progress').length;
-  const overdueW   = myWorks.filter(w => w.status === 'overdue' || (calcOverdueDays(w.dueDate) > 0 && w.status !== 'completed')).length;
   const completedW = myWorks.filter(w => w.status === 'completed').length;
 
   const handleLeave = (id, action) => {
@@ -41,7 +40,7 @@ export default function ManagerDashboard() {
 
   const NOTIFS = [
     { id:1, msg:`${myStaff[0]?.name || 'Staff'} applied for leave`, icon:'📋', unread:true },
-    { id:2, msg:'Work overdue: GST Filing — 3 days', icon:'⚠️', unread:true },
+    { id:2, msg:'Shift Schedule Update: Guindy Bunk', icon:'⛽', unread:true },
     { id:3, msg:'New work assigned to your team', icon:'📌', unread:false },
     { id:4, msg:'Client sent a request', icon:'🏢', unread:false },
   ];

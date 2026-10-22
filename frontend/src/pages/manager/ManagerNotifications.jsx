@@ -5,7 +5,7 @@ import { Bell, X } from 'lucide-react';
 
 const NOTIFS = [
   { id:1, title:'Staff Leave Request', msg:'Anitha Devi applied for Sick Leave Oct 10-11. Action required.', type:'leave',   icon:'📋', unread:true,  time:'2026-10-08T09:30:00' },
-  { id:2, title:'⚠️ Shift Coverage',  msg:'IOCL Anna Salai evening shift needs 1 relief pump attendant.',   type:'overdue', icon:'⚠️', unread:true,  time:'2026-10-08T08:00:00' },
+  { id:2, title:'⚠️ Shift Coverage',  msg:'IOCL Anna Salai evening shift needs 1 relief pump attendant.',   type:'shift',   icon:'⚠️', unread:true,  time:'2026-10-08T08:00:00' },
   { id:3, title:'Staff Absent',        msg:'Ravi Kumar has not punched in today for Night Shift.',          type:'attend',  icon:'🔴', unread:true,  time:'2026-10-08T22:30:00' },
   { id:4, title:'Bunk Duty Completed ✅', msg:'Morning shift cash audit completed by Anitha Devi.',        type:'work',    icon:'✅', unread:false, time:'2026-10-07T14:00:00' },
   { id:5, title:'Leave Approved',      msg:'Your manager leave request has been approved by Admin.',       type:'leave',   icon:'✅', unread:false, time:'2026-10-07T14:00:00' },

@@ -4,11 +4,11 @@ import { X, Send } from 'lucide-react';
 
 const NOTIFS_INIT = [
   { id:1,  title:'Leave Request — Murugan P',     msg:'Sick Leave requested for Oct 10-11. Pending approval.',          type:'leave',   icon:'📋', unread:true,  time:'2026-10-08T09:30:00' },
-  { id:2,  title:'⚠️ Bunk Shift Allocation',      msg:'IOCL Anna Salai requires 2 standby fuel operators for evening rush.', type:'overdue', icon:'⚠️', unread:true,  time:'2026-10-08T08:00:00' },
+  { id:2,  title:'⚠️ Bunk Shift Allocation',      msg:'IOCL Anna Salai requires 2 standby fuel operators for evening rush.', type:'work',    icon:'⚠️', unread:true,  time:'2026-10-08T08:00:00' },
   { id:3,  title:'Staff Late — Vijay S',          msg:'Vijay S punched in at 06:15 AM (15 mins late for Morning Shift).', type:'attend',  icon:'🕐', unread:true,  time:'2026-10-08T06:16:00' },
   { id:4,  title:'New Petrol Bunk Registered',    msg:'Nayara Energy Fuel Pump (Poonamallee) added under ELAKIYAA.',   type:'client',  icon:'🏢', unread:false, time:'2026-10-08T09:00:00' },
   { id:5,  title:'Bunk Duty Completed ✅',         msg:'Morning Shift Duty at IOCL Anna Salai completed by Anitha Devi.', type:'work',   icon:'✅', unread:false, time:'2026-10-07T14:00:00' },
-  { id:6,  title:'⚠️ Monthly Bunk Bill Pending',  msg:'BPCL Guindy manpower invoice verification pending.',             type:'overdue', icon:'⚠️', unread:true,  time:'2026-10-07T08:00:00' },
+  { id:6,  title:'⚠️ Monthly Bunk Bill Pending',  msg:'BPCL Guindy manpower invoice verification pending.',             type:'salary',  icon:'⚠️', unread:true,  time:'2026-10-07T08:00:00' },
   { id:7,  title:'Staff Absent — Ravi Kumar',     msg:'Ravi Kumar has not reported for Night Shift.',                  type:'attend',  icon:'🔴', unread:false, time:'2026-10-08T22:30:00' },
   { id:8,  title:'Salary Pending — 3 Attendants', msg:'October wages ready for disbursement via GPay / Bank Transfer.',type:'salary',  icon:'💰', unread:false, time:'2026-10-07T09:00:00' },
   { id:9,  title:'Leave Approved',                msg:'Deepa S Annual Leave Oct 20-23 has been approved.',             type:'leave',   icon:'✅', unread:false, time:'2026-10-06T14:00:00' },
@@ -17,7 +17,7 @@ const NOTIFS_INIT = [
   { id:12, title:'System: 3 Bunk Shifts Active',  msg:'24/7 Bunk Operational shifts (Morning, Evening, Night) active.', type:'system', icon:'⚙️', unread:false, time:'2026-10-05T09:00:00' },
 ];
 
-const TYPES = ['all','leave','overdue','attend','work','client','salary','system'];
+const TYPES = ['all','leave','attend','work','client','salary','system'];
 
 function groupByDate(notifs) {
   const today = new Date().toISOString().split('T')[0];

@@ -2,21 +2,19 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import DashboardLayout from '../../components/DashboardLayout';
 import { useAuth } from '../../context/AuthContext';
-import { getClientData, calcOverdueDays } from '../../data/clientData.js';
+import { getClientData } from '../../data/clientData.js';
 import { DUMMY_USERS } from '../../data/dummyData.jsx';
 
 const STATUS_COLOR = {
   in_progress: 'bg-blue-100 text-blue-700',
   pending: 'bg-yellow-100 text-yellow-700',
   completed: 'bg-green-100 text-green-700',
-  overdue: 'bg-red-100 text-red-700',
   on_hold: 'bg-slate-100 text-slate-600',
 };
 const STATUS_LABEL = {
   in_progress: 'In Progress',
   pending: 'Pending',
   completed: 'Completed',
-  overdue: 'Overdue',
   on_hold: 'On Hold',
 };
 
@@ -26,7 +24,7 @@ const PRIORITY_COLOR = {
   low: 'bg-green-100 text-green-700',
 };
 
-const TABS = ['All', 'In Progress', 'Pending', 'Completed', 'Overdue'];
+const TABS = ['All', 'In Progress', 'Pending', 'Completed'];
 
 export default function ClientWork() {
   const { user } = useAuth();
@@ -43,19 +41,15 @@ export default function ClientWork() {
     if (activeTab === 'In Progress') return w.status === 'in_progress';
     if (activeTab === 'Pending') return w.status === 'pending';
     if (activeTab === 'Completed') return w.status === 'completed';
-    if (activeTab === 'Overdue') return w.status === 'overdue';
     return true;
   });
 
   const stats = [
     { label: 'Total', value: works.length, color: 'bg-orange-50 border-orange-200 text-orange-700' },
     { label: 'In Progress', value: works.filter((w) => w.status === 'in_progress').length, color: 'bg-blue-50 border-blue-200 text-blue-700' },
+    { label: 'Pending', value: works.filter((w) => w.status === 'pending').length, color: 'bg-yellow-50 border-yellow-200 text-yellow-700' },
     { label: 'Completed', value: works.filter((w) => w.status === 'completed').length, color: 'bg-green-50 border-green-200 text-green-700' },
-    { label: 'Overdue', value: works.filter((w) => w.status === 'overdue').length, color: 'bg-red-50 border-red-200 text-red-700' },
   ];
-
-  const isDueDateOverdue = (dueDate, status) =>
-    status !== 'completed' && calcOverdueDays(dueDate) > 0;
 
   return (
     <DashboardLayout title="My Work">
@@ -96,7 +90,6 @@ export default function ClientWork() {
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
           {filteredWorks.map((work) => {
             const staff = getStaff(work.staffId);
-            const overdue = isDueDateOverdue(work.dueDate, work.status);
             return (
               <div
                 key={work.id}
@@ -138,13 +131,8 @@ export default function ClientWork() {
                 {/* Due Date */}
                 <div className="flex items-center gap-1 text-sm">
                   <span className="text-slate-500">Due:</span>
-                  <span className={overdue ? 'text-red-600 font-semibold' : 'text-slate-700'}>
+                  <span className="text-slate-700 font-medium">
                     {work.dueDate}
-                    {overdue && (
-                      <span className="ml-1 text-xs bg-red-100 text-red-600 px-1.5 py-0.5 rounded-full">
-                        {calcOverdueDays(work.dueDate)}d overdue
-                      </span>
-                    )}
                   </span>
                 </div>
 
@@ -233,7 +221,7 @@ export default function ClientWork() {
                 </div>
                 <div className="bg-slate-50 rounded-lg p-3">
                   <p className="text-xs text-slate-400">Due Date</p>
-                  <p className={`font-medium ${calcOverdueDays(selectedWork.dueDate) > 0 && selectedWork.status !== 'completed' ? 'text-red-600' : 'text-slate-700'}`}>
+                  <p className="font-medium text-slate-700">
                     {selectedWork.dueDate}
                   </p>
                 </div>

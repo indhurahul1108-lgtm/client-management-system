@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import DashboardLayout from '../../components/DashboardLayout';
 import { useAuth } from '../../context/AuthContext';
 import { DUMMY_USERS, DUMMY_ATTENDANCE, DUMMY_LEAVES } from '../../data/dummyData.jsx';
-import { CLIENT_WORKS, calcOverdueDays } from '../../data/clientData.js';
+import { CLIENT_WORKS } from '../../data/clientData.js';
 import { SHIFT_CONFIG } from '../../utils/attendanceUtils.js';
 import { Link } from 'react-router-dom';
 import { LogIn, LogOut, Clock, AlertTriangle, Briefcase, CheckCircle, Bell, Users, FileText, Calendar, ChevronRight } from 'lucide-react';
@@ -27,7 +27,6 @@ export default function StaffDashboard() {
   const activeW    = myWorks.filter(w => w.status === 'in_progress').length;
   const pendingW   = myWorks.filter(w => w.status === 'pending').length;
   const completedW = myWorks.filter(w => w.status === 'completed').length;
-  const overdueW   = myWorks.filter(w => w.status === 'overdue' || (calcOverdueDays(w.dueDate) > 0 && w.status !== 'completed')).length;
 
   const attStatus = todayAtt?.status;
   const attColor = attStatus === 'present' ? 'text-green-600' : attStatus === 'late' ? 'text-yellow-600' : 'text-slate-400';

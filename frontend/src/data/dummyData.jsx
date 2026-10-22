@@ -560,17 +560,18 @@ export const DUMMY_SALARIES = [
   { id: 'sal010', staffId: 'u010', staffName: 'Meena R',      month: 'October 2024',   basic: 27000, allowance: 3300, deduction: 1700, net: 28600, status: 'pending', paidOn: null },
 ];
 
-// ── OVERDUE DATA (BUNK ALLOCATIONS) ────────────────────────
-export const DUMMY_OVERDUE = [
-  { id: 'o001', clientId: 'c001', clientName: 'Indian Oil Petrol Bunk (IOCL) — Anna Salai', staffId: 's001', staffName: 'Anitha Devi',  task: 'Bunk Fuel Dispenser Shift Log Submission', dueDate: '2024-09-25', status: 'overdue',   overdueDays: 10, remarks: 'Waiting for manager signoff' },
-  { id: 'o002', clientId: 'c002', clientName: 'Bharat Petroleum Pump (BPCL) — Guindy',       staffId: 's002', staffName: 'Murugan P',    task: 'Cash Collection & POS Machine Reconciliation', dueDate: '2024-09-30', status: 'overdue',   overdueDays: 5,  remarks: 'Pending bank receipt voucher' },
-  { id: 'o003', clientId: 'c003', clientName: 'Hindustan Petroleum (HPCL) — OMR',            staffId: 's003', staffName: 'Deepa S',      task: 'Fuel Tank Dip Measurement & Density Test',     dueDate: '2024-10-08', status: 'completed', overdueDays: 0,  remarks: 'Completed on morning shift' },
-  { id: 'o004', clientId: 'c004', clientName: 'Shell Petrol Bunk — Sholinganallur',           staffId: 's004', staffName: 'Ravi Kumar',   task: 'Monthly Manpower Invoice Clearance',           dueDate: '2024-10-01', status: 'overdue',   overdueDays: 4,  remarks: 'Bunk dealer approval awaited' },
-  { id: 'o005', clientId: 'c005', clientName: 'Nayara Energy Fuel Pump — Poonamallee',       staffId: 's005', staffName: 'Lavanya M',    task: 'Safety Equipment & Fire Extinguisher Audit',   dueDate: '2024-10-10', status: 'pending',   overdueDays: 0,  remarks: 'Scheduled for evening shift' },
-  { id: 'o006', clientId: 'c006', clientName: 'Indian Oil Auto Care — Koyambedu',            staffId: 's006', staffName: 'Senthil K',    task: 'Overnight Highway Attendant Roster',           dueDate: '2024-09-28', status: 'overdue',   overdueDays: 7,  remarks: 'Standby staff assigned' },
-  { id: 'o007', clientId: 'c007', clientName: 'BPCL Fuel Station — Tambaram Sanatorium',     staffId: 's007', staffName: 'Meena R',      task: 'Attendant Uniform & Safety Shoes Issuance',   dueDate: '2024-10-12', status: 'pending',   overdueDays: 0,  remarks: 'Kit handover tomorrow' },
-  { id: 'o008', clientId: 'c008', clientName: 'HPCL Express Fuel — Velachery',               staffId: 's008', staffName: 'Vijay S',      task: 'Fuel Dispensing Nozzle Calibration Support',  dueDate: '2024-10-05', status: 'completed', overdueDays: 0,  remarks: 'Successfully inspected' },
+// ── TASKS DATA (BUNK ALLOCATIONS) ────────────────────────
+export const DUMMY_TASKS = [
+  { id: 'o001', clientId: 'c001', clientName: 'Indian Oil Petrol Bunk (IOCL) — Anna Salai', staffId: 's001', staffName: 'Anitha Devi',  task: 'Bunk Fuel Dispenser Shift Log Submission', dueDate: '2024-09-25', status: 'in_progress', remarks: 'Waiting for manager signoff' },
+  { id: 'o002', clientId: 'c002', clientName: 'Bharat Petroleum Pump (BPCL) — Guindy',       staffId: 's002', staffName: 'Murugan P',    task: 'Cash Collection & POS Machine Reconciliation', dueDate: '2024-09-30', status: 'in_progress', remarks: 'Pending bank receipt voucher' },
+  { id: 'o003', clientId: 'c003', clientName: 'Hindustan Petroleum (HPCL) — OMR',            staffId: 's003', staffName: 'Deepa S',      task: 'Fuel Tank Dip Measurement & Density Test',     dueDate: '2024-10-08', status: 'completed',   remarks: 'Completed on morning shift' },
+  { id: 'o004', clientId: 'c004', clientName: 'Shell Petrol Bunk — Sholinganallur',           staffId: 's004', staffName: 'Ravi Kumar',   task: 'Monthly Manpower Invoice Clearance',           dueDate: '2024-10-01', status: 'in_progress', remarks: 'Bunk dealer approval awaited' },
+  { id: 'o005', clientId: 'c005', clientName: 'Nayara Energy Fuel Pump — Poonamallee',       staffId: 's005', staffName: 'Lavanya M',    task: 'Safety Equipment & Fire Extinguisher Audit',   dueDate: '2024-10-10', status: 'pending',     remarks: 'Scheduled for evening shift' },
+  { id: 'o006', clientId: 'c006', clientName: 'Indian Oil Auto Care — Koyambedu',            staffId: 's006', staffName: 'Senthil K',    task: 'Overnight Highway Attendant Roster',           dueDate: '2024-09-28', status: 'in_progress', remarks: 'Standby staff assigned' },
+  { id: 'o007', clientId: 'c007', clientName: 'BPCL Fuel Station — Tambaram Sanatorium',     staffId: 's007', staffName: 'Meena R',      task: 'Attendant Uniform & Safety Shoes Issuance',   dueDate: '2024-10-12', status: 'pending',     remarks: 'Kit handover tomorrow' },
+  { id: 'o008', clientId: 'c008', clientName: 'HPCL Express Fuel — Velachery',               staffId: 's008', staffName: 'Vijay S',      task: 'Fuel Dispensing Nozzle Calibration Support',  dueDate: '2024-10-05', status: 'completed',   remarks: 'Successfully inspected' },
 ];
+export const DUMMY_OVERDUE = DUMMY_TASKS;
 
 // ── MANAGERS META ───────────────────────────────────────────
 export const DUMMY_MANAGERS = [
