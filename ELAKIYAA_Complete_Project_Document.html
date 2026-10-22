@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ELAKIYAA — Client & Workforce Management System | Official Documentation</title>
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --secondary: #7c3aed;
+      --accent: #059669;
+      --dark: #0f172a;
+      --slate: #475569;
+      --light-bg: #f8fafc;
+      --border: #e2e8f0;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+    body { background-color: #f1f5f9; color: var(--dark); line-height: 1.6; padding: 40px 20px; }
+    .doc-container { max-width: 900px; margin: 0 auto; background: #ffffff; padding: 60px 50px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.06); border: 1px solid var(--border); }
+    .header { text-align: center; border-bottom: 3px solid var(--primary); padding-bottom: 30px; margin-bottom: 40px; }
+    .header h1 { font-size: 28px; color: var(--primary-dark); letter-spacing: -0.5px; margin-bottom: 8px; text-transform: uppercase; }
+    .header .subtitle { font-size: 16px; color: var(--slate); font-weight: 500; }
+    .badges { display: flex; justify-content: center; gap: 10px; margin-top: 15px; flex-wrap: wrap; }
+    .badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; }
+    .badge-blue { background: #dbeafe; color: #1e40af; }
+    .badge-purple { background: #ede9fe; color: #5b21b6; }
+    .badge-green { background: #d1fae5; color: #065f46; }
+    .badge-orange { background: #ffedd5; color: #9a3412; }
+
+    .toc { background: var(--light-bg); border: 1px solid var(--border); border-radius: 12px; padding: 25px 30px; margin-bottom: 40px; }
+    .toc h3 { font-size: 16px; color: var(--dark); margin-bottom: 15px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .toc ul { list-style: none; display: grid; grid-template-columns: 1fr 1fr; gap: 8px 20px; }
+    .toc li a { color: var(--primary); text-decoration: none; font-size: 14px; font-weight: 500; }
+    .toc li a:hover { text-decoration: underline; }
+
+    .section { margin-bottom: 45px; }
+    .section-title { font-size: 20px; color: var(--dark); border-left: 5px solid var(--primary); padding-left: 12px; margin-bottom: 20px; }
+    p { margin-bottom: 14px; font-size: 14.5px; color: #334155; }
+    
+    .callout { background: #eff6ff; border-left: 4px solid var(--primary); padding: 16px 20px; border-radius: 0 8px 8px 0; margin-bottom: 20px; font-size: 14px; color: #1e3a8a; }
+    .callout-success { background: #f0fdf4; border-left-color: var(--accent); color: #064e3b; }
+
+    table { width: 100%; border-collapse: collapse; margin-bottom: 25px; font-size: 13.5px; }
+    th { background: #f8fafc; color: #334155; text-align: left; padding: 12px 14px; font-weight: 600; border-bottom: 2px solid var(--border); }
+    td { padding: 12px 14px; border-bottom: 1px solid var(--border); color: #334155; }
+    tr:hover { background-color: #fbfcfe; }
+
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 25px; }
+    .card { background: #ffffff; border: 1px solid var(--border); border-radius: 10px; padding: 20px; }
+    .card h4 { font-size: 15px; margin-bottom: 8px; color: var(--dark); display: flex; align-items: center; gap: 8px; }
+    .card p { font-size: 13px; color: var(--slate); margin-bottom: 0; }
+
+    code { background: #f1f5f9; padding: 2px 6px; border-radius: 4px; font-family: monospace; font-size: 12.5px; color: #be185d; }
+    pre { background: #0f172a; color: #f8fafc; padding: 18px; border-radius: 10px; overflow-x: auto; font-size: 12.5px; margin-bottom: 25px; line-height: 1.5; }
+
+    .print-btn { display: block; margin: 0 auto 30px auto; padding: 12px 28px; background: var(--primary); color: #ffffff; border: none; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; box-shadow: 0 4px 12px rgba(37,99,235,0.25); }
+    .print-btn:hover { background: var(--primary-dark); }
+
+    @media print {
+      body { background: #ffffff; padding: 0; }
+      .doc-container { box-shadow: none; border: none; padding: 0; }
+      .print-btn { display: none; }
+      .section { page-break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+
+  <button class="print-btn" onclick="window.print()">🖨️ Print Document / Save as PDF (Ctrl + P)</button>
+
+  <div class="doc-container">
+
+    <div class="header">
+      <h1>ELAKIYAA — Client & Workforce Management System</h1>
+      <div class="subtitle">Complete Technical Specification & Project Architecture Documentation</div>
+      <div class="badges">
+        <span class="badge badge-blue">React 19.3</span>
+        <span class="badge badge-purple">Vite 8</span>
+        <span class="badge badge-green">Supabase PostgreSQL</span>
+        <span class="badge badge-orange">Tailwind CSS 3.4</span>
+      </div>
+    </div>
+
+    <div class="toc">
+      <h3>📑 Table of Contents</h3>
+      <ul>
+        <li><a href="#section-1">1. Project Overview & Business Model</a></li>
+        <li><a href="#section-2">2. System Architecture & Tech Stack</a></li>
+        <li><a href="#section-3">3. Role-Based Access Control (RBAC)</a></li>
+        <li><a href="#section-4">4. Core System Modules & Features</a></li>
+        <li><a href="#section-5">5. Database Schema & Data Models</a></li>
+        <li><a href="#section-6">6. Evaluation & Demo Credentials</a></li>
+        <li><a href="#section-7">7. GitHub Code Navigation Guide</a></li>
+      </ul>
+    </div>
+
+    <!-- SECTION 1 -->
+    <div class="section" id="#section-1">
+      <h2 class="section-title">1. Project Overview & Business Model</h2>
+      <p>The <strong>ELAKIYAA Client & Workforce Management System</strong> is a cloud-based software platform engineered for <strong>ELAKIYAA</strong>, an enterprise <strong>Manpower Supply & Staffing Agency</strong>.</p>
+      
+      <div class="callout">
+        <strong>💡 Real-World Business Model:</strong><br>
+        • <strong>ELAKIYAA (The Company)</strong>: A manpower agency that recruits, manages, and supplies trained field attendants, security staff, and cashiers.<br>
+        • <strong>Clients (Petrol Bunks & Enterprises)</strong>: Indian Oil (IOCL), Bharat Petroleum (BPCL), Hindustan Petroleum (HPCL), Shell, Nayara Energy petrol bunks that hire workforce from ELAKIYAA.<br>
+        • <strong>Staff (The Workforce)</strong>: Employees deployed at client sites who perform daily shifts and record attendance.<br>
+        • <strong>Managers</strong>: Area supervisors from ELAKIYAA who inspect deployed staff and coordinate daily shift rosters.
+      </div>
+      
+      <p><strong>Primary Problem Solved:</strong> Eliminates ghost attendance, manual paper registers, untracked duty allocations, and billing disputes between the staffing agency and client petrol stations.</p>
+    </div>
+
+    <!-- SECTION 2 -->
+    <div class="section" id="#section-2">
+      <h2 class="section-title">2. System Architecture & Tech Stack</h2>
+      <p>The project follows a <strong>Modern Serverless Full Stack SaaS Architecture</strong>:</p>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Architecture Layer</th>
+            <th>Technology Used</th>
+            <th>Purpose</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Frontend Framework</strong></td>
+            <td>React 19 (Functional Components + Hooks)</td>
+            <td>High-performance reactive user interface with state isolation.</td>
+          </tr>
+          <tr>
+            <td><strong>Build System</strong></td>
+            <td>Vite 8.3.2</td>
+            <td>Ultra-fast HMR and optimized production bundle packaging (~2s builds).</td>
+          </tr>
+          <tr>
+            <td><strong>Styling & Design</strong></td>
+            <td>Tailwind CSS 3.4</td>
+            <td>Utility-first mobile responsive interface with consistent brand theming.</td>
+          </tr>
+          <tr>
+            <td><strong>Cloud Backend & Database</strong></td>
+            <td>Supabase (PostgreSQL Cloud)</td>
+            <td>Relational database storage, schema definitions, and RLS security policies.</td>
+          </tr>
+          <tr>
+            <td><strong>Hosting & CI/CD</strong></td>
+            <td>Vercel Global Edge Network</td>
+            <td>Automated build and continuous deployment connected to GitHub <code>main</code> branch.</td>
+          </tr>
+          <tr>
+            <td><strong>Hardware APIs</strong></td>
+            <td>WebRTC MediaStream + HTML5 Canvas</td>
+            <td>Live camera facial capture with automated GPS coordinate & time watermarking.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- SECTION 3 -->
+    <div class="section" id="#section-3">
+      <h2 class="section-title">3. Role-Based Access Control (4 Distinct Portals)</h2>
+      <p>The system provides secure, role-restricted portals for 4 classes of users:</p>
+
+      <div class="grid-2">
+        <div class="card">
+          <h4>👑 1. Admin Portal (<code>/admin</code>)</h4>
+          <p>Complete organizational oversight: User account governance, multi-staff task allocations, attendance overrides with audit logging, salary generation, and system shift configuration.</p>
+        </div>
+        <div class="card">
+          <h4>👔 2. Manager Portal (<code>/manager</code>)</h4>
+          <p>Supervises assigned staff teams, monitors client bunk operations, reviews and approves leave applications, and coordinates daily shift coverage.</p>
+        </div>
+        <div class="card">
+          <h4>👷 3. Staff Portal (<code>/staff</code>)</h4>
+          <p>Biometric camera punch-in/punch-out with live GPS stamp, task status progress updates, leave submission, and downloadable salary vouchers.</p>
+        </div>
+        <div class="card">
+          <h4>🏢 4. Client Portal (<code>/client</code>)</h4>
+          <p>Client bunk dealers monitor deployed staff on their site, confirm daily duty attendance ("Duty Confirm"), initiate direct phone calls, and download monthly invoices/contracts.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 4 -->
+    <div class="section" id="#section-4">
+      <h2 class="section-title">4. Core System Modules & Features</h2>
+      
+      <p><strong>1. Tamper-Proof Photographic Attendance:</strong></p>
+      <p>Staff capture their photo using their front device camera. The system reads real-time GPS coordinates and stamps Employee Name, Timestamp (HH:MM:SS), and City/Address directly onto the canvas. Punch-ins after 10:10 AM automatically calculate exact late penalty minutes.</p>
+
+      <p><strong>2. Multi-Staff & Multi-Client Task Delegation:</strong></p>
+      <p>Admins can select multiple staff members and multiple client bunks simultaneously in one assignment form. Progress tracks seamlessly from <code>Pending</code> ➔ <code>In Progress</code> ➔ <code>Completed</code>.</p>
+
+      <p><strong>3. Immutable Audit Logging:</strong></p>
+      <p>All sensitive operations (attendance edits, leave approvals, salary updates, account deactivations) append an immutable record into the audit log containing User, Action, Timestamp, and IP Address.</p>
+
+      <p><strong>4. Client Duty Confirmation:</strong></p>
+      <p>Petrol bunk dealers log in and click "Confirm Duty" for workers present at their station. This provides legal proof of attendance for monthly billing reconciliation.</p>
+    </div>
+
+    <!-- SECTION 5 -->
+    <div class="section" id="#section-5">
+      <h2 class="section-title">5. Database Schema & Data Models</h2>
+      <p>Located in <code>supabase/schema.sql</code>, the PostgreSQL relational schema includes:</p>
+
+      <pre><code>-- 1. USERS TABLE
+CREATE TABLE users (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    name VARCHAR(100) NOT NULL,
+    mobile VARCHAR(15) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    role VARCHAR(20) CHECK (role IN ('admin', 'manager', 'staff', 'client')),
+    photo TEXT,
+    status VARCHAR(20) DEFAULT 'active',
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- 2. ATTENDANCE TABLE (With Photographic & Geo Evidence)
+CREATE TABLE attendance (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    user_id UUID REFERENCES users(id),
+    date DATE NOT NULL,
+    punch_in TIME,
+    punch_out TIME,
+    status VARCHAR(20) CHECK (status IN ('present', 'absent', 'late')),
+    late_minutes INT DEFAULT 0,
+    photo_url TEXT,
+    location_address TEXT,
+    coordinates POINT
+);
+
+-- 3. TASKS TABLE (Multi-Entity Allocation)
+CREATE TABLE tasks (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    title VARCHAR(255) NOT NULL,
+    due_date DATE NOT NULL,
+    priority VARCHAR(20) CHECK (priority IN ('high', 'medium', 'low')),
+    status VARCHAR(20) CHECK (status IN ('pending', 'in_progress', 'completed')),
+    remarks TEXT
+);
+
+-- 4. AUDIT LOGS (Immutable Activity Log)
+CREATE TABLE audit_logs (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    user_name VARCHAR(100),
+    action VARCHAR(50),
+    module VARCHAR(50),
+    description TEXT,
+    ip_address VARCHAR(45),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);</code></pre>
+    </div>
+
+    <!-- SECTION 6 -->
+    <div class="section" id="#section-6">
+      <h2 class="section-title">6. Evaluation & Demo Credentials</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Role</th>
+            <th>Sample User</th>
+            <th>Mobile Number</th>
+            <th>Password</th>
+            <th>Primary Portal</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>👑 System Admin</strong></td>
+            <td>Arjun Sharma</td>
+            <td><code>9000000001</code></td>
+            <td><code>admin123</code></td>
+            <td><code>/admin</code></td>
+          </tr>
+          <tr>
+            <td><strong>👔 Operations Manager</strong></td>
+            <td>Priya Nair</td>
+            <td><code>9000000002</code></td>
+            <td><code>manager123</code></td>
+            <td><code>/manager</code></td>
+          </tr>
+          <tr>
+            <td><strong>👷 Field Staff</strong></td>
+            <td>Anitha Devi</td>
+            <td><code>9000000004</code></td>
+            <td><code>staff123</code></td>
+            <td><code>/staff</code></td>
+          </tr>
+          <tr>
+            <td><strong>🏢 Client (Bunk Dealer)</strong></td>
+            <td>Indian Oil Petrol Bunk</td>
+            <td><code>9100000001</code></td>
+            <td><code>client123</code></td>
+            <td><code>/client</code></td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="callout callout-success">
+        ⚡ <strong>Evaluator Tip:</strong> On the live login page at <a href="https://client-management-system-iota.vercel.app">https://client-management-system-iota.vercel.app</a>, click any of the 4 quick test pills to instantly log in without typing credentials!
+      </div>
+    </div>
+
+    <!-- SECTION 7 -->
+    <div class="section" id="#section-7">
+      <h2 class="section-title">7. GitHub Code Navigation Guide</h2>
+      <p>When reviewing the GitHub repository (<code>https://github.com/indhurahul1108-lgtm/client-management-system</code>), use this map to inspect files:</p>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Directory / File</th>
+            <th>Contents & Code Location</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>frontend/src/pages/admin/</code></td>
+            <td><strong>13 Admin Pages</strong>: Dashboard, Assign Tasks, Manage Staff, Attendance, Salary, Audit Log, User Management, System Settings.</td>
+          </tr>
+          <tr>
+            <td><code>frontend/src/pages/manager/</code></td>
+            <td><strong>10 Manager Pages</strong>: Staff Roster, Client Oversight, Attendance Review, Leave Approval, Team Tasks.</td>
+          </tr>
+          <tr>
+            <td><code>frontend/src/pages/staff/</code></td>
+            <td><strong>Staff Pages</strong>: Camera Punch In/Out (<code>Attendance.jsx</code>), Work Updates (<code>StaffWork.jsx</code>), Payslips, Leaves.</td>
+          </tr>
+          <tr>
+            <td><code>frontend/src/pages/client/</code></td>
+            <td><strong>Client Pages</strong>: Duty Confirmation (<code>ClientDashboard.jsx</code>), Work Monitoring, Document Locker, Service Requests.</td>
+          </tr>
+          <tr>
+            <td><code>frontend/src/context/</code></td>
+            <td><code>AuthContext.jsx</code>: Session management, role-based route protection, login/logout functions.</td>
+          </tr>
+          <tr>
+            <td><code>supabase/</code></td>
+            <td><code>schema.sql</code> & <code>seed.sql</code>: PostgreSQL relational database tables, foreign keys, and seed records.</td>
+          </tr>
+          <tr>
+            <td><code>README.md</code> & <code>DOCUMENTATION.md</code></td>
+            <td>Full system documentation viewable directly on GitHub repository homepage.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+
+</body>
+</html>
