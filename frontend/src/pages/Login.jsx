@@ -57,10 +57,10 @@ export default function Login() {
 
   // Quick-fill sample accounts
   const DEMOS = [
-    { label: 'Admin',   sub: 'Arjun',   mobile: '9000000001', password: 'admin123',   color: 'bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100' },
-    { label: 'Manager', sub: 'Priya',   mobile: '9000000002', password: 'manager123', color: 'bg-purple-50 text-purple-700 border-purple-200 hover:bg-purple-100' },
-    { label: 'Staff',   sub: 'Anitha',  mobile: '9000000004', password: 'staff123',   color: 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100' },
-    { label: 'Client',  sub: 'Karthik', mobile: '9100000001', password: 'client123',  color: 'bg-orange-50 text-orange-700 border-orange-200 hover:bg-orange-100' },
+    { label: 'Admin',   sub: 'Arjun',        mobile: '9000000001', password: 'admin123',   color: 'bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100' },
+    { label: 'Manager', sub: 'Priya',        mobile: '9000000002', password: 'manager123', color: 'bg-purple-50 text-purple-700 border-purple-200 hover:bg-purple-100' },
+    { label: 'Staff',   sub: 'Anitha',       mobile: '9000000004', password: 'staff123',   color: 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100' },
+    { label: 'Client',  sub: 'IOCL Bunk',    mobile: '9100000001', password: 'client123',  color: 'bg-orange-50 text-orange-700 border-orange-200 hover:bg-orange-100' },
   ];
 
   const modalUsers = DUMMY_USERS.filter(u => u.role === modalTab);
